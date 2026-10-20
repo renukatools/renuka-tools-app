@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renuka Tools - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Master Control</h1>
+        <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold hidden">Log Out</button>
+    </nav>
+
+    <!-- Authentication Screen -->
+    <div id="loginSection" class="max-w-md mx-auto mt-20 bg-white p-8 border rounded shadow">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Admin Login</h2>
+        <input type="email" id="email" placeholder="Admin Email" class="w-full border p-2 mb-4 rounded focus:ring-2 focus:ring-blue-500">
+        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded focus:ring-2 focus:ring-blue-500">
+        <button id="loginBtn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-bold">Secure Login</button>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="dashboardSection" class="max-w-7xl mx-auto mt-8 p-4 hidden">
+        
+        <!-- Tab Navigation -->
+        <div class="flex space-x-2 border-b mb-6">
+            <button id="tabCustomers" class="tab-btn active-tab px-4 py-2 bg-white border-t border-l border-r rounded-t font-bold text-blue-900">Customer Tiers</button>
+            <button id="tabTools" class="tab-btn px-4 py-2 text-gray-600 hover:text-blue-900 font-bold">Tool Categories</button>
+            <button id="tabMaterials" class="tab-btn px-4 py-2 text-gray-600 hover:text-blue-900 font-bold">Raw Materials</button>
+        </div>
+
+        <!-- 1. CUSTOMER TIERS SECTION -->
+        <div id="sectionCustomers" class="tab-section bg-white p-6 rounded shadow border">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Customer Tier Margins</h3>
+                <button id="addCustomerBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">+ Add Tier</button>
+            </div>
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-100 text-gray-600 text-sm border-b">
+                    <tr><th class="p-3">Tier Name</th><th class="p-3">Base Floor Margin (%)</th><th class="p-3">Trading Margin (%)</th><th class="p-3">Actions</th></tr>
+                </thead>
+                <tbody id="customerTable"></tbody>
+            </table>
+        </div>
+
+        <!-- 2. TOOL CATEGORIES SECTION -->
+        <div id="sectionTools" class="tab-section bg-white p-6 rounded shadow border hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Tool Categories & Pricing Escalation</h3>
+                <button id="addToolBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">+ Add Category</button>
+            </div>
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-100 text-gray-600 text-sm border-b">
+                    <tr><th class="p-3">Category Name</th><th class="p-3">Criticality Modifier (%)</th><th class="p-3">Escalation Markup (%)</th><th class="p-3">Actions</th></tr>
+                </thead>
+                <tbody id="toolTable"></tbody>
+            </table>
+        </div>
+
+        <!-- 3. RAW MATERIALS SECTION -->
+        <div id="sectionMaterials" class="tab-section bg-white p-6 rounded shadow border hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Raw Materials</h3>
+                <button id="addMaterialBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">+ Add Material</button>
+            </div>
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-100 text-gray-600 text-sm border-b">
+                    <tr><th class="p-3">Grade / Type</th><th class="p-3">Density (g/cm³)</th><th class="p-3">Cost (₹/kg)</th><th class="p-3">Actions</th></tr>
+                </thead>
+                <tbody id="materialTable"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- SHARED MODAL FOR ALL DATA ENTRY -->
+    <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded shadow-lg w-96">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4 text-gray-800">Add Item</h3>
+            <input type="hidden" id="docId">
+            <input type="hidden" id="collectionName">
+            
+            <div class="mb-4">
+                <label id="label1" class="block text-sm font-bold mb-1 text-gray-700">Name</label>
+                <input type="text" id="input1" class="w-full border p-2 rounded">
+            </div>
+            <div class="mb-4">
+                <label id="label2" class="block text-sm font-bold mb-1 text-gray-700">Param 1</label>
+                <input type="number" step="0.01" id="input2" class="w-full border p-2 rounded">
+            </div>
+            <div class="mb-6">
+                <label id="label3" class="block text-sm font-bold mb-1 text-gray-700">Param 2</label>
+                <input type="number" step="0.01" id="input3" class="w-full border p-2 rounded">
+            </div>
+            
+            <div class="flex justify-end space-x-2">
+                <button id="cancelModalBtn" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+                <button id="saveDataBtn" class="px-4 py-2 bg-blue-600 text-white font-bold rounded">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+        // === REPLACE WITH YOUR CONFIG ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
+  authDomain: "renuka-tools-quote.firebaseapp.com",
+  databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "renuka-tools-quote",
+  storageBucket: "renuka-tools-quote.firebasestorage.app",
+  messagingSenderId: "300959855269",
+  appId: "1:300959855269:web:d8d19e979ac3616b10934c",
+  measurementId: "G-H4LKDQGG0P"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- AUTHENTICATION ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                loadAllData();
+            } else {
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('dashboardSection').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
+                .catch(err => alert("Invalid credentials"));
+        });
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        // --- TAB NAVIGATION ---
+        const tabs = {
+            'tabCustomers': 'sectionCustomers',
+            'tabTools': 'sectionTools',
+            'tabMaterials': 'sectionMaterials'
+        };
+
+        Object.keys(tabs).forEach(tabId => {
+            document.getElementById(tabId).addEventListener('click', (e) => {
+                // Reset styles
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t', 'text-blue-900');
+                    btn.classList.add('text-gray-600');
+                });
+                document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+                
+                // Set active
+                e.target.classList.add('bg-white', 'border-t', 'border-l', 'border-r', 'rounded-t', 'text-blue-900');
+                e.target.classList.remove('text-gray-600');
+                document.getElementById(tabs[tabId]).classList.remove('hidden');
+            });
+        });
+
+        // --- MODAL LOGIC ---
+        const modal = document.getElementById('dataModal');
+        
+        function openModal(title, colName, l1, l2, l3, id="", val1="", val2="", val3="") {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('collectionName').value = colName;
+            document.getElementById('docId').value = id;
+            
+            document.getElementById('label1').innerText = l1;
+            document.getElementById('label2').innerText = l2;
+            document.getElementById('label3').innerText = l3;
+            
+            document.getElementById('input1').value = val1;
+            document.getElementById('input2').value = val2;
+            document.getElementById('input3').value = val3;
+            
+            modal.classList.remove('hidden');
+        }
+
+        document.getElementById('cancelModalBtn').addEventListener('click', () => modal.classList.add('hidden'));
+
+        // Open specific modals for adding
+        document.getElementById('addCustomerBtn').addEventListener('click', () => 
+            openModal("Add Customer Tier", "customer_tiers", "Tier Name", "Base Floor Margin (%)", "Trading Margin (%)"));
+            
+        document.getElementById('addToolBtn').addEventListener('click', () => 
+            openModal("Add Tool Category", "tool_categories", "Category Name", "Criticality Modifier (%)", "Escalation Markup (%)"));
+            
+        document.getElementById('addMaterialBtn').addEventListener('click', () => 
+            openModal("Add Raw Material", "raw_materials", "Grade / Type", "Density (g/cm³)", "Cost (₹/kg)"));
+
+        // Save Data
+        document.getElementById('saveDataBtn').addEventListener('click', async () => {
+            const col = document.getElementById('collectionName').value;
+            const id = document.getElementById('docId').value;
+            
+            // Standardized data object
+            const dataObj = {
+                name: document.getElementById('input1').value,
+                param1: Number(document.getElementById('input2').value),
+                param2: Number(document.getElementById('input3').value)
+            };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, col, id), dataObj);
+                } else {
+                    await addDoc(collection(db, col), dataObj);
+                }
+                modal.classList.add('hidden');
+                loadAllData();
+            } catch (err) {
+                alert("Error saving data: " + err.message);
+            }
+        });
+
+        // --- LOAD DATA FROM FIREBASE ---
+        async function loadAllData() {
+            // 1. Load Customers
+            let custHTML = "";
+            const custSnap = await getDocs(collection(db, "customer_tiers"));
+            custSnap.forEach(doc => {
+                const d = doc.data();
+                custHTML += `<tr class="border-b">
+                    <td class="p-3">${d.name}</td><td class="p-3">${d.param1}%</td><td class="p-3">${d.param2}%</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 mr-2" onclick="window.editItem('customer_tiers','${doc.id}','${d.name}',${d.param1},${d.param2}, 'Edit Tier', 'Tier Name', 'Floor Margin (%)', 'Trading Margin (%)')">Edit</button>
+                        <button class="text-red-600" onclick="window.deleteItem('customer_tiers','${doc.id}')">Delete</button>
+                    </td></tr>`;
+            });
+            document.getElementById('customerTable').innerHTML = custHTML;
+
+            // 2. Load Tools
+            let toolHTML = "";
+            const toolSnap = await getDocs(collection(db, "tool_categories"));
+            toolSnap.forEach(doc => {
+                const d = doc.data();
+                toolHTML += `<tr class="border-b">
+                    <td class="p-3">${d.name}</td><td class="p-3">+${d.param1}%</td><td class="p-3">${d.param2}%</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 mr-2" onclick="window.editItem('tool_categories','${doc.id}','${d.name}',${d.param1},${d.param2}, 'Edit Category', 'Category Name', 'Criticality (%)', 'Escalation (%)')">Edit</button>
+                        <button class="text-red-600" onclick="window.deleteItem('tool_categories','${doc.id}')">Delete</button>
+                    </td></tr>`;
+            });
+            document.getElementById('toolTable').innerHTML = toolHTML;
+
+            // 3. Load Materials
+            let matHTML = "";
+            const matSnap = await getDocs(collection(db, "raw_materials"));
+            matSnap.forEach(doc => {
+                const d = doc.data();
+                matHTML += `<tr class="border-b">
+                    <td class="p-3">${d.name}</td><td class="p-3">${d.param1}</td><td class="p-3">₹ ${d.param2}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 mr-2" onclick="window.editItem('raw_materials','${doc.id}','${d.name}',${d.param1},${d.param2}, 'Edit Material', 'Grade', 'Density', 'Cost')">Edit</button>
+                        <button class="text-red-600" onclick="window.deleteItem('raw_materials','${doc.id}')">Delete</button>
+                    </td></tr>`;
+            });
+            document.getElementById('materialTable').innerHTML = matHTML;
+        }
+
+        // Global functions for inline HTML buttons
+        window.editItem = (col, id, val1, val2, val3, title, l1, l2, l3) => {
+            openModal(title, col, l1, l2, l3, id, val1, val2, val3);
+        };
+
+        window.deleteItem = async (col, id) => {
+            if (confirm("Are you sure you want to delete this master record?")) {
+                await deleteDoc(doc(db, col, id));
+                loadAllData();
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renuka Tools | Sales Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Quote Generator</h1>
+        <button id="logoutBtn" class="bg-red-600 px-4 py-2 rounded text-sm font-bold hidden">Log Out</button>
+    </nav>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="max-w-md mx-auto mt-20 bg-white p-8 rounded shadow border">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Sales Login</h2>
+        <input type="email" id="email" placeholder="Email" class="w-full border p-2 mb-4 rounded">
+        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded">
+        <button id="loginBtn" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">Login</button>
+    </div>
+
+    <!-- Main Calculator Screen -->
+    <div id="appScreen" class="max-w-6xl mx-auto mt-8 p-4 hidden grid grid-cols-3 gap-6">
+        
+        <!-- Input Column -->
+        <div class="col-span-2 bg-white p-6 rounded shadow border">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">1. Tool Geometry & Customer</h3>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700">Customer Tier</label>
+                    <select id="custTier" class="w-full border p-2 rounded">
+                        <option value="25">Authorised Distributor (25% Floor)</option>
+                        <option value="40">Large Account / OEM (40% Floor)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700">Tool Type Category</label>
+                    <select id="toolTier" class="w-full border p-2 rounded">
+                        <option value="100">Custom Indexable Tool (100% Escalation)</option>
+                    </select>
+                </div>
+            </div>
+
+            <h4 class="font-bold text-gray-700 mb-2">Stepped Dimensions (mm)</h4>
+            <div class="grid grid-cols-3 gap-4 mb-4 bg-gray-50 p-4 rounded border">
+                <div>
+                    <label class="block text-sm">Shank Dia</label>
+                    <input type="number" id="shankDia" value="32" class="w-full border p-2 rounded mb-2">
+                    <label class="block text-sm">Shank Length</label>
+                    <input type="number" id="shankLen" value="100" class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block text-sm">Collar Dia</label>
+                    <input type="number" id="collarDia" value="80" class="w-full border p-2 rounded mb-2">
+                    <label class="block text-sm">Collar Length</label>
+                    <input type="number" id="collarLen" value="20" class="w-full border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block text-sm">Head Dia</label>
+                    <input type="number" id="headDia" value="63" class="w-full border p-2 rounded mb-2">
+                    <label class="block text-sm">Head Length</label>
+                    <input type="number" id="headLen" value="50" class="w-full border p-2 rounded">
+                </div>
+            </div>
+
+            <button id="calculateBtn" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700">Calculate Quote</button>
+        </div>
+
+        <!-- Output Column -->
+        <div class="col-span-1">
+            <div class="bg-gray-800 text-white p-6 rounded shadow mb-4">
+                <h3 class="text-lg font-bold mb-4 border-b border-gray-600 pb-2">Quote Summary</h3>
+                <p class="text-sm text-gray-400 mb-1">Target Quote Price</p>
+                <p class="text-3xl font-bold text-green-400 mb-4" id="outQuote">₹ 0.00</p>
+                
+                <p class="text-sm text-gray-400 mb-1">Max Permissible Discount</p>
+                <p class="text-2xl font-bold text-yellow-400 mb-6" id="outDiscount">0.0%</p>
+                
+                <button id="pdfBtn" class="w-full bg-blue-600 p-2 rounded font-bold hover:bg-blue-700">Download PDF Quote</button>
+            </div>
+
+            <!-- Admin Only Cost Audit Box -->
+            <div class="bg-white p-4 rounded shadow border">
+                <h4 class="text-sm font-bold text-gray-700 mb-2">Admin Cost Audit (Hidden from Print)</h4>
+                <p class="text-xs text-gray-500">Raw Material Sizing: <span id="outRaw">0 x 0 mm</span></p>
+                <p class="text-xs text-gray-500">Base Mfg Cost: <span id="outBase">₹ 0.00</span></p>
+                <p class="text-xs text-gray-500">No-Regret Floor Price: <span id="outFloor">₹ 0.00</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic Script -->
+    <script type="module">
+        // 1. ADD YOUR FIREBASE CONFIG HERE
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
+  authDomain: "renuka-tools-quote.firebaseapp.com",
+  databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "renuka-tools-quote",
+  storageBucket: "renuka-tools-quote.firebasestorage.app",
+  messagingSenderId: "300959855269",
+  appId: "1:300959855269:web:d8d19e979ac3616b10934c",
+  measurementId: "G-H4LKDQGG0P"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Auth Logic
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('appScreen').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.add('hidden');
+            }
+        });
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
+                .catch(() => alert("Invalid credentials"));
+        });
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        // Core Calculator Engine Logic
+        document.getElementById('calculateBtn').addEventListener('click', () => {
+            // 1. Fetch Stepped Inputs
+            let sDia = Number(document.getElementById('shankDia').value);
+            let sLen = Number(document.getElementById('shankLen').value);
+            let cDia = Number(document.getElementById('collarDia').value);
+            let cLen = Number(document.getElementById('collarLen').value);
+            let hDia = Number(document.getElementById('headDia').value);
+            let hLen = Number(document.getElementById('headLen').value);
+
+            // 2. Bounding Box Logic for Raw Material
+            let maxDia = Math.max(sDia, cDia, hDia) + 10; 
+            let totalLen = sLen + cLen + hLen + 10;
+            document.getElementById('outRaw').innerText = `Dia ${maxDia} mm × L ${totalLen} mm`;
+
+            // 3. Weight & Cost Simulation (Assuming EN24 density & Rs. 150/kg)
+            let radius = maxDia / 20; // convert to cm
+            let lengthCm = totalLen / 10;
+            let volume = Math.PI * (radius * radius) * lengthCm; 
+            let weightKg = (volume * 7.85) / 1000; 
+            let baseMaterialCost = weightKg * 150; 
+            
+            // Dummy Machining Cost (Rs. 800/hr) + Assembly operations
+            let baseMachiningCost = 4500; 
+            let totalBaseCost = baseMaterialCost + baseMachiningCost;
+
+            // 4. Margin Mathematics
+            let floorMarginPercent = Number(document.getElementById('custTier').value);
+            let escalationPercent = Number(document.getElementById('toolTier').value);
+
+            let floorPrice = totalBaseCost * (1 + (floorMarginPercent / 100));
+            let quotePrice = totalBaseCost * (1 + (escalationPercent / 100));
+            let maxDiscount = ((quotePrice - floorPrice) / quotePrice) * 100;
+
+            // 5. Update Screen
+            document.getElementById('outBase').innerText = `₹ ${totalBaseCost.toFixed(2)}`;
+            document.getElementById('outFloor').innerText = `₹ ${floorPrice.toFixed(2)}`;
+            document.getElementById('outQuote').innerText = `₹ ${quotePrice.toFixed(2)}`;
+            document.getElementById('outDiscount').innerText = `${maxDiscount.toFixed(1)}%`;
+        });
+
+        // Basic PDF Generator logic
+        document.getElementById('pdfBtn').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(22);
+            doc.text("RENUKA TOOLS", 20, 20);
+            doc.setFontSize(12);
+            doc.text("Quotation: RT-202610-001", 20, 30);
+            doc.text("Target Price: " + document.getElementById('outQuote').innerText, 20, 50);
+            doc.save("Renuka_Tools_Quote.pdf");
+        });
+    </script>
+</body>
+</html>
