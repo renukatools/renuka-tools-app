@@ -1,72 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renuka Tools | ERP Admin Control</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Renuka Tools | ERP Admin Control</title>
+    <script src="https://cdn.tailwindcss.com"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>.custom-scrollbar::-webkit-scrollbar{width:6px;height:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}.active-nav{background-color:#1e40af;border-left:4px solid #60a5fa;color:white}</style>
 </head>
 <body class="bg-gray-100 h-screen flex overflow-hidden font-sans">
-    <div id="loginSection" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center hidden">
-        <div class="max-w-md w-full bg-white p-8 border rounded shadow-lg">
-            <h2 class="text-2xl font-bold text-center text-gray-800 tracking-wide mb-6">RENUKA TOOLS<br><span class="text-sm text-gray-500">Master Admin Secure Login</span></h2>
-            <input type="email" id="email" placeholder="Admin Email" class="w-full border p-3 mb-4 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-            <input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-            <button id="loginBtn" class="w-full bg-blue-700 text-white p-3 rounded font-bold hover:bg-blue-800 shadow transition">Access Master DB</button>
-        </div>
-    </div>
+    <div id="loginSection" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center hidden"><div class="max-w-md w-full bg-white p-8 border rounded shadow-lg"><h2 class="text-2xl font-bold text-center text-gray-800 tracking-wide mb-6">RENUKA TOOLS<br><span class="text-sm text-gray-500">Admin Authentication</span></h2><input type="email" id="email" placeholder="Admin Email" class="w-full border p-3 mb-4 rounded focus:ring-2 focus:ring-blue-500 outline-none"><input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded focus:ring-2 focus:ring-blue-500 outline-none"><button id="loginBtn" class="w-full bg-blue-700 text-white p-3 rounded font-bold hover:bg-blue-800 shadow">Secure Login</button></div></div>
 
-    <!-- LEFT SIDEBAR -->
     <div id="sidebar" class="w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl z-20">
         <div class="p-5 bg-gray-950 border-b border-gray-800"><h1 class="text-xl font-bold text-white tracking-wider">ERP ADMIN</h1><p class="text-xs text-blue-400 mt-1">Master Data Control</p></div>
         <div class="flex-1 overflow-y-auto custom-scrollbar py-4">
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">CRM & Access</p></div><div id="nav-crm" class="space-y-1 mb-4"></div>
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Manufacturing Engine</p></div><div id="nav-mfg" class="space-y-1 mb-4"></div>
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Commercial & Spares</p></div><div id="nav-com" class="space-y-1 mb-4"></div>
-            
             <div class="px-4 mt-6 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">System Settings</p></div>
             <button onclick="window.showProfile()" id="btnProfile" class="w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-gray-400">🏢 Company Profile</button>
         </div>
-        <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2">
-            <button id="schemaBuilderBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded text-sm font-bold shadow transition">⚙️ Custom Master</button>
-            <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button>
-        </div>
+        <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2"><button id="schemaBuilderBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded text-sm font-bold shadow transition">⚙️ Custom Master</button><button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button></div>
     </div>
 
-    <!-- MAIN CONTENT AREA -->
     <div class="flex-1 flex flex-col h-full bg-gray-50">
         <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center z-10"><h2 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h2><div class="flex space-x-3" id="topActionButtons"></div></header>
         <main class="flex-1 overflow-y-auto p-6 custom-scrollbar">
-            
             <div id="tableContainer" class="bg-white rounded-lg shadow border min-h-[500px]"></div>
-            
             <div id="profileContainer" class="hidden bg-white rounded-lg shadow border p-8 max-w-4xl mx-auto">
                 <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Global Organization Profile</h3>
                 <div class="grid grid-cols-2 gap-6">
-                    <div class="col-span-2 flex items-center space-x-4">
-                        <div class="w-24 h-24 bg-gray-100 border rounded flex items-center justify-center overflow-hidden shadow-inner"><img id="logoPreview" class="max-h-full hidden"></div>
-                        <div><label class="block text-xs font-bold mb-1 text-gray-600">Company Logo (For UI & PDF)</label><input type="file" id="logoUpload" accept="image/*" class="text-sm"><p class="text-[10px] text-gray-500 mt-1">Replaces text header on PDF.</p></div>
-                    </div>
-                    <div><label class="block text-xs font-bold mb-1">Company Name</label><input type="text" id="cpName" class="w-full border p-2 rounded text-sm font-bold" value="RENUKA TOOLS"></div>
-                    <div><label class="block text-xs font-bold mb-1">Email Address</label><input type="text" id="cpEmail" class="w-full border p-2 rounded text-sm" value="sales@renukatools.in"></div>
-                    <div class="col-span-2"><label class="block text-xs font-bold mb-1">Registered Address</label><input type="text" id="cpAddress" class="w-full border p-2 rounded text-sm" value="M.I.D.C Waluj, Chhatrapati Sambhajinagar, Maharashtra, India"></div>
-                    <div><label class="block text-xs font-bold mb-1">GST Number</label><input type="text" id="cpGst" class="w-full border p-2 rounded text-sm font-semibold text-blue-800"></div>
-                    <div><label class="block text-xs font-bold mb-1">PAN Number</label><input type="text" id="cpPan" class="w-full border p-2 rounded text-sm font-semibold"></div>
-                    <div><label class="block text-xs font-bold mb-1">IEC Code</label><input type="text" id="cpIec" class="w-full border p-2 rounded text-sm"></div>
-                    <div><label class="block text-xs font-bold mb-1">Phone / Mobile</label><input type="text" id="cpPhone" class="w-full border p-2 rounded text-sm"></div>
-                    <div class="col-span-2"><label class="block text-xs font-bold mb-1">Bank Details (For PDF Footer)</label><input type="text" id="cpBank" class="w-full border p-2 rounded text-sm" placeholder="Bank Name | A/c: XXXXX | IFSC: YYYYY"></div>
+                    <div class="col-span-2 flex items-center space-x-4"><div class="w-24 h-24 bg-gray-100 border rounded flex items-center justify-center overflow-hidden shadow-inner"><img id="logoPreview" class="max-h-full hidden"></div><div><label class="block text-xs font-bold mb-1 text-gray-600">Company Logo</label><input type="file" id="logoUpload" accept="image/*" class="text-sm"></div></div>
+                    <div><label class="block text-xs font-bold mb-1">Company Name</label><input type="text" id="cpName" class="w-full border p-2 rounded text-sm font-bold" value="RENUKA TOOLS"></div><div><label class="block text-xs font-bold mb-1">Email Address</label><input type="text" id="cpEmail" class="w-full border p-2 rounded text-sm"></div>
+                    <div class="col-span-2"><label class="block text-xs font-bold mb-1">Registered Address</label><input type="text" id="cpAddress" class="w-full border p-2 rounded text-sm"></div>
+                    <div><label class="block text-xs font-bold mb-1">GST Number</label><input type="text" id="cpGst" class="w-full border p-2 rounded text-sm"></div><div><label class="block text-xs font-bold mb-1">PAN Number</label><input type="text" id="cpPan" class="w-full border p-2 rounded text-sm"></div>
+                    <div><label class="block text-xs font-bold mb-1">IEC Code</label><input type="text" id="cpIec" class="w-full border p-2 rounded text-sm"></div><div><label class="block text-xs font-bold mb-1">Phone / Mobile</label><input type="text" id="cpPhone" class="w-full border p-2 rounded text-sm"></div>
+                    <div class="col-span-2"><label class="block text-xs font-bold mb-1">Bank Details (For PDF Footer)</label><input type="text" id="cpBank" class="w-full border p-2 rounded text-sm"></div>
                 </div>
                 <div class="mt-8 pt-4 border-t text-right"><button id="saveProfileBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded font-bold shadow transition">💾 Save Organization Profile</button></div>
             </div>
-
         </main>
     </div>
 
     <input type="file" id="excelUpload" class="hidden" accept=".xlsx, .xls">
 
-    <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 backdrop-blur-sm"><div class="bg-white p-6 rounded-lg shadow-2xl w-[450px]"><div class="flex justify-between items-center mb-5 border-b pb-3"><h3 id="modalTitle" class="text-xl font-bold text-gray-800">Add Record</h3><div class="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full border"><input type="checkbox" id="isActive" class="w-4 h-4 text-blue-600 rounded cursor-pointer" checked><label class="text-xs font-bold text-gray-700 cursor-pointer" for="isActive">Active</label></div></div><input type="hidden" id="activeCollection"><input type="hidden" id="activeDocId"><div class="space-y-4"><div id="grp1"><label id="lbl1" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp1" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold text-gray-800"></div><div class="hidden" id="grp2"><label id="lbl2" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp2" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"><select id="sel2" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"></select></div><div class="hidden" id="grp3"><label id="lbl3" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp3" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"><select id="sel3" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"></select><div id="multiCheck3" class="hidden max-h-40 overflow-y-auto border p-3 rounded bg-blue-50 space-y-2"></div></div><div class="hidden" id="grp4"><label id="lbl4" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp4" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"><select id="sel4" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"><option value="No">No (Strict Lock)</option><option value="Yes">Yes (Allow Override)</option></select></div></div><div class="flex justify-end space-x-3 border-t mt-6 pt-4"><button id="cancelModalBtn" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold transition">Cancel</button><button id="saveDataBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded shadow transition">Save Record</button></div></div></div>
+    <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 backdrop-blur-sm"><div class="bg-white p-6 rounded-lg shadow-2xl w-[450px]"><div class="flex justify-between items-center mb-5 border-b pb-3"><h3 id="modalTitle" class="text-xl font-bold text-gray-800">Add Record</h3><div class="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full border"><input type="checkbox" id="isActive" class="w-4 h-4 text-blue-600 rounded cursor-pointer" checked><label class="text-xs font-bold text-gray-700 cursor-pointer" for="isActive">Active</label></div></div><input type="hidden" id="activeCollection"><input type="hidden" id="activeDocId"><div class="space-y-4">
+        <div id="grp1"><label id="lbl1" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp1" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold text-gray-800"></div>
+        <div class="hidden" id="grp2"><label id="lbl2" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp2" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"><select id="sel2" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"></select></div>
+        <div class="hidden" id="grp3"><label id="lbl3" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp3" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"><select id="sel3" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"></select><div id="multiCheck3" class="hidden max-h-40 overflow-y-auto border p-3 rounded bg-blue-50 space-y-2"></div></div>
+        <div class="hidden" id="grp4"><label id="lbl4" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp4" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"><select id="sel4" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+        <div class="hidden" id="grp5"><label id="lbl5" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><select id="sel5" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+    </div><div class="flex justify-end space-x-3 border-t mt-6 pt-4"><button id="cancelModalBtn" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold">Cancel</button><button id="saveDataBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded shadow">Save Record</button></div></div></div>
 
     <div id="schemaModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 backdrop-blur-sm"><div class="bg-white p-6 rounded-lg shadow-2xl w-[500px]"><h3 class="text-xl font-bold mb-4 text-purple-800 border-b pb-2">Define Custom Master</h3><label class="block text-xs font-bold mb-1 uppercase text-gray-600">Master Title</label><input type="text" id="schTitle" class="w-full border p-2 rounded mb-4 text-sm" placeholder="e.g. Agent Commission"><label class="block text-xs font-bold mb-1 uppercase text-gray-600">Calculation Behavior</label><select id="schBehavior" class="w-full border p-2 rounded mb-4 bg-purple-50 text-sm font-semibold"><option value="flat">Flat Cost Adder (₹)</option><option value="variable">Variable Cost Adder (₹ × Qty/Hrs)</option><option value="percentage">MRP Percentage Adder (%)</option><option value="margin">Margin Modifier (%)</option><option value="lookup">Standalone Lookup (Dropdown only)</option><option value="crm">CRM Relational Data</option></select><label class="block text-xs font-bold mb-1 uppercase text-gray-600">Data Columns Needed</label><select id="schType" class="w-full border p-2 rounded mb-4 text-sm"><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option><option value="4">4 Columns</option></select><div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded border"><div><label class="text-[10px] font-bold uppercase text-gray-500">Col 1 (Text)</label><input type="text" id="schCol1" value="Name" class="w-full border p-1 rounded text-sm font-semibold text-gray-700"></div><div id="schCol2Grp" class="hidden"><label class="text-[10px] font-bold uppercase text-gray-500">Col 2 (Value)</label><input type="text" id="schCol2" class="w-full border p-1 rounded text-sm text-gray-700"></div><div id="schCol3Grp" class="hidden"><label class="text-[10px] font-bold uppercase text-gray-500">Col 3 (Value)</label><input type="text" id="schCol3" class="w-full border p-1 rounded text-sm text-gray-700"></div><div id="schCol4Grp" class="hidden"><label class="text-[10px] font-bold uppercase text-gray-500">Col 4 (Value)</label><input type="text" id="schCol4" class="w-full border p-1 rounded text-sm text-gray-700"></div></div><div class="flex justify-end space-x-2 border-t pt-4"><button id="cancelSchemaBtn" class="px-4 py-2 bg-gray-200 rounded font-bold text-gray-700 hover:bg-gray-300">Cancel</button><button id="saveSchemaBtn" class="px-4 py-2 bg-purple-600 text-white font-bold rounded hover:bg-purple-700 shadow">Generate Master</button></div></div></div>
 
@@ -75,26 +56,16 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // PERFECTLY SYNCHRONIZED PRODUCTION FIREBASE KEYS
-        const firebaseConfig = { 
-            apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
-            authDomain: "renuka-tools-quote.firebaseapp.com",
-            databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "renuka-tools-quote",
-            storageBucket: "renuka-tools-quote.firebasestorage.app",
-            messagingSenderId: "300959855269",
-            appId: "1:300959855269:web:d8d19e979ac3616b10934c" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", authDomain: "renuka-tools-quote.firebaseapp.com", databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "renuka-tools-quote", storageBucket: "renuka-tools-quote.firebasestorage.app", messagingSenderId: "300959855269", appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
-
-        // SECURE ADMIN GATE
-        const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"];
+        
+        const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
 
         let appSchemas = []; let mst = {}; let currentTabId = "roles"; let pendingImportCollection = ""; let base64Logo = "";
-
+        
         const defaultSchemas = [
             { id: "roles", category: "crm", title: "Sales Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
-            { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override"], params: 4, behavior: "crm" },
+            { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override", "Show Cost Breakup"], params: 5, behavior: "crm" },
             { id: "customers", category: "crm", title: "Customer Directory", cols: ["Company Name", "Contact Person", "Owner Role", "GST No"], params: 4, behavior: "crm" },
             { id: "raw_materials", category: "mfg", title: "Raw Materials", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3, behavior: "variable" },
             { id: "blanks", category: "mfg", title: "Taper Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 4, behavior: "lookup" },
@@ -111,23 +82,16 @@
 
         onAuthStateChanged(auth, async (user) => { 
             if (user) { 
-                if (!ADMIN_EMAILS.includes(user.email)) {
-                    alert("Unauthorized Access. Admin Privileges Required.");
-                    signOut(auth);
-                    return;
-                }
-                document.getElementById('loginSection').classList.add('hidden'); 
-                await initializeSchemas(); 
-                fetchProfile(); 
-            } 
-            else { document.getElementById('loginSection').classList.remove('hidden'); } 
+                if (!ADMIN_EMAILS.includes(user.email)) { alert("Unauthorized Access. Admin Privileges Required."); signOut(auth); return; }
+                document.getElementById('loginSection').classList.add('hidden'); await initializeSchemas(); fetchProfile(); 
+            } else { document.getElementById('loginSection').classList.remove('hidden'); } 
         });
 
         document.getElementById('loginBtn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(() => alert("Invalid credentials")));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
         async function initializeSchemas() {
-            await setDoc(doc(db, "system_schemas", "users"), { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override (Yes/No)"], params: 4, behavior: "crm" }, { merge: true });
+            await setDoc(doc(db, "system_schemas", "users"), { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override (Yes/No)", "Show Cost Breakup (Yes/No)"], params: 5, behavior: "crm" }, { merge: true });
             const snap = await getDocs(collection(db, "system_schemas")); appSchemas = [];
             if (snap.empty || snap.size < 14) { for (let schema of defaultSchemas) await setDoc(doc(db, "system_schemas", schema.id), schema); appSchemas = defaultSchemas; } 
             else { snap.forEach(doc => appSchemas.push(doc.data())); }
@@ -157,49 +121,39 @@
             else { mst[sch.id].forEach(d => {
                 const activeBadge = (d.isActive !== false) ? `<span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold border border-green-200">Active</span>` : `<span class="bg-red-100 text-red-700 text-[10px] px-2 py-1 rounded-full font-bold border border-red-200">Inactive</span>`;
                 let trCols = `<td class="px-4 py-3 font-semibold text-gray-800">${d.name || ''}</td>`;
-                if(sch.params >= 2) trCols += `<td class="px-4 py-3 text-gray-600">${d.param1 || '-'}</td>`; if(sch.params >= 3) trCols += `<td class="px-4 py-3 text-gray-600 truncate max-w-[200px]">${d.param2 || '-'}</td>`; if(sch.params >= 4) trCols += `<td class="px-4 py-3 text-gray-600">${d.param3 || '-'}</td>`;
+                if(sch.params >= 2) trCols += `<td class="px-4 py-3 text-gray-600">${d.param1 || '-'}</td>`; 
+                if(sch.params >= 3) trCols += `<td class="px-4 py-3 text-gray-600 truncate max-w-[200px]">${d.param2 || '-'}</td>`; 
+                if(sch.params >= 4) trCols += `<td class="px-4 py-3 text-gray-600">${d.param3 || '-'}</td>`;
+                if(sch.params >= 5) trCols += `<td class="px-4 py-3 text-gray-600">${d.param4 || '-'}</td>`;
                 html += `<tr class="hover:bg-blue-50 transition-colors">${trCols}<td class="px-4 py-3">${activeBadge}</td><td class="px-4 py-3 text-right"><button class="text-blue-600 font-bold mr-3 text-xs" onclick="window.openEntryModal('${sch.id}', '${d.id}')">EDIT</button><button class="text-red-500 font-bold text-xs" onclick="window.deleteItem('${sch.id}','${d.id}')">DEL</button></td></tr>`;
             }); }
             document.getElementById(`tbody_${sch.id}`).innerHTML = html;
         }
 
-        window.showProfile = () => {
-            document.querySelectorAll('#sidebar button').forEach(b => b.classList.remove('active-nav'));
-            document.getElementById('btnProfile').classList.add('active-nav');
-            document.getElementById('tableContainer').classList.add('hidden');
-            document.getElementById('profileContainer').classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = "Company Settings"; document.getElementById('topActionButtons').innerHTML = "";
-        };
+        window.showProfile = () => { document.querySelectorAll('#sidebar button').forEach(b => b.classList.remove('active-nav')); document.getElementById('btnProfile').classList.add('active-nav'); document.getElementById('tableContainer').classList.add('hidden'); document.getElementById('profileContainer').classList.remove('hidden'); document.getElementById('pageTitle').innerText = "Company Settings"; document.getElementById('topActionButtons').innerHTML = ""; };
 
         async function fetchProfile() {
             const snap = await getDoc(doc(db, "settings", "company_profile"));
             if(snap.exists()) {
                 const d = snap.data();
-                document.getElementById('cpName').value = d.name || ""; document.getElementById('cpEmail').value = d.email || ""; document.getElementById('cpAddress').value = d.address || "";
-                document.getElementById('cpGst').value = d.gst || ""; document.getElementById('cpPan').value = d.pan || ""; document.getElementById('cpIec').value = d.iec || "";
-                document.getElementById('cpPhone').value = d.phone || ""; document.getElementById('cpBank').value = d.bank || "";
+                ['cpName','cpEmail','cpAddress','cpGst','cpPan','cpIec','cpPhone','cpBank'].forEach(k => document.getElementById(k).value = d[k.replace('cp','').toLowerCase()] || "");
                 if(d.logo) { base64Logo = d.logo; document.getElementById('logoPreview').src = d.logo; document.getElementById('logoPreview').classList.remove('hidden'); }
             }
         }
 
-        document.getElementById('logoUpload').addEventListener('change', function(e) {
-            const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
-            reader.onload = function(event) { base64Logo = event.target.result; document.getElementById('logoPreview').src = base64Logo; document.getElementById('logoPreview').classList.remove('hidden'); };
-            reader.readAsDataURL(file);
-        });
-
-        document.getElementById('saveProfileBtn').addEventListener('click', async () => {
-            const profile = { name: document.getElementById('cpName').value, email: document.getElementById('cpEmail').value, address: document.getElementById('cpAddress').value, gst: document.getElementById('cpGst').value, pan: document.getElementById('cpPan').value, iec: document.getElementById('cpIec').value, phone: document.getElementById('cpPhone').value, bank: document.getElementById('cpBank').value, logo: base64Logo };
-            await setDoc(doc(db, "settings", "company_profile"), profile); alert("Company Profile Updated!");
-        });
+        document.getElementById('logoUpload').addEventListener('change', function(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(event) { base64Logo = event.target.result; document.getElementById('logoPreview').src = base64Logo; document.getElementById('logoPreview').classList.remove('hidden'); }; reader.readAsDataURL(file); });
+        document.getElementById('saveProfileBtn').addEventListener('click', async () => { const profile = { name: document.getElementById('cpName').value, email: document.getElementById('cpEmail').value, address: document.getElementById('cpAddress').value, gst: document.getElementById('cpGst').value, pan: document.getElementById('cpPan').value, iec: document.getElementById('cpIec').value, phone: document.getElementById('cpPhone').value, bank: document.getElementById('cpBank').value, logo: base64Logo }; await setDoc(doc(db, "settings", "company_profile"), profile); alert("Company Profile Updated!"); });
 
         window.openEntryModal = async (schemaId, docId = "") => {
             const sch = appSchemas.find(s => s.id === schemaId); let eData = {}; if (docId) eData = mst[schemaId].find(x => x.id === docId) || {};
-            document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`;
-            document.getElementById('activeCollection').value = sch.id; document.getElementById('activeDocId').value = docId;
-            [2,3,4].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden')); document.getElementById('inp2').classList.remove('hidden'); document.getElementById('sel2').classList.add('hidden'); document.getElementById('inp3').classList.remove('hidden'); document.getElementById('sel3').classList.add('hidden'); document.getElementById('multiCheck3').classList.add('hidden'); document.getElementById('inp4').classList.remove('hidden'); document.getElementById('sel4').classList.add('hidden');
+            document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`; document.getElementById('activeCollection').value = sch.id; document.getElementById('activeDocId').value = docId;
+            [2,3,4,5].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden')); document.getElementById('inp2').classList.remove('hidden'); document.getElementById('sel2').classList.add('hidden'); document.getElementById('inp3').classList.remove('hidden'); document.getElementById('sel3').classList.add('hidden'); document.getElementById('multiCheck3').classList.add('hidden'); document.getElementById('inp4').classList.remove('hidden'); document.getElementById('sel4').classList.add('hidden');
             document.getElementById('inp1').value = eData.name || ""; document.getElementById('inp2').value = eData.param1 || ""; document.getElementById('inp3').value = eData.param2 || ""; document.getElementById('inp4').value = eData.param3 || ""; document.getElementById('isActive').checked = eData.isActive !== false;
-            document.getElementById('lbl1').innerText = sch.cols[0]; if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; } if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; } if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
+            document.getElementById('lbl1').innerText = sch.cols[0]; 
+            if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; } 
+            if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; } 
+            if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
+            if(sch.params >= 5) { document.getElementById('grp5').classList.remove('hidden'); document.getElementById('lbl5').innerText = sch.cols[4]; document.getElementById('sel5').value = eData.param4 || "No"; }
 
             if (schemaId === 'roles') { document.getElementById('inp2').classList.add('hidden'); let sel2 = document.getElementById('sel2'); sel2.classList.remove('hidden'); if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); } sel2.innerHTML = `<option value="ALL">ALL (Top Level)</option>` + mst.roles.map(r => `<option value="${r.name}">${r.name}</option>`).join(''); sel2.value = eData.param1 || "ALL"; }
             if (schemaId === 'customers') { document.getElementById('inp3').classList.add('hidden'); let sel3 = document.getElementById('sel3'); sel3.classList.remove('hidden'); if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); } sel3.innerHTML = `<option value="Admin">Admin</option>` + mst.roles.map(r => `<option value="${r.name}">${r.name}</option>`).join(''); sel3.value = eData.param2 || "Admin"; }
@@ -214,6 +168,7 @@
             if (col === 'roles') dataObj.param1 = document.getElementById('sel2').value; else if (sch.params >= 2) dataObj.param1 = isText ? document.getElementById('inp2').value : Number(document.getElementById('inp2').value);
             if (col === 'customers') dataObj.param2 = document.getElementById('sel3').value; else if (col === 'users') dataObj.param2 = Array.from(document.querySelectorAll('.role-check:checked')).map(c => c.value).join(', '); else if (sch.params >= 3) dataObj.param2 = isText ? document.getElementById('inp3').value : Number(document.getElementById('inp3').value);
             if (col === 'users') dataObj.param3 = document.getElementById('sel4').value; else if (sch.params >= 4) dataObj.param3 = isText ? document.getElementById('inp4').value : Number(document.getElementById('inp4').value);
+            if (col === 'users') dataObj.param4 = document.getElementById('sel5').value;
             try { if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); document.getElementById('dataModal').classList.add('hidden'); renderActiveTable(); } catch (err) { alert("Error saving data."); }
         });
 

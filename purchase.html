@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Renuka Tools | Purchase Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>.custom-scrollbar::-webkit-scrollbar{width:6px;height:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}.active-nav{background-color:#047857;border-left:4px solid #34d399;color:white}</style>
+</head>
+<body class="bg-gray-100 h-screen flex overflow-hidden font-sans">
+    
+    <div id="loginSection" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center"><div class="max-w-md w-full bg-white p-8 border rounded shadow-2xl"><h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Procurement Auth</h2><input type="email" id="email" placeholder="Email Address" class="w-full border p-3 mb-4 rounded outline-none focus:ring-2 focus:ring-emerald-500"><input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded outline-none focus:ring-2 focus:ring-emerald-500"><button id="loginBtn" class="w-full bg-emerald-700 text-white p-3 rounded font-bold hover:bg-emerald-800 shadow transition">Access Procurement DB</button></div></div>
+
+    <!-- LEFT SIDEBAR -->
+    <div id="sidebar" class="w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl z-20">
+        <div class="p-5 bg-gray-950 border-b border-gray-800"><h1 class="text-xl font-bold text-white tracking-wider">PROCUREMENT</h1><p class="text-xs text-emerald-400 mt-1">Cost & Item Master</p></div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar py-4">
+            <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Raw Material Costs</p></div><div id="nav-mfg" class="space-y-1 mb-4"></div>
+            <div class="px-4 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Trading & Spares</p></div><div id="nav-com" class="space-y-1 mb-4"></div>
+        </div>
+        <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2"><div class="text-xs text-gray-500 mb-2 truncate" id="userBadge"></div><button onclick="window.location.href='index.html'" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded text-sm font-bold shadow transition">Go to Sales</button><button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col h-full bg-gray-50">
+        <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center z-10"><h2 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h2><div class="flex space-x-3" id="topActionButtons"></div></header>
+        <main class="flex-1 overflow-y-auto p-6 custom-scrollbar"><div id="tableContainer" class="bg-white rounded-lg shadow border min-h-[500px]"></div></main>
+    </div>
+
+    <!-- REUSED ADMIN MODALS (Filtered for Purchase) -->
+    <input type="file" id="excelUpload" class="hidden" accept=".xlsx, .xls">
+    <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 backdrop-blur-sm"><div class="bg-white p-6 rounded-lg shadow-2xl w-[450px]"><div class="flex justify-between items-center mb-5 border-b pb-3"><h3 id="modalTitle" class="text-xl font-bold text-gray-800">Add Record</h3><div class="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full border"><input type="checkbox" id="isActive" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" checked><label class="text-xs font-bold text-gray-700 cursor-pointer" for="isActive">Active</label></div></div><input type="hidden" id="activeCollection"><input type="hidden" id="activeDocId"><div class="space-y-4"><div id="grp1"><label id="lbl1" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp1" class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-semibold text-gray-800"></div><div class="hidden" id="grp2"><label id="lbl2" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp2" class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></div><div class="hidden" id="grp3"><label id="lbl3" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp3" class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></div><div class="hidden" id="grp4"><label id="lbl4" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label><input type="text" id="inp4" class="w-full border p-2 rounded focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></div></div><div class="flex justify-end space-x-3 border-t mt-6 pt-4"><button id="cancelModalBtn" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold">Cancel</button><button id="saveDataBtn" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded shadow">Save Cost Record</button></div></div></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", authDomain: "renuka-tools-quote.firebaseapp.com", databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "renuka-tools-quote", storageBucket: "renuka-tools-quote.firebasestorage.app", messagingSenderId: "300959855269", appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
+        const PROCUREMENT_SCHEMAS = ['raw_materials', 'blanks', 'operations', 'features', 'assembly', 'spares', 'freight'];
+
+        let appSchemas = []; let mst = {}; let currentTabId = "raw_materials"; let pendingImportCollection = "";
+
+        onAuthStateChanged(auth, async (user) => { 
+            if (user) { 
+                let isAuthorized = ADMIN_EMAILS.includes(user.email);
+                const uSnap = await getDocs(collection(db, "users")); 
+                uSnap.forEach(doc => { if (doc.data().param1 === user.email && doc.data().param2 && doc.data().param2.includes('Purchase Team')) isAuthorized = true; });
+                
+                if (!isAuthorized) { alert("Access Denied. Purchase Team role required."); signOut(auth); return; }
+                
+                document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('userBadge').innerText = user.email;
+                await initializeSchemas(); 
+            } else { document.getElementById('loginScreen').classList.remove('hidden'); } 
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(() => alert("Invalid credentials")));
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        async function initializeSchemas() {
+            const snap = await getDocs(collection(db, "system_schemas")); appSchemas = [];
+            snap.forEach(doc => { if(PROCUREMENT_SCHEMAS.includes(doc.data().id)) appSchemas.push(doc.data()); });
+            renderSidebar(); renderActiveTable();
+        }
+
+        function renderSidebar() {
+            document.getElementById('nav-mfg').innerHTML = ""; document.getElementById('nav-com').innerHTML = "";
+            appSchemas.forEach(sch => {
+                const targetDiv = sch.category === 'mfg' ? 'nav-mfg' : 'nav-com';
+                const btn = document.createElement('button'); btn.className = `w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 ${sch.id === currentTabId ? 'active-nav' : 'text-gray-400'}`; btn.innerText = sch.title;
+                btn.onclick = () => { currentTabId = sch.id; renderSidebar(); renderActiveTable(); };
+                document.getElementById(targetDiv).appendChild(btn);
+            });
+        }
+
+        async function renderActiveTable() {
+            const sch = appSchemas.find(s => s.id === currentTabId); if(!sch) return; mst[sch.id] = [];
+            const dataSnap = await getDocs(collection(db, sch.id)); dataSnap.forEach(docSnap => mst[sch.id].push({ id: docSnap.id, ...docSnap.data() }));
+            document.getElementById('pageTitle').innerText = sch.title;
+            document.getElementById('topActionButtons').innerHTML = `<button onclick="window.downloadTemplate('${sch.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm font-bold shadow">📥 Template</button><button onclick="window.triggerImport('${sch.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-bold shadow">📤 Import Excel</button><button onclick="window.openEntryModal('${sch.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded text-sm font-bold shadow">+ Add Cost Record</button>`;
+            let thHtml = sch.cols.map(c => `<th class="px-4 py-3 border-b">${c}</th>`).join('');
+            document.getElementById('tableContainer').innerHTML = `<div class="overflow-x-auto"><table class="w-full text-left border-collapse whitespace-nowrap"><thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider"><tr>${thHtml}<th class="px-4 py-3 border-b w-24">Status</th><th class="px-4 py-3 border-b text-right w-24">Actions</th></tr></thead><tbody id="tbody_${sch.id}" class="text-sm divide-y divide-gray-100"></tbody></table></div>`;
+            let html = "";
+            if(mst[sch.id].length === 0) { html = `<tr><td colspan="6" class="text-center py-10 text-gray-400">No records found. Click "+ Add Record" to begin.</td></tr>`; } 
+            else { mst[sch.id].forEach(d => {
+                const activeBadge = (d.isActive !== false) ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded-full font-bold border border-emerald-200">Active</span>` : `<span class="bg-red-100 text-red-700 text-[10px] px-2 py-1 rounded-full font-bold border border-red-200">Inactive</span>`;
+                let trCols = `<td class="px-4 py-3 font-semibold text-gray-800">${d.name || ''}</td>`;
+                if(sch.params >= 2) trCols += `<td class="px-4 py-3 text-gray-600">${d.param1 || '-'}</td>`; if(sch.params >= 3) trCols += `<td class="px-4 py-3 text-gray-600 truncate max-w-[200px]">${d.param2 || '-'}</td>`; if(sch.params >= 4) trCols += `<td class="px-4 py-3 text-gray-600">${d.param3 || '-'}</td>`;
+                html += `<tr class="hover:bg-emerald-50 transition-colors">${trCols}<td class="px-4 py-3">${activeBadge}</td><td class="px-4 py-3 text-right"><button class="text-emerald-600 font-bold mr-3 text-xs" onclick="window.openEntryModal('${sch.id}', '${d.id}')">EDIT</button><button class="text-red-500 font-bold text-xs" onclick="window.deleteItem('${sch.id}','${d.id}')">DEL</button></td></tr>`;
+            }); }
+            document.getElementById(`tbody_${sch.id}`).innerHTML = html;
+        }
+
+        window.openEntryModal = async (schemaId, docId = "") => {
+            const sch = appSchemas.find(s => s.id === schemaId); let eData = {}; if (docId) eData = mst[schemaId].find(x => x.id === docId) || {};
+            document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`; document.getElementById('activeCollection').value = sch.id; document.getElementById('activeDocId').value = docId;
+            [2,3,4].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden')); 
+            document.getElementById('inp1').value = eData.name || ""; document.getElementById('inp2').value = eData.param1 || ""; document.getElementById('inp3').value = eData.param2 || ""; document.getElementById('inp4').value = eData.param3 || ""; document.getElementById('isActive').checked = eData.isActive !== false;
+            document.getElementById('lbl1').innerText = sch.cols[0]; if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; } if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; } if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
+            document.getElementById('dataModal').classList.remove('hidden');
+        };
+
+        document.getElementById('cancelModalBtn').addEventListener('click', () => document.getElementById('dataModal').classList.add('hidden'));
+        document.getElementById('saveDataBtn').addEventListener('click', async () => {
+            const col = document.getElementById('activeCollection').value; const id = document.getElementById('activeDocId').value; const sch = appSchemas.find(s => s.id === col);
+            const dataObj = { name: document.getElementById('inp1').value, isActive: document.getElementById('isActive').checked }; 
+            if (sch.params >= 2) dataObj.param1 = Number(document.getElementById('inp2').value);
+            if (sch.params >= 3) dataObj.param2 = Number(document.getElementById('inp3').value);
+            if (sch.params >= 4) dataObj.param3 = Number(document.getElementById('inp4').value);
+            try { if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); document.getElementById('dataModal').classList.add('hidden'); renderActiveTable(); } catch (err) { alert("Error saving data."); }
+        });
+        window.deleteItem = async (col, id) => { if(confirm("Permanently delete?")) { await deleteDoc(doc(db, col, id)); renderActiveTable(); } };
+
+        // Excel Logic
+        window.downloadTemplate = (schemaId) => { const sch = appSchemas.find(s => s.id === schemaId); const ws = XLSX.utils.aoa_to_sheet([sch.cols]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `${sch.title}_Template.xlsx`); }; window.triggerImport = (schemaId) => { pendingImportCollection = schemaId; document.getElementById('excelUpload').click(); };
+        document.getElementById('excelUpload').addEventListener('change', (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (event) => { const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'}); const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); const sch = appSchemas.find(s => s.id === pendingImportCollection); let count = 0; for(let row of jsonData) { const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true }; if(sch.params >= 2) dataObj.param1 = Number(row[sch.cols[1]] || 0); if(sch.params >= 3) dataObj.param2 = Number(row[sch.cols[2]] || 0); if(sch.params >= 4) dataObj.param3 = Number(row[sch.cols[3]] || 0); await addDoc(collection(db, pendingImportCollection), dataObj); count++; } document.getElementById('excelUpload').value = ""; alert(`Imported ${count} items!`); renderActiveTable(); }; reader.readAsArrayBuffer(file); });
+    </script>
+</body>
+</html>

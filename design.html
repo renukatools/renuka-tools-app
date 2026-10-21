@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Renuka Tools | Design Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>.custom-scrollbar::-webkit-scrollbar{width:6px;height:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}</style>
+</head>
+<body class="bg-gray-100 h-screen flex overflow-hidden font-sans">
+    
+    <div id="loginScreen" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center"><div class="max-w-md w-full bg-white p-8 border rounded shadow-2xl"><h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Design Team Auth</h2><input type="email" id="email" placeholder="Email Address" class="w-full border p-3 mb-4 rounded outline-none focus:ring-2 focus:ring-purple-500"><input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded outline-none focus:ring-2 focus:ring-purple-500"><button id="loginBtn" class="w-full bg-purple-700 text-white p-3 rounded font-bold hover:bg-purple-800 shadow transition">Access Design Library</button></div></div>
+
+    <!-- LEFT SIDEBAR -->
+    <div id="sidebar" class="w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl z-20">
+        <div class="p-5 bg-gray-950 border-b border-gray-800"><h1 class="text-xl font-bold text-white tracking-wider">ENGINEERING</h1><p class="text-xs text-purple-400 mt-1">Standard Design Library</p></div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar py-4 px-2">
+            <button class="w-full bg-purple-800 text-white p-2 rounded text-sm font-bold shadow text-left px-4">📐 Parametric Builder</button>
+            <div class="mt-6 px-4 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Saved Standard Profiles</p></div>
+            <div id="savedList" class="space-y-1 mt-2 text-sm text-gray-400 px-2"></div>
+        </div>
+        <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2"><div class="text-xs text-gray-500 mb-2 truncate" id="userBadge"></div><button onclick="window.location.href='index.html'" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded text-sm font-bold shadow transition">Go to Sales</button><button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col h-full bg-gray-50">
+        <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center z-10"><h2 class="text-2xl font-bold text-gray-800">Parametric Profile Builder</h2></header>
+        <main class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Data Entry -->
+                <div class="col-span-12 lg:col-span-4 space-y-4">
+                    <div class="bg-white p-5 rounded-lg shadow border border-t-4 border-t-purple-600">
+                        <label class="block text-xs font-bold mb-1 text-gray-700">Standard Profile Name (e.g., BT40 Taper Blank)</label>
+                        <input type="text" id="pName" class="w-full border p-2 text-sm rounded font-bold text-purple-900 focus:ring-2 focus:ring-purple-500 outline-none mb-4">
+                        
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="col-span-2"><label class="font-bold text-xs">Insert Setup:</label><select id="pIns" class="w-full border p-1 rounded preview-trigger"><option value="None">None (Blank/Holder)</option><option value="CNMG">CNMG</option><option value="WNMG">WNMG</option></select></div>
+                            <div class="col-span-2 border-t mt-2 pt-2"><p class="text-[10px] uppercase font-bold text-gray-500">Shank / Base Area</p></div>
+                            <div><label class="font-bold text-xs">Dia (mm):</label><input type="number" id="psD" value="40" class="w-full border p-1 rounded preview-trigger"></div>
+                            <div><label class="font-bold text-xs">Length (mm):</label><input type="number" id="psL" value="50" class="w-full border p-1 rounded preview-trigger"></div>
+                            
+                            <div class="col-span-2 border-t mt-2 pt-2"><p class="text-[10px] uppercase font-bold text-gray-500">Taper / Collar Area</p></div>
+                            <div><label class="font-bold text-xs">Dia (mm):</label><input type="number" id="pcD" value="63" class="w-full border p-1 rounded preview-trigger"></div>
+                            <div><label class="font-bold text-xs">Length (mm):</label><input type="number" id="pcL" value="25" class="w-full border p-1 rounded preview-trigger"></div>
+                            
+                            <div class="col-span-2 border-t mt-2 pt-2"><p class="text-[10px] uppercase font-bold text-gray-500">Head / Overhang Area</p></div>
+                            <div><label class="font-bold text-xs">Dia (mm):</label><input type="number" id="phD" value="50" class="w-full border p-1 rounded preview-trigger"></div>
+                            <div><label class="font-bold text-xs">Length (mm):</label><input type="number" id="phL" value="60" class="w-full border p-1 rounded preview-trigger"></div>
+                        </div>
+                        <button id="saveLibraryBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-3 rounded font-bold shadow mt-6 transition">💾 Save to Master Library</button>
+                    </div>
+                </div>
+
+                <!-- 3D Preview -->
+                <div class="col-span-12 lg:col-span-8">
+                    <div class="bg-gray-900 rounded-lg shadow-2xl border border-gray-700 h-[600px] relative overflow-hidden flex flex-col">
+                        <div class="p-3 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10"><h3 class="text-white font-bold text-sm">3D Engineering Sandbox</h3><span class="text-[10px] text-gray-400 bg-gray-900 px-2 py-1 rounded">Live Render</span></div>
+                        <div id="canvasContainer" class="flex-1 relative w-full h-full">
+                            <div id="dimLabels" class="absolute inset-0 pointer-events-none w-full h-full p-4 z-10"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", authDomain: "renuka-tools-quote.firebaseapp.com", databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "renuka-tools-quote", storageBucket: "renuka-tools-quote.firebasestorage.app", messagingSenderId: "300959855269", appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
+
+        onAuthStateChanged(auth, async (user) => { 
+            if (user) { 
+                let isAuthorized = ADMIN_EMAILS.includes(user.email);
+                const uSnap = await getDocs(collection(db, "users")); 
+                uSnap.forEach(doc => { if (doc.data().param1 === user.email && doc.data().param2 && doc.data().param2.includes('Design Team')) isAuthorized = true; });
+                
+                if (!isAuthorized) { alert("Access Denied. Design Team role required."); signOut(auth); return; }
+                
+                document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('userBadge').innerText = user.email;
+                initThreeJS(); fetchLibrary(); 
+            } else { document.getElementById('loginScreen').classList.remove('hidden'); } 
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=>alert("Invalid Login")));
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        document.querySelectorAll('.preview-trigger').forEach(el => { el.addEventListener('input', triggerRender); el.addEventListener('change', triggerRender); });
+
+        async function fetchLibrary() {
+            const list = document.getElementById('savedList'); list.innerHTML = "";
+            const snap = await getDocs(collection(db, "design_library"));
+            snap.forEach(docSnap => {
+                let d = docSnap.data();
+                list.insertAdjacentHTML('beforeend', `<div class="p-2 bg-gray-800 rounded flex justify-between items-center mb-1"><span class="truncate font-bold text-gray-300 w-3/4">${d.name}</span><button onclick="window.delDesign('${docSnap.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold">X</button></div>`);
+            });
+        }
+
+        window.delDesign = async (id) => { if(confirm("Delete this standard profile?")) { await deleteDoc(doc(db, "design_library", id)); fetchLibrary(); } };
+
+        document.getElementById('saveLibraryBtn').addEventListener('click', async () => {
+            const name = document.getElementById('pName').value; if(!name) return alert("Please enter a profile name.");
+            const config = {
+                sD: Number(document.getElementById('psD').value), sL: Number(document.getElementById('psL').value),
+                cD: Number(document.getElementById('pcD').value), cL: Number(document.getElementById('pcL').value),
+                hD: Number(document.getElementById('phD').value), hL: Number(document.getElementById('phL').value),
+                ins: document.getElementById('pIns').value
+            };
+            try { await addDoc(collection(db, "design_library"), { name: name, param1: JSON.stringify(config), isActive: true }); alert("Saved to Database!"); document.getElementById('pName').value = ""; fetchLibrary(); } catch(e) { alert("Error saving."); }
+        });
+
+        let scene, camera, renderer, toolGroup;
+        function initThreeJS() {
+            const container = document.getElementById('canvasContainer'); scene = new THREE.Scene(); scene.background = new THREE.Color(0x0f172a);
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000); camera.position.set(0, 0, 300);
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(container.clientWidth, container.clientHeight); 
+            container.insertBefore(renderer.domElement, container.firstChild);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7)); const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(100, 100, 50); scene.add(dirLight);
+            toolGroup = new THREE.Group(); scene.add(toolGroup); animate(); triggerRender();
+        }
+
+        function triggerRender() {
+            const sD=Number(document.getElementById('psD').value), sL=Number(document.getElementById('psL').value), cD=Number(document.getElementById('pcD').value), cL=Number(document.getElementById('pcL').value), hD=Number(document.getElementById('phD').value), hL=Number(document.getElementById('phL').value), ins=document.getElementById('pIns').value;
+            
+            while(toolGroup.children.length > 0) { toolGroup.remove(toolGroup.children[0]); }
+            const sMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.6, roughness: 0.4 }); const cMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.2 }); const hMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.5, roughness: 0.5 });
+            const addEdges = (mesh) => { const edges = new THREE.EdgesGeometry(mesh.geometry); const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 })); mesh.add(line); };
+
+            const shank = new THREE.Mesh(new THREE.CylinderGeometry(sD/2, sD/2, sL, 32), sMat); addEdges(shank);
+            const collar = new THREE.Mesh(new THREE.CylinderGeometry(cD/2, cD/2, cL, 32), cMat); addEdges(collar);
+            const head = new THREE.Mesh(new THREE.CylinderGeometry(hD/2, hD/2, hL, 32), hMat); addEdges(head);
+            
+            const totalL = sL + cL + hL; let cY = -totalL / 2;
+            shank.position.y = cY + (sL / 2); cY += sL; collar.position.y = cY + (cL / 2); cY += cL; head.position.y = cY + (hL / 2);
+            toolGroup.add(shank); toolGroup.add(collar); toolGroup.add(head);
+
+            if(ins !== 'None') {
+                const insMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.3, roughness: 0.8 });
+                let insGeo = (ins === 'CNMG') ? new THREE.BoxGeometry(10, 10, 2) : new THREE.CylinderGeometry(6, 6, 2, 3);
+                const insert = new THREE.Mesh(insGeo, insMat); addEdges(insert);
+                insert.position.set((hD/2)-2, cY + (hL/2), 0); toolGroup.add(insert);
+            }
+            toolGroup.rotation.x = Math.PI / 6; toolGroup.rotation.z = -Math.PI / 4; camera.position.z = totalL * 1.5;
+
+            document.getElementById('dimLabels').innerHTML = `
+                <div class="absolute text-[12px] font-bold text-gray-300 drop-shadow-md bg-gray-900/70 px-2 py-1 rounded border border-gray-500/50" style="top: 15%; left: 5%;">Shank: Ø${sD} × ${sL}</div>
+                <div class="absolute text-[12px] font-bold text-gray-200 drop-shadow-md bg-gray-900/70 px-2 py-1 rounded border border-gray-400/50" style="top: 45%; left: 5%;">Collar/Taper: Ø${cD} × ${cL}</div>
+                <div class="absolute text-[12px] font-bold text-gray-400 drop-shadow-md bg-gray-900/70 px-2 py-1 rounded border border-gray-600/50" style="top: 75%; left: 5%;">Head: Ø${hD} × ${hL}</div>
+            `;
+        }
+        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
+    </script>
+</body>
+</html>
