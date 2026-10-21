@@ -3,101 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renuka Tools | Sales Dashboard</title>
+    <title>Renuka Tools | Quote Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Three.js for 3D Rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <!-- Navigation -->
     <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Quote Generator</h1>
-        <button id="logoutBtn" class="bg-red-600 px-4 py-2 rounded text-sm font-bold hidden">Log Out</button>
+        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Sales Engine</h1>
+        <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold hidden">Log Out</button>
     </nav>
 
     <!-- Login Screen -->
     <div id="loginScreen" class="max-w-md mx-auto mt-20 bg-white p-8 rounded shadow border">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Sales Login</h2>
-        <input type="email" id="email" placeholder="Email" class="w-full border p-2 mb-4 rounded">
-        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded">
+        <input type="email" id="email" placeholder="Email Address" class="w-full border p-2 mb-4 rounded focus:ring-2 focus:ring-blue-500">
+        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded focus:ring-2 focus:ring-blue-500">
         <button id="loginBtn" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">Login</button>
     </div>
 
-    <!-- Main Calculator Screen -->
-    <div id="appScreen" class="max-w-6xl mx-auto mt-8 p-4 hidden grid grid-cols-3 gap-6">
+    <!-- Main Application -->
+    <div id="appScreen" class="max-w-7xl mx-auto mt-6 p-4 hidden grid grid-cols-12 gap-6">
         
-        <!-- Input Column -->
-        <div class="col-span-2 bg-white p-6 rounded shadow border">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">1. Tool Geometry & Customer</h3>
+        <!-- LEFT COLUMN: Configurator -->
+        <div class="col-span-12 lg:col-span-8 space-y-6">
             
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700">Customer Tier</label>
-                    <select id="custTier" class="w-full border p-2 rounded">
-                        <option value="25">Authorised Distributor (25% Floor)</option>
-                        <option value="40">Large Account / OEM (40% Floor)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700">Tool Type Category</label>
-                    <select id="toolTier" class="w-full border p-2 rounded">
-                        <option value="100">Custom Indexable Tool (100% Escalation)</option>
-                    </select>
-                </div>
-            </div>
-
-            <h4 class="font-bold text-gray-700 mb-2">Stepped Dimensions (mm)</h4>
-            <div class="grid grid-cols-3 gap-4 mb-4 bg-gray-50 p-4 rounded border">
-                <div>
-                    <label class="block text-sm">Shank Dia</label>
-                    <input type="number" id="shankDia" value="32" class="w-full border p-2 rounded mb-2">
-                    <label class="block text-sm">Shank Length</label>
-                    <input type="number" id="shankLen" value="100" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-sm">Collar Dia</label>
-                    <input type="number" id="collarDia" value="80" class="w-full border p-2 rounded mb-2">
-                    <label class="block text-sm">Collar Length</label>
-                    <input type="number" id="collarLen" value="20" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-sm">Head Dia</label>
-                    <input type="number" id="headDia" value="63" class="w-full border p-2 rounded mb-2">
-                    <label class="block text-sm">Head Length</label>
-                    <input type="number" id="headLen" value="50" class="w-full border p-2 rounded">
+            <!-- Quote Metadata -->
+            <div class="bg-white p-6 rounded shadow border">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">1. Client & Project Details</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1">Company Name</label><input type="text" id="clientCompany" class="w-full border p-2 rounded"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1">Contact Person</label><input type="text" id="clientName" class="w-full border p-2 rounded"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1">Project / Application</label><input type="text" id="projectName" class="w-full border p-2 rounded"></div>
+                    
+                    <div class="col-span-2">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Customer Tier (Margin Profile)</label>
+                        <select id="custTier" class="w-full border p-2 rounded bg-gray-50"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Quote ID</label>
+                        <input type="text" id="quoteId" readonly class="w-full border p-2 rounded bg-gray-200 font-bold text-gray-600">
+                    </div>
                 </div>
             </div>
 
-            <button id="calculateBtn" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700">Calculate Quote</button>
+            <!-- Tool Configurator -->
+            <div class="bg-white p-6 rounded shadow border">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">2. Tool Geometry & Manufacturing</h3>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Tool Item Name / Description</label>
+                        <input type="text" id="toolName" placeholder="e.g., ISO Finish Boring Bar" class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Tool Category (Escalation Profile)</label>
+                        <select id="toolCat" class="w-full border p-2 rounded bg-gray-50"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <!-- Dimensions Input -->
+                    <div class="bg-blue-50 p-4 rounded border border-blue-100">
+                        <h4 class="font-bold text-blue-900 mb-3">Stepped Dimensions (mm)</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <label class="font-bold">Shank Dia:</label> <input type="number" id="sDia" value="32" class="border p-1 rounded w-full tool-dim">
+                            <label class="font-bold">Shank Length:</label> <input type="number" id="sLen" value="100" class="border p-1 rounded w-full tool-dim">
+                            <div class="col-span-2 border-b my-1 border-blue-200"></div>
+                            <label class="font-bold">Collar Dia:</label> <input type="number" id="cDia" value="63" class="border p-1 rounded w-full tool-dim">
+                            <label class="font-bold">Collar Thick:</label> <input type="number" id="cLen" value="15" class="border p-1 rounded w-full tool-dim">
+                            <div class="col-span-2 border-b my-1 border-blue-200"></div>
+                            <label class="font-bold">Head Dia:</label> <input type="number" id="hDia" value="50" class="border p-1 rounded w-full tool-dim">
+                            <label class="font-bold">Head Length:</label> <input type="number" id="hLen" value="45" class="border p-1 rounded w-full tool-dim">
+                        </div>
+                    </div>
+                    
+                    <!-- 3D Visualizer -->
+                    <div class="flex flex-col items-center justify-center bg-gray-900 rounded border relative overflow-hidden" id="canvasContainer" style="height: 250px;">
+                        <!-- ThreeJS Canvas will inject here -->
+                        <button id="downloadImgBtn" class="absolute bottom-2 right-2 bg-gray-700 text-white text-xs px-2 py-1 rounded hover:bg-gray-600">📥 Save Image</button>
+                    </div>
+                </div>
+
+                <!-- Manufacturing Variables -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Raw Material</label>
+                        <select id="rawMaterial" class="w-full border p-2 rounded bg-gray-50"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Primary Operation</label>
+                        <select id="primaryOp" class="w-full border p-2 rounded bg-gray-50"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Est. Machining Hrs</label>
+                        <input type="number" id="machiningHrs" value="4" class="w-full border p-2 rounded">
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <button id="auditToggleBtn" class="text-sm text-gray-500 hover:text-blue-600 underline">Show Cost Audit (Admin)</button>
+                    <button id="addToCartBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold shadow-lg">🛒 Add to Quote</button>
+                </div>
+
+                <!-- Admin Cost Audit Box (Hidden by default) -->
+                <div id="auditBox" class="hidden mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-gray-700">
+                    <h4 class="font-bold text-yellow-800 mb-2">Internal Cost Breakdown</h4>
+                    <div class="grid grid-cols-2 gap-2" id="auditData">
+                        <p>Raw Material Vol: <span id="auditVol" class="font-bold">0</span> cm³</p>
+                        <p>Raw Material Wt: <span id="auditWt" class="font-bold">0</span> kg</p>
+                        <p>Material Cost: <span id="auditMatCost" class="font-bold text-red-600">₹ 0</span></p>
+                        <p>Machining Cost: <span id="auditMfgCost" class="font-bold text-red-600">₹ 0</span></p>
+                        <p>Base Mfg Cost: <span id="auditBaseCost" class="font-bold">₹ 0</span></p>
+                        <p>Floor Price: <span id="auditFloorCost" class="font-bold text-blue-600">₹ 0</span></p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Output Column -->
-        <div class="col-span-1">
-            <div class="bg-gray-800 text-white p-6 rounded shadow mb-4">
-                <h3 class="text-lg font-bold mb-4 border-b border-gray-600 pb-2">Quote Summary</h3>
-                <p class="text-sm text-gray-400 mb-1">Target Quote Price</p>
-                <p class="text-3xl font-bold text-green-400 mb-4" id="outQuote">₹ 0.00</p>
+        <!-- RIGHT COLUMN: Shopping Cart -->
+        <div class="col-span-12 lg:col-span-4">
+            <div class="bg-gray-800 text-white p-6 rounded shadow sticky top-6 border border-gray-700">
+                <h3 class="text-lg font-bold mb-4 border-b border-gray-600 pb-2">Shopping Cart</h3>
                 
-                <p class="text-sm text-gray-400 mb-1">Max Permissible Discount</p>
-                <p class="text-2xl font-bold text-yellow-400 mb-6" id="outDiscount">0.0%</p>
-                
-                <button id="pdfBtn" class="w-full bg-blue-600 p-2 rounded font-bold hover:bg-blue-700">Download PDF Quote</button>
-            </div>
+                <div id="cartItems" class="space-y-3 mb-6 min-h-[150px] max-h-[300px] overflow-y-auto pr-2">
+                    <!-- Cart items inject here -->
+                    <p class="text-gray-400 text-sm text-center mt-10" id="emptyCartMsg">Cart is empty.</p>
+                </div>
 
-            <!-- Admin Only Cost Audit Box -->
-            <div class="bg-white p-4 rounded shadow border">
-                <h4 class="text-sm font-bold text-gray-700 mb-2">Admin Cost Audit (Hidden from Print)</h4>
-                <p class="text-xs text-gray-500">Raw Material Sizing: <span id="outRaw">0 x 0 mm</span></p>
-                <p class="text-xs text-gray-500">Base Mfg Cost: <span id="outBase">₹ 0.00</span></p>
-                <p class="text-xs text-gray-500">No-Regret Floor Price: <span id="outFloor">₹ 0.00</span></p>
+                <div class="border-t border-gray-600 pt-4 mb-6">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-400">Total Items:</span>
+                        <span id="cartCount" class="font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-400">Total Floor Price:</span>
+                        <span id="cartFloor" class="text-yellow-400">₹ 0.00</span>
+                    </div>
+                    <div class="flex justify-between text-lg mt-2">
+                        <span class="font-bold">Total Quote Price:</span>
+                        <span id="cartTotal" class="font-bold text-green-400">₹ 0.00</span>
+                    </div>
+                </div>
+
+                <button id="saveQuoteBtn" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold shadow-lg mb-3">💾 Save Quote to DB</button>
+                <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-bold shadow-lg">📄 Generate PDF Proposal</button>
             </div>
         </div>
     </div>
 
-    <!-- Logic Script -->
     <script type="module">
-        // 1. ADD YOUR FIREBASE CONFIG HERE
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
-        
+        import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+        // === REPLACE WITH YOUR CONFIG ===
         const firebaseConfig = {
             apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
   authDomain: "renuka-tools-quote.firebaseapp.com",
@@ -105,82 +168,346 @@
   projectId: "renuka-tools-quote",
   storageBucket: "renuka-tools-quote.firebasestorage.app",
   messagingSenderId: "300959855269",
-  appId: "1:300959855269:web:d8d19e979ac3616b10934c",
-  measurementId: "G-H4LKDQGG0P"
+  appId: "1:300959855269:web:d8d19e979ac3616b10934c"
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State Variables
+        let masterData = { tiers: [], categories: [], materials: [], operations: [] };
+        let shoppingCart = [];
+        let currentItemDraft = null;
+
+        // Generate ID
+        const dateStr = new Date().toISOString().slice(0, 7).replace("-", "");
+        const randId = Math.floor(100 + Math.random() * 900);
+        document.getElementById('quoteId').value = `RT-${dateStr}-${randId}`;
 
         // Auth Logic
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
                 document.getElementById('logoutBtn').classList.remove('hidden');
+                await loadMasters();
+                initThreeJS();
+                calculateDraft();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('appScreen').classList.add('hidden');
                 document.getElementById('logoutBtn').classList.add('hidden');
             }
         });
+
         document.getElementById('loginBtn').addEventListener('click', () => {
             signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
                 .catch(() => alert("Invalid credentials"));
         });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // Core Calculator Engine Logic
-        document.getElementById('calculateBtn').addEventListener('click', () => {
-            // 1. Fetch Stepped Inputs
-            let sDia = Number(document.getElementById('shankDia').value);
-            let sLen = Number(document.getElementById('shankLen').value);
-            let cDia = Number(document.getElementById('collarDia').value);
-            let cLen = Number(document.getElementById('collarLen').value);
-            let hDia = Number(document.getElementById('headDia').value);
-            let hLen = Number(document.getElementById('headLen').value);
+        // --- FETCH DYNAMIC MASTERS ---
+        async function loadMasters() {
+            // Fetch Tiers
+            const tSnap = await getDocs(collection(db, "customer_tiers"));
+            tSnap.forEach(doc => masterData.tiers.push({ id: doc.id, ...doc.data() }));
+            populateDropdown('custTier', masterData.tiers, (item) => `${item.name} (Floor: ${item.param1}%)`);
 
-            // 2. Bounding Box Logic for Raw Material
-            let maxDia = Math.max(sDia, cDia, hDia) + 10; 
-            let totalLen = sLen + cLen + hLen + 10;
-            document.getElementById('outRaw').innerText = `Dia ${maxDia} mm × L ${totalLen} mm`;
+            // Fetch Categories
+            const cSnap = await getDocs(collection(db, "tool_categories"));
+            cSnap.forEach(doc => masterData.categories.push({ id: doc.id, ...doc.data() }));
+            populateDropdown('toolCat', masterData.categories, (item) => `${item.name} (Escalation: +${item.param2}%)`);
 
-            // 3. Weight & Cost Simulation (Assuming EN24 density & Rs. 150/kg)
-            let radius = maxDia / 20; // convert to cm
-            let lengthCm = totalLen / 10;
-            let volume = Math.PI * (radius * radius) * lengthCm; 
-            let weightKg = (volume * 7.85) / 1000; 
-            let baseMaterialCost = weightKg * 150; 
+            // Fetch Materials
+            const mSnap = await getDocs(collection(db, "raw_materials"));
+            mSnap.forEach(doc => masterData.materials.push({ id: doc.id, ...doc.data() }));
+            populateDropdown('rawMaterial', masterData.materials, (item) => `${item.name} (₹${item.param2}/kg)`);
+
+            // Fetch Operations
+            const oSnap = await getDocs(collection(db, "operations"));
+            oSnap.forEach(doc => masterData.operations.push({ id: doc.id, ...doc.data() }));
+            populateDropdown('primaryOp', masterData.operations, (item) => `${item.name} (₹${item.param1}/hr)`);
+        }
+
+        function populateDropdown(elementId, dataArray, textFormatter) {
+            const select = document.getElementById(elementId);
+            select.innerHTML = "";
+            dataArray.forEach((item, index) => {
+                let opt = document.createElement('option');
+                opt.value = index; // Store array index for easy retrieval
+                opt.text = textFormatter(item);
+                select.appendChild(opt);
+            });
+        }
+
+        // --- THE CALCULATION ENGINE ---
+        function calculateDraft() {
+            if (masterData.materials.length === 0) return; // Wait for load
+
+            // 1. Dimensions
+            const sD = Number(document.getElementById('sDia').value);
+            const sL = Number(document.getElementById('sLen').value);
+            const cD = Number(document.getElementById('cDia').value);
+            const cL = Number(document.getElementById('cLen').value);
+            const hD = Number(document.getElementById('hDia').value);
+            const hL = Number(document.getElementById('hLen').value);
+
+            // 2. Bound Math
+            const maxDia = Math.max(sD, cD, hD) + 10; 
+            const totalLen = sL + cL + hL + 10;
+            const volCm3 = Math.PI * Math.pow(maxDia / 20, 2) * (totalLen / 10);
+
+            // 3. Cost Math
+            const matIdx = document.getElementById('rawMaterial').value;
+            const opIdx = document.getElementById('primaryOp').value;
+            const tierIdx = document.getElementById('custTier').value;
+            const catIdx = document.getElementById('toolCat').value;
+
+            const selectedMat = masterData.materials[matIdx];
+            const selectedOp = masterData.operations[opIdx];
+            const selectedTier = masterData.tiers[tierIdx];
+            const selectedCat = masterData.categories[catIdx];
+
+            const weightKg = (volCm3 * (selectedMat ? selectedMat.param1 : 7.85)) / 1000;
+            const matCost = weightKg * (selectedMat ? selectedMat.param2 : 150);
             
-            // Dummy Machining Cost (Rs. 800/hr) + Assembly operations
-            let baseMachiningCost = 4500; 
-            let totalBaseCost = baseMaterialCost + baseMachiningCost;
+            const hrs = Number(document.getElementById('machiningHrs').value);
+            const opCost = (hrs * (selectedOp ? selectedOp.param1 : 800)) + (selectedOp ? selectedOp.param2 : 0);
+            
+            const baseCost = matCost + opCost;
+            
+            // Margins
+            const floorMargin = selectedTier ? selectedTier.param1 : 25;
+            const escalation = selectedCat ? selectedCat.param2 : 100;
+            
+            const floorPrice = baseCost * (1 + (floorMargin / 100));
+            const quotePrice = baseCost * (1 + (escalation / 100));
 
-            // 4. Margin Mathematics
-            let floorMarginPercent = Number(document.getElementById('custTier').value);
-            let escalationPercent = Number(document.getElementById('toolTier').value);
+            // Update Draft Object
+            currentItemDraft = {
+                name: document.getElementById('toolName').value || "Custom Stepped Tool",
+                baseCost: baseCost,
+                floorPrice: floorPrice,
+                quotePrice: quotePrice,
+                maxDiscount: ((quotePrice - floorPrice) / quotePrice) * 100
+            };
 
-            let floorPrice = totalBaseCost * (1 + (floorMarginPercent / 100));
-            let quotePrice = totalBaseCost * (1 + (escalationPercent / 100));
-            let maxDiscount = ((quotePrice - floorPrice) / quotePrice) * 100;
+            // Update Audit UI
+            document.getElementById('auditVol').innerText = volCm3.toFixed(2);
+            document.getElementById('auditWt').innerText = weightKg.toFixed(2);
+            document.getElementById('auditMatCost').innerText = `₹ ${matCost.toFixed(2)}`;
+            document.getElementById('auditMfgCost').innerText = `₹ ${opCost.toFixed(2)}`;
+            document.getElementById('auditBaseCost').innerText = `₹ ${baseCost.toFixed(2)}`;
+            document.getElementById('auditFloorCost').innerText = `₹ ${floorPrice.toFixed(2)}`;
 
-            // 5. Update Screen
-            document.getElementById('outBase').innerText = `₹ ${totalBaseCost.toFixed(2)}`;
-            document.getElementById('outFloor').innerText = `₹ ${floorPrice.toFixed(2)}`;
-            document.getElementById('outQuote').innerText = `₹ ${quotePrice.toFixed(2)}`;
-            document.getElementById('outDiscount').innerText = `${maxDiscount.toFixed(1)}%`;
+            update3DModel(sD, sL, cD, cL, hD, hL);
+        }
+
+        // Event Listeners for Recalculation
+        document.querySelectorAll('.tool-dim, select, #machiningHrs, #toolName').forEach(el => {
+            el.addEventListener('input', calculateDraft);
+            el.addEventListener('change', calculateDraft);
         });
 
-        // Basic PDF Generator logic
+        document.getElementById('auditToggleBtn').addEventListener('click', () => {
+            document.getElementById('auditBox').classList.toggle('hidden');
+        });
+
+        // --- SHOPPING CART LOGIC ---
+        document.getElementById('addToCartBtn').addEventListener('click', () => {
+            if (!currentItemDraft) return;
+            shoppingCart.push({...currentItemDraft});
+            renderCart();
+            // Reset tool name for next item
+            document.getElementById('toolName').value = "";
+        });
+
+        function renderCart() {
+            const cartDiv = document.getElementById('cartItems');
+            document.getElementById('emptyCartMsg').style.display = shoppingCart.length > 0 ? 'none' : 'block';
+            
+            let html = "";
+            let totalFloor = 0;
+            let totalQuote = 0;
+
+            shoppingCart.forEach((item, idx) => {
+                totalFloor += item.floorPrice;
+                totalQuote += item.quotePrice;
+                html += `
+                    <div class="bg-gray-700 p-3 rounded flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-sm">${item.name}</p>
+                            <p class="text-xs text-gray-400">Max Disc: ${item.maxDiscount.toFixed(1)}%</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-green-400">₹ ${item.quotePrice.toFixed(2)}</p>
+                            <button onclick="window.removeItem(${idx})" class="text-xs text-red-400 hover:underline">Remove</button>
+                        </div>
+                    </div>`;
+            });
+
+            cartDiv.innerHTML = html;
+            document.getElementById('cartCount').innerText = shoppingCart.length;
+            document.getElementById('cartFloor').innerText = `₹ ${totalFloor.toFixed(2)}`;
+            document.getElementById('cartTotal').innerText = `₹ ${totalQuote.toFixed(2)}`;
+        }
+
+        window.removeItem = (idx) => {
+            shoppingCart.splice(idx, 1);
+            renderCart();
+        };
+
+        // --- SAVING & PDF ---
+        document.getElementById('saveQuoteBtn').addEventListener('click', async () => {
+            if (shoppingCart.length === 0) return alert("Cart is empty!");
+            const quoteData = {
+                quoteId: document.getElementById('quoteId').value,
+                company: document.getElementById('clientCompany').value,
+                contact: document.getElementById('clientName').value,
+                project: document.getElementById('projectName').value,
+                date: new Date().toISOString(),
+                items: shoppingCart,
+                totalQuote: shoppingCart.reduce((sum, item) => sum + item.quotePrice, 0)
+            };
+            try {
+                await addDoc(collection(db, "quotes"), quoteData);
+                alert(`Quote ${quoteData.quoteId} saved successfully to database!`);
+            } catch (e) {
+                alert("Error saving quote.");
+            }
+        });
+
         document.getElementById('pdfBtn').addEventListener('click', () => {
+            if (shoppingCart.length === 0) return alert("Cart is empty!");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
             doc.setFontSize(22);
             doc.text("RENUKA TOOLS", 20, 20);
             doc.setFontSize(12);
-            doc.text("Quotation: RT-202610-001", 20, 30);
-            doc.text("Target Price: " + document.getElementById('outQuote').innerText, 20, 50);
-            doc.save("Renuka_Tools_Quote.pdf");
+            doc.text(`Quote ID: ${document.getElementById('quoteId').value}`, 20, 30);
+            doc.text(`Company: ${document.getElementById('clientCompany').value}`, 20, 40);
+            
+            let y = 60;
+            doc.setFontSize(14);
+            doc.text("Item Breakdown:", 20, y);
+            y += 10;
+            
+            doc.setFontSize(10);
+            let total = 0;
+            shoppingCart.forEach((item, idx) => {
+                doc.text(`${idx + 1}. ${item.name}`, 20, y);
+                doc.text(`Rs. ${item.quotePrice.toFixed(2)}`, 150, y);
+                total += item.quotePrice;
+                y += 10;
+            });
+            
+            y += 10;
+            doc.setFontSize(14);
+            doc.text(`Total Amount: Rs. ${total.toFixed(2)}`, 20, y);
+            
+            doc.save(`${document.getElementById('quoteId').value}_Proposal.pdf`);
         });
+
+        // --- THREE.JS VISUALIZER ---
+        let scene, camera, renderer, toolGroup;
+
+        function initThreeJS() {
+            const container = document.getElementById('canvasContainer');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111827); // Tailwind gray-900
+
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 300);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); // preserveDrawingBuffer allows image download
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(100, 100, 50);
+            scene.add(dirLight);
+
+            toolGroup = new THREE.Group();
+            scene.add(toolGroup);
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            animate();
+        }
+
+        function update3DModel(sD, sL, cD, cL, hD, hL) {
+            if (!toolGroup) return;
+            
+            // Clear existing meshes
+            while(toolGroup.children.length > 0){ 
+                toolGroup.remove(toolGroup.children[0]); 
+            }
+
+            const material = new THREE.MeshStandardMaterial({ 
+                color: 0x9ca3af, // Steel color
+                metalness: 0.8,
+                roughness: 0.2
+            });
+
+            // Create geometries (Radius is Dia/2)
+            const shankGeo = new THREE.CylinderGeometry(sD/2, sD/2, sL, 32);
+            const collarGeo = new THREE.CylinderGeometry(cD/2, cD/2, cL, 32);
+            const headGeo = new THREE.CylinderGeometry(hD/2, hD/2, hL, 32);
+
+            const shank = new THREE.Mesh(shankGeo, material);
+            const collar = new THREE.Mesh(collarGeo, material);
+            const head = new THREE.Mesh(headGeo, material);
+
+            // Position them end-to-end along the Y axis
+            // Tool is centered at origin. 
+            // Total length
+            const totalL = sL + cL + hL;
+            
+            // Start from bottom (Shank end)
+            let currentY = -totalL / 2;
+            
+            shank.position.y = currentY + (sL / 2);
+            currentY += sL;
+            
+            collar.position.y = currentY + (cL / 2);
+            currentY += cL;
+            
+            head.position.y = currentY + (hL / 2);
+
+            toolGroup.add(shank);
+            toolGroup.add(collar);
+            toolGroup.add(head);
+
+            // Rotate slightly for isometric view
+            toolGroup.rotation.x = Math.PI / 6;
+            toolGroup.rotation.z = -Math.PI / 4;
+
+            // Auto-scale camera to fit tool
+            camera.position.z = totalL * 1.5;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        document.getElementById('downloadImgBtn').addEventListener('click', () => {
+            const dataURL = renderer.domElement.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `${document.getElementById('quoteId').value}_ToolRender.png`;
+            link.href = dataURL;
+            link.click();
+        });
+
     </script>
 </body>
 </html>

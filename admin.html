@@ -80,6 +80,14 @@
             <label class="block text-sm font-bold mb-1">Master Title (e.g., Sub-Contractors)</label>
             <input type="text" id="schTitle" class="w-full border p-2 rounded mb-4">
             
+            <label class="block text-sm font-bold mb-1">Calculation Behavior</label>
+            <select id="schBehavior" class="w-full border p-2 rounded mb-4 bg-purple-50 font-semibold">
+                <option value="flat">Flat Cost Adder (₹) - Adds directly to Base Cost</option>
+                <option value="variable">Variable Cost Adder (₹ × Input) - Multiplies by quantity</option>
+                <option value="margin">Margin Modifier (%) - Adjusts final profit margin</option>
+                <option value="lookup">Standalone Lookup - No math, just a dropdown</option>
+            </select>
+            
             <label class="block text-sm font-bold mb-1">Structure Type</label>
             <select id="schType" class="w-full border p-2 rounded mb-4">
                 <option value="2">2 Parameters (Name + 2 numeric fields)</option>
@@ -114,25 +122,24 @@
   projectId: "renuka-tools-quote",
   storageBucket: "renuka-tools-quote.firebasestorage.app",
   messagingSenderId: "300959855269",
-  appId: "1:300959855269:web:d8d19e979ac3616b10934c",
-  measurementId: "G-H4LKDQGG0P"
+  appId: "1:300959855269:web:d8d19e979ac3616b10934c"
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let appSchemas = []; // Holds dynamic configurations
+        let appSchemas = []; 
         let currentTabId = "customer_tiers"; 
         let pendingImportCollection = "";
 
-        // Default Masters to initialize if DB is empty
+        // Default Masters now include the mathematical behavior mapping
         const defaultSchemas = [
-            { id: "customer_tiers", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 2 },
-            { id: "tool_categories", title: "Tool Categories", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 2 },
-            { id: "raw_materials", title: "Raw Materials", cols: ["Grade", "Density", "Cost (₹/kg)"], params: 2 },
-            { id: "operations", title: "Operations Cost", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 2 },
-            { id: "blanks", title: "Standard Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 3 },
-            { id: "standard_items", title: "Standard Products", cols: ["Item Name", "List Price (₹)", "Max Discount (%)"], params: 2 }
+            { id: "customer_tiers", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 2, behavior: "margin" },
+            { id: "tool_categories", title: "Tool Categories", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 2, behavior: "margin" },
+            { id: "raw_materials", title: "Raw Materials", cols: ["Grade", "Density", "Cost (₹/kg)"], params: 2, behavior: "variable" },
+            { id: "operations", title: "Operations Cost", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 2, behavior: "variable" },
+            { id: "blanks", title: "Standard Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 3, behavior: "lookup" },
+            { id: "standard_items", title: "Standard Products", cols: ["Item Name", "List Price (₹)", "Max Discount (%)"], params: 2, behavior: "lookup" }
         ];
 
         // --- AUTH ---
@@ -160,7 +167,6 @@
         async function initializeSchemas() {
             const snap = await getDocs(collection(db, "system_schemas"));
             if (snap.empty) {
-                // First time ever loading app: Inject defaults to DB
                 for (let schema of defaultSchemas) {
                     await setDoc(doc(db, "system_schemas", schema.id), schema);
                 }
@@ -169,7 +175,6 @@
                 appSchemas = [];
                 snap.forEach(doc => appSchemas.push(doc.data()));
             }
-            // Sort to keep default ones roughly in order
             renderArchitecture();
         }
 
@@ -181,7 +186,6 @@
             tablesDiv.innerHTML = "";
 
             appSchemas.forEach((sch, index) => {
-                // Render Tab
                 let isActive = (sch.id === currentTabId);
                 if(index === 0 && !appSchemas.find(s => s.id === currentTabId)) { isActive = true; currentTabId = sch.id; }
                 
@@ -191,11 +195,13 @@
                         ${sch.title}
                     </button>`;
 
-                // Render Table Section
                 let tableHtml = `
                     <div id="section_${sch.id}" class="tab-section ${isActive ? '' : 'hidden'}">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold">${sch.title} Data</h3>
+                            <div>
+                                <h3 class="text-lg font-bold">${sch.title} Data</h3>
+                                <p class="text-xs text-purple-600 font-bold uppercase tracking-wide">Behavior: ${sch.behavior}</p>
+                            </div>
                             <div class="flex space-x-2">
                                 <button onclick="window.downloadTemplate('${sch.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm font-bold">📥 Template</button>
                                 <button onclick="window.triggerImport('${sch.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm font-bold">📤 Import Excel</button>
@@ -272,10 +278,6 @@
                 document.getElementById('grp4').classList.add('hidden');
             }
 
-            if (docId) {
-                // Fetch existing logic could go here, but for simplicity, user overwrites. 
-                // A complete build would fetch the specific document.
-            }
             document.getElementById('dataModal').classList.remove('hidden');
         };
 
@@ -321,22 +323,23 @@
         document.getElementById('saveSchemaBtn').addEventListener('click', async () => {
             const title = document.getElementById('schTitle').value;
             const id = title.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const behavior = document.getElementById('schBehavior').value;
             const params = Number(document.getElementById('schType').value);
             const cols = [document.getElementById('schCol1').value, document.getElementById('schCol2').value, document.getElementById('schCol3').value];
             if(params === 3) cols.push(document.getElementById('schCol4').value);
 
             if(!title) return alert("Title required");
-            const newSchema = { id, title, params, cols };
+            const newSchema = { id, title, params, cols, behavior };
 
             await setDoc(doc(db, "system_schemas", id), newSchema);
             document.getElementById('schemaModal').classList.add('hidden');
-            await initializeSchemas(); // Reload UI!
+            await initializeSchemas(); 
         });
 
         // --- EXCEL ENGINE (IMPORT/EXPORT/TEMPLATE) ---
         window.downloadTemplate = (schemaId) => {
             const sch = appSchemas.find(s => s.id === schemaId);
-            const ws = XLSX.utils.aoa_to_sheet([sch.cols]); // Headers only
+            const ws = XLSX.utils.aoa_to_sheet([sch.cols]); 
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Template");
             XLSX.writeFile(wb, `${sch.title}_Template.xlsx`);
@@ -390,7 +393,7 @@
                     await addDoc(collection(db, pendingImportCollection), dataObj);
                     count++;
                 }
-                document.getElementById('excelUpload').value = ""; // Reset input
+                document.getElementById('excelUpload').value = ""; 
                 alert(`Successfully imported ${count} items into ${sch.title}!`);
                 loadDataForAllTables();
             };
