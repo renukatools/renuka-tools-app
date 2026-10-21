@@ -14,7 +14,7 @@
 </head>
 <body class="bg-gray-100 h-screen flex overflow-hidden font-sans">
 
-    <!-- Login Section (Overlays everything if not logged in) -->
+    <!-- Login Section -->
     <div id="loginSection" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center hidden">
         <div class="max-w-md w-full bg-white p-8 border rounded shadow-lg">
             <div class="text-center mb-6">
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <!-- LEFT SIDEBAR (Vertical Layout) -->
+    <!-- LEFT SIDEBAR -->
     <div id="sidebar" class="w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl transition-all z-20">
         <div class="p-5 bg-gray-950 border-b border-gray-800">
             <h1 class="text-xl font-bold text-white tracking-wider">ERP ADMIN</h1>
@@ -35,22 +35,14 @@
         </div>
         
         <div class="flex-1 overflow-y-auto custom-scrollbar py-4">
-            
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">CRM & Access</p></div>
-            <div id="nav-crm" class="space-y-1 mb-6">
-                <!-- CRM nav links injected here -->
-            </div>
+            <div id="nav-crm" class="space-y-1 mb-6"></div>
 
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Manufacturing Engine</p></div>
-            <div id="nav-mfg" class="space-y-1 mb-6">
-                <!-- Mfg nav links injected here -->
-            </div>
+            <div id="nav-mfg" class="space-y-1 mb-6"></div>
             
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Commercial & Spares</p></div>
-            <div id="nav-com" class="space-y-1">
-                <!-- Com nav links injected here -->
-            </div>
-
+            <div id="nav-com" class="space-y-1"></div>
         </div>
 
         <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2">
@@ -61,27 +53,19 @@
 
     <!-- MAIN CONTENT AREA -->
     <div class="flex-1 flex flex-col h-full bg-gray-50">
-        
-        <!-- Topbar -->
         <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center z-10">
             <h2 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h2>
-            <div class="flex space-x-3" id="topActionButtons">
-                <!-- Dynamic Buttons injected here -->
-            </div>
+            <div class="flex space-x-3" id="topActionButtons"></div>
         </header>
 
-        <!-- Dynamic Tables Area -->
         <main class="flex-1 overflow-y-auto p-6 custom-scrollbar">
-            <div id="tableContainer" class="bg-white rounded-lg shadow border min-h-[500px]">
-                <!-- Tables injected here via JS -->
-            </div>
+            <div id="tableContainer" class="bg-white rounded-lg shadow border min-h-[500px]"></div>
         </main>
     </div>
 
-    <!-- HIDDEN EXCEL INPUT -->
     <input type="file" id="excelUpload" class="hidden" accept=".xlsx, .xls">
 
-    <!-- UNIVERSAL DATA ENTRY MODAL -->
+    <!-- UNIVERSAL DATA ENTRY MODAL (Upgraded with Relational Dropdowns) -->
     <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-white p-6 rounded-lg shadow-2xl w-[450px]">
             <div class="flex justify-between items-center mb-5 border-b pb-3">
@@ -100,14 +84,21 @@
                     <label id="lbl1" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label>
                     <input type="text" id="inp1" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm font-semibold text-gray-800">
                 </div>
+                
                 <div class="hidden" id="grp2">
                     <label id="lbl2" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label>
                     <input type="text" id="inp2" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    <select id="sel2" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"></select>
                 </div>
+                
                 <div class="hidden" id="grp3">
                     <label id="lbl3" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label>
                     <input type="text" id="inp3" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    <select id="sel3" class="hidden w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-blue-50"></select>
+                    <!-- Multi-Select Box for Roles -->
+                    <div id="multiCheck3" class="hidden max-h-40 overflow-y-auto border p-3 rounded bg-blue-50 space-y-2"></div>
                 </div>
+                
                 <div class="hidden" id="grp4">
                     <label id="lbl4" class="block text-xs font-bold mb-1 text-gray-600 uppercase"></label>
                     <input type="text" id="inp4" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm">
@@ -125,10 +116,8 @@
     <div id="schemaModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 backdrop-blur-sm">
         <div class="bg-white p-6 rounded-lg shadow-2xl w-[500px]">
             <h3 class="text-xl font-bold mb-4 text-purple-800 border-b pb-2">Define Custom Master</h3>
-            
             <label class="block text-xs font-bold mb-1 uppercase text-gray-600">Master Title</label>
             <input type="text" id="schTitle" class="w-full border p-2 rounded mb-4 text-sm" placeholder="e.g. Laser Marking">
-            
             <label class="block text-xs font-bold mb-1 uppercase text-gray-600">Calculation Behavior</label>
             <select id="schBehavior" class="w-full border p-2 rounded mb-4 bg-purple-50 text-sm font-semibold">
                 <option value="flat">Flat Cost Adder (₹)</option>
@@ -137,22 +126,14 @@
                 <option value="lookup">Standalone Lookup (Dropdown only)</option>
                 <option value="crm">CRM Relational Data</option>
             </select>
-            
             <label class="block text-xs font-bold mb-1 uppercase text-gray-600">Data Columns Needed</label>
-            <select id="schType" class="w-full border p-2 rounded mb-4 text-sm">
-                <option value="1">1 Column (Name only)</option>
-                <option value="2">2 Columns (Name + 1 Value)</option>
-                <option value="3">3 Columns (Name + 2 Values)</option>
-                <option value="4">4 Columns (Name + 3 Values)</option>
-            </select>
-
+            <select id="schType" class="w-full border p-2 rounded mb-4 text-sm"><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option><option value="4">4 Columns</option></select>
             <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded border">
                 <div><label class="text-[10px] font-bold uppercase text-gray-500">Col 1 (Text)</label><input type="text" id="schCol1" value="Name" class="w-full border p-1 rounded text-sm font-semibold text-gray-700"></div>
                 <div id="schCol2Grp" class="hidden"><label class="text-[10px] font-bold uppercase text-gray-500">Col 2 (Value)</label><input type="text" id="schCol2" class="w-full border p-1 rounded text-sm text-gray-700"></div>
                 <div id="schCol3Grp" class="hidden"><label class="text-[10px] font-bold uppercase text-gray-500">Col 3 (Value)</label><input type="text" id="schCol3" class="w-full border p-1 rounded text-sm text-gray-700"></div>
                 <div id="schCol4Grp" class="hidden"><label class="text-[10px] font-bold uppercase text-gray-500">Col 4 (Value)</label><input type="text" id="schCol4" class="w-full border p-1 rounded text-sm text-gray-700"></div>
             </div>
-
             <div class="flex justify-end space-x-2 border-t pt-4">
                 <button id="cancelSchemaBtn" class="px-4 py-2 bg-gray-200 rounded font-bold text-gray-700 hover:bg-gray-300">Cancel</button>
                 <button id="saveSchemaBtn" class="px-4 py-2 bg-purple-600 text-white font-bold rounded hover:bg-purple-700 shadow">Generate Master</button>
@@ -181,24 +162,21 @@
         const db = getFirestore(app);
 
         let appSchemas = []; 
-        let currentTabId = "roles"; // Default to Roles for setup
+        let mst = {}; // Local memory for dropdown lookups
+        let currentTabId = "roles"; 
         let pendingImportCollection = "";
 
-        // The Ultimate ERP Master Architecture (Now with CRM built-in)
         const defaultSchemas = [
-            // CRM & Access (Category: crm)
             { id: "roles", category: "crm", title: "Sales Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
-            { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Role"], params: 3, behavior: "crm" },
+            { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles"], params: 3, behavior: "crm" },
             { id: "customers", category: "crm", title: "Customer Directory", cols: ["Company Name", "Contact Person", "Owner Role", "GST No (Opt)"], params: 4, behavior: "crm" },
             
-            // Manufacturing Engine (Category: mfg)
             { id: "raw_materials", category: "mfg", title: "Raw Materials", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3, behavior: "variable" },
             { id: "blanks", category: "mfg", title: "Taper Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 4, behavior: "lookup" },
             { id: "operations", category: "mfg", title: "Machine Operations", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 3, behavior: "variable" },
             { id: "features", category: "mfg", title: "Features & Pocketing", cols: ["Feature Name", "Rate per Qty (₹)"], params: 2, behavior: "variable" },
             { id: "assembly", category: "mfg", title: "Assembly & Surface", cols: ["Process Name", "Flat Cost (₹)"], params: 2, behavior: "flat" },
             
-            // Commercial (Category: com)
             { id: "customer_tiers", category: "com", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 3, behavior: "margin" },
             { id: "tool_categories", category: "com", title: "Tool Categories", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 3, behavior: "margin" },
             { id: "spares", category: "com", title: "Spares & Standard Items", cols: ["Item Name", "List Price (₹)", "Max Disc (%)"], params: 3, behavior: "lookup" },
@@ -211,136 +189,132 @@
             if (user) {
                 document.getElementById('loginSection').classList.add('hidden');
                 await initializeSchemas();
-            } else {
-                document.getElementById('loginSection').classList.remove('hidden');
-            }
+            } else { document.getElementById('loginSection').classList.remove('hidden'); }
         });
 
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(() => alert("Invalid credentials"));
-        });
+        document.getElementById('loginBtn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(() => alert("Invalid credentials")));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
         async function initializeSchemas() {
             const snap = await getDocs(collection(db, "system_schemas"));
             appSchemas = [];
-            
-            // Auto-inject full 14-master schema if empty OR missing critical masters
             if (snap.empty || snap.size < 14) {
-                for (let schema of defaultSchemas) {
-                    await setDoc(doc(db, "system_schemas", schema.id), schema);
-                }
+                for (let schema of defaultSchemas) await setDoc(doc(db, "system_schemas", schema.id), schema);
                 appSchemas = defaultSchemas;
-            } else {
-                snap.forEach(doc => appSchemas.push(doc.data()));
-            }
-            renderSidebar();
-            renderActiveTable();
+            } else { snap.forEach(doc => appSchemas.push(doc.data())); }
+            renderSidebar(); renderActiveTable();
         }
 
-        // --- RENDER SIDEBAR ---
         function renderSidebar() {
-            document.getElementById('nav-crm').innerHTML = "";
-            document.getElementById('nav-mfg').innerHTML = "";
-            document.getElementById('nav-com').innerHTML = "";
-
+            document.getElementById('nav-crm').innerHTML = ""; document.getElementById('nav-mfg').innerHTML = ""; document.getElementById('nav-com').innerHTML = "";
             appSchemas.forEach(sch => {
                 const targetDiv = sch.category === 'crm' ? 'nav-crm' : (sch.category === 'mfg' ? 'nav-mfg' : 'nav-com');
                 const btn = document.createElement('button');
                 btn.className = `w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 ${sch.id === currentTabId ? 'active-nav' : 'text-gray-400'}`;
                 btn.innerText = sch.title;
-                btn.onclick = () => {
-                    currentTabId = sch.id;
-                    renderSidebar(); // Update active state
-                    renderActiveTable(); // Update main content
-                };
-                
-                // Fallback for custom masters created via Schema Builder
-                if(document.getElementById(targetDiv)) {
-                    document.getElementById(targetDiv).appendChild(btn);
-                } else {
-                    document.getElementById('nav-com').appendChild(btn);
-                }
+                btn.onclick = () => { currentTabId = sch.id; renderSidebar(); renderActiveTable(); };
+                if(document.getElementById(targetDiv)) document.getElementById(targetDiv).appendChild(btn);
+                else document.getElementById('nav-com').appendChild(btn);
             });
         }
 
-        // --- RENDER MAIN CONTENT ---
         async function renderActiveTable() {
             const sch = appSchemas.find(s => s.id === currentTabId);
             if(!sch) return;
 
+            // Load data into local memory for dropdown mapping
+            mst[sch.id] = [];
+            const dataSnap = await getDocs(collection(db, sch.id));
+            dataSnap.forEach(docSnap => mst[sch.id].push({ id: docSnap.id, ...docSnap.data() }));
+
             document.getElementById('pageTitle').innerText = sch.title;
-            
-            // Render Action Buttons
-            document.getElementById('topActionButtons').innerHTML = `
-                <button onclick="window.downloadTemplate('${sch.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm font-bold shadow transition">📥 Template</button>
-                <button onclick="window.triggerImport('${sch.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold shadow transition">📤 Import Excel</button>
-                <button onclick="window.exportExcel('${sch.id}')" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded text-sm font-bold shadow transition">📊 Export Data</button>
-                <button onclick="window.openEntryModal('${sch.id}')" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded text-sm font-bold shadow transition">+ Add Record</button>
-            `;
+            document.getElementById('topActionButtons').innerHTML = `<button onclick="window.downloadTemplate('${sch.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm font-bold shadow transition">📥 Template</button><button onclick="window.triggerImport('${sch.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold shadow transition">📤 Import Excel</button><button onclick="window.exportExcel('${sch.id}')" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded text-sm font-bold shadow transition">📊 Export Data</button><button onclick="window.openEntryModal('${sch.id}')" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded text-sm font-bold shadow transition">+ Add Record</button>`;
 
             let thHtml = sch.cols.map(c => `<th class="px-4 py-3 border-b">${c}</th>`).join('');
-            
-            document.getElementById('tableContainer').innerHTML = `
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse whitespace-nowrap">
-                        <thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
-                            <tr>${thHtml}<th class="px-4 py-3 border-b w-24">Status</th><th class="px-4 py-3 border-b text-right w-24">Actions</th></tr>
-                        </thead>
-                        <tbody id="tbody_${sch.id}" class="text-sm divide-y divide-gray-100">
-                            <tr><td colspan="6" class="text-center py-10 text-gray-400">Loading data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
+            document.getElementById('tableContainer').innerHTML = `<div class="overflow-x-auto"><table class="w-full text-left border-collapse whitespace-nowrap"><thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider"><tr>${thHtml}<th class="px-4 py-3 border-b w-24">Status</th><th class="px-4 py-3 border-b text-right w-24">Actions</th></tr></thead><tbody id="tbody_${sch.id}" class="text-sm divide-y divide-gray-100"><tr><td colspan="6" class="text-center py-10 text-gray-400">Loading data...</td></tr></tbody></table></div>`;
 
-            // Fetch and render data rows
             let html = "";
-            const snap = await getDocs(collection(db, sch.id));
-            if(snap.empty) {
+            if(mst[sch.id].length === 0) {
                 html = `<tr><td colspan="6" class="text-center py-10 text-gray-400">No records found. Click "+ Add Record" or Import Excel to begin.</td></tr>`;
             } else {
-                snap.forEach(docSnap => {
-                    const d = docSnap.data();
-                    const activeBadge = (d.isActive !== false) ? 
-                        `<span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold border border-green-200">Active</span>` : 
-                        `<span class="bg-red-100 text-red-700 text-[10px] px-2 py-1 rounded-full font-bold border border-red-200">Inactive</span>`;
-                    
+                mst[sch.id].forEach(d => {
+                    const activeBadge = (d.isActive !== false) ? `<span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold border border-green-200">Active</span>` : `<span class="bg-red-100 text-red-700 text-[10px] px-2 py-1 rounded-full font-bold border border-red-200">Inactive</span>`;
                     let trCols = `<td class="px-4 py-3 font-semibold text-gray-800">${d.name || ''}</td>`;
                     if(sch.params >= 2) trCols += `<td class="px-4 py-3 text-gray-600">${d.param1 || '-'}</td>`;
-                    if(sch.params >= 3) trCols += `<td class="px-4 py-3 text-gray-600">${d.param2 || '-'}</td>`;
+                    if(sch.params >= 3) trCols += `<td class="px-4 py-3 text-gray-600 truncate max-w-[200px]">${d.param2 || '-'}</td>`;
                     if(sch.params >= 4) trCols += `<td class="px-4 py-3 text-gray-600">${d.param3 || '-'}</td>`;
                     
-                    html += `
-                        <tr class="hover:bg-blue-50 transition-colors">
-                            ${trCols}
-                            <td class="px-4 py-3">${activeBadge}</td>
-                            <td class="px-4 py-3 text-right">
-                                <button class="text-blue-600 hover:text-blue-800 font-bold mr-3 text-xs" onclick="window.openEntryModal('${sch.id}', '${docSnap.id}')">EDIT</button>
-                                <button class="text-red-500 hover:text-red-700 font-bold text-xs" onclick="window.deleteItem('${sch.id}','${docSnap.id}')">DEL</button>
-                            </td>
-                        </tr>`;
+                    html += `<tr class="hover:bg-blue-50 transition-colors">${trCols}<td class="px-4 py-3">${activeBadge}</td><td class="px-4 py-3 text-right"><button class="text-blue-600 hover:text-blue-800 font-bold mr-3 text-xs" onclick="window.openEntryModal('${sch.id}', '${d.id}')">EDIT</button><button class="text-red-500 hover:text-red-700 font-bold text-xs" onclick="window.deleteItem('${sch.id}','${d.id}')">DEL</button></td></tr>`;
                 });
             }
             document.getElementById(`tbody_${sch.id}`).innerHTML = html;
         }
 
-        // --- DATA ENTRY LOGIC ---
+        // --- DATA ENTRY WITH RELATIONAL DROPDOWNS ---
         window.openEntryModal = async (schemaId, docId = "") => {
             const sch = appSchemas.find(s => s.id === schemaId);
+            
+            // Extract existing data for pre-filling
+            let eData = {};
+            if (docId) eData = mst[schemaId].find(x => x.id === docId) || {};
+
             document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`;
             document.getElementById('activeCollection').value = sch.id;
             document.getElementById('activeDocId').value = docId;
             
-            // Reset fields
+            // Reset UI states
             [2,3,4].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden'));
-            for(let i=1; i<=4; i++) { document.getElementById(`inp${i}`).value = ""; }
-            document.getElementById('isActive').checked = true;
+            document.getElementById('inp2').classList.remove('hidden'); document.getElementById('sel2').classList.add('hidden');
+            document.getElementById('inp3').classList.remove('hidden'); document.getElementById('sel3').classList.add('hidden');
+            document.getElementById('multiCheck3').classList.add('hidden');
+
+            document.getElementById('inp1').value = eData.name || "";
+            document.getElementById('inp2').value = eData.param1 || "";
+            document.getElementById('inp3').value = eData.param2 || "";
+            document.getElementById('inp4').value = eData.param3 || "";
+            document.getElementById('isActive').checked = eData.isActive !== false;
 
             document.getElementById('lbl1').innerText = sch.cols[0];
             if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; }
             if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; }
             if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
+
+            // --- RELATIONAL DROPDOWN OVERRIDES ---
+            
+            // Role Hierarchy Dropdown
+            if (schemaId === 'roles') {
+                document.getElementById('inp2').classList.add('hidden');
+                let sel2 = document.getElementById('sel2'); sel2.classList.remove('hidden');
+                // Ensure mst.roles is loaded
+                if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); }
+                
+                sel2.innerHTML = `<option value="ALL">ALL (Top Level)</option>` + mst.roles.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+                sel2.value = eData.param1 || "ALL";
+            }
+
+            // Customer Owner Dropdown
+            if (schemaId === 'customers') {
+                document.getElementById('inp3').classList.add('hidden');
+                let sel3 = document.getElementById('sel3'); sel3.classList.remove('hidden');
+                if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); }
+                
+                sel3.innerHTML = `<option value="Admin">Admin</option>` + mst.roles.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+                sel3.value = eData.param2 || "Admin";
+            }
+
+            // Multi-Select Roles for Users
+            if (schemaId === 'users') {
+                document.getElementById('inp3').classList.add('hidden');
+                let mc = document.getElementById('multiCheck3'); mc.classList.remove('hidden');
+                if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); }
+                
+                let assignedRoles = (eData.param2 || "").split(',').map(s=>s.trim());
+                mc.innerHTML = mst.roles.map(r => `
+                    <label class="flex items-center space-x-2 text-sm text-gray-800 cursor-pointer p-1 hover:bg-blue-100 rounded">
+                        <input type="checkbox" value="${r.name}" class="role-check w-4 h-4 text-blue-600 rounded" ${assignedRoles.includes(r.name) ? 'checked' : ''}>
+                        <span>${r.name}</span>
+                    </label>`).join('');
+            }
 
             document.getElementById('dataModal').classList.remove('hidden');
         };
@@ -352,37 +326,36 @@
             const id = document.getElementById('activeDocId').value;
             const sch = appSchemas.find(s => s.id === col);
             
-            const dataObj = { 
-                name: document.getElementById('inp1').value,
-                isActive: document.getElementById('isActive').checked 
-            };
-            
-            // If it's a CRM schema (text based), save as strings. If pricing, save as numbers.
+            const dataObj = { name: document.getElementById('inp1').value, isActive: document.getElementById('isActive').checked };
             const isText = (sch.category === 'crm');
             
-            if (sch.params >= 2) dataObj.param1 = isText ? document.getElementById('inp2').value : Number(document.getElementById('inp2').value);
-            if (sch.params >= 3) dataObj.param2 = isText ? document.getElementById('inp3').value : Number(document.getElementById('inp3').value);
+            // Param 1 logic
+            if (col === 'roles') dataObj.param1 = document.getElementById('sel2').value;
+            else if (sch.params >= 2) dataObj.param1 = isText ? document.getElementById('inp2').value : Number(document.getElementById('inp2').value);
+            
+            // Param 2 logic
+            if (col === 'customers') dataObj.param2 = document.getElementById('sel3').value;
+            else if (col === 'users') {
+                let checks = Array.from(document.querySelectorAll('.role-check:checked')).map(c => c.value);
+                dataObj.param2 = checks.join(', ');
+            }
+            else if (sch.params >= 3) dataObj.param2 = isText ? document.getElementById('inp3').value : Number(document.getElementById('inp3').value);
+            
+            // Param 3 logic
             if (sch.params >= 4) dataObj.param3 = isText ? document.getElementById('inp4').value : Number(document.getElementById('inp4').value);
 
             try {
-                if (id) await updateDoc(doc(db, col, id), dataObj);
-                else await addDoc(collection(db, col), dataObj);
+                if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj);
                 document.getElementById('dataModal').classList.add('hidden');
                 renderActiveTable();
             } catch (err) { alert("Error saving data."); }
         });
 
-        window.deleteItem = async (col, id) => {
-            if(confirm("Permanently delete this record?")) {
-                await deleteDoc(doc(db, col, id));
-                renderActiveTable();
-            }
-        };
+        window.deleteItem = async (col, id) => { if(confirm("Permanently delete?")) { await deleteDoc(doc(db, col, id)); renderActiveTable(); } };
 
-        // --- SCHEMA BUILDER & EXCEL LOGIC ---
+        // --- CUSTOM SCHEMA BUILDER ---
         document.getElementById('schemaBuilderBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.remove('hidden'));
         document.getElementById('cancelSchemaBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.add('hidden'));
-        
         document.getElementById('schType').addEventListener('change', (e) => {
             const val = Number(e.target.value);
             document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2);
@@ -391,77 +364,52 @@
         });
 
         document.getElementById('saveSchemaBtn').addEventListener('click', async () => {
-            const title = document.getElementById('schTitle').value;
-            if(!title) return alert("Title required");
+            const title = document.getElementById('schTitle').value; if(!title) return alert("Title required");
             const id = title.toLowerCase().replace(/[^a-z0-9]/g, '_');
-            const behavior = document.getElementById('schBehavior').value;
-            const params = Number(document.getElementById('schType').value);
-            
+            const behavior = document.getElementById('schBehavior').value; const params = Number(document.getElementById('schType').value);
             let cols = [document.getElementById('schCol1').value];
             if(params >= 2) cols.push(document.getElementById('schCol2').value);
             if(params >= 3) cols.push(document.getElementById('schCol3').value);
             if(params >= 4) cols.push(document.getElementById('schCol4').value);
-
-            // New masters go under Commercial category by default
             await setDoc(doc(db, "system_schemas", id), { id, title, params, cols, behavior, category: "com" });
-            document.getElementById('schemaModal').classList.add('hidden');
-            await initializeSchemas(); 
+            document.getElementById('schemaModal').classList.add('hidden'); await initializeSchemas(); 
         });
 
+        // --- EXCEL LOGIC ---
         window.downloadTemplate = (schemaId) => {
-            const sch = appSchemas.find(s => s.id === schemaId);
-            const ws = XLSX.utils.aoa_to_sheet([sch.cols]); 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Template");
-            XLSX.writeFile(wb, `${sch.title}_Template.xlsx`);
+            const sch = appSchemas.find(s => s.id === schemaId); const ws = XLSX.utils.aoa_to_sheet([sch.cols]); const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `${sch.title}_Template.xlsx`);
         };
 
         window.triggerImport = (schemaId) => { pendingImportCollection = schemaId; document.getElementById('excelUpload').click(); };
         document.getElementById('excelUpload').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
+            const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
             reader.onload = async (event) => {
-                const data = new Uint8Array(event.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
+                const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'});
                 const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                const sch = appSchemas.find(s => s.id === pendingImportCollection);
-                const isText = (sch.category === 'crm');
-                
+                const sch = appSchemas.find(s => s.id === pendingImportCollection); const isText = (sch.category === 'crm');
                 let count = 0;
                 for(let row of jsonData) {
                     const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true };
                     if(sch.params >= 2) dataObj.param1 = isText ? String(row[sch.cols[1]] || "") : Number(row[sch.cols[1]] || 0);
                     if(sch.params >= 3) dataObj.param2 = isText ? String(row[sch.cols[2]] || "") : Number(row[sch.cols[2]] || 0);
                     if(sch.params >= 4) dataObj.param3 = isText ? String(row[sch.cols[3]] || "") : Number(row[sch.cols[3]] || 0);
-                    await addDoc(collection(db, pendingImportCollection), dataObj);
-                    count++;
+                    await addDoc(collection(db, pendingImportCollection), dataObj); count++;
                 }
-                document.getElementById('excelUpload').value = ""; 
-                alert(`Successfully imported ${count} items!`);
-                renderActiveTable();
+                document.getElementById('excelUpload').value = ""; alert(`Successfully imported ${count} items!`); renderActiveTable();
             };
             reader.readAsArrayBuffer(file);
         });
 
         window.exportExcel = async (schemaId) => {
             const sch = appSchemas.find(s => s.id === schemaId);
-            const snap = await getDocs(collection(db, schemaId));
-            let dataArr = [];
-            snap.forEach(docSnap => {
-                let d = docSnap.data();
-                let row = {};
-                row[sch.cols[0]] = d.name;
-                if(sch.params >= 2) row[sch.cols[1]] = d.param1;
-                if(sch.params >= 3) row[sch.cols[2]] = d.param2;
-                if(sch.params >= 4) row[sch.cols[3]] = d.param3;
-                row["Is Active"] = (d.isActive !== false) ? "Yes" : "No";
-                dataArr.push(row);
+            let dataArr = mst[schemaId].map(d => {
+                let row = {}; row[sch.cols[0]] = d.name;
+                if(sch.params >= 2) row[sch.cols[1]] = d.param1; if(sch.params >= 3) row[sch.cols[2]] = d.param2; if(sch.params >= 4) row[sch.cols[3]] = d.param3;
+                row["Is Active"] = (d.isActive !== false) ? "Yes" : "No"; return row;
             });
-            const ws = XLSX.utils.json_to_sheet(dataArr);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, sch.title);
-            XLSX.writeFile(wb, `${sch.title}_Export.xlsx`);
+            const ws = XLSX.utils.json_to_sheet(dataArr); const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sch.title); XLSX.writeFile(wb, `${sch.title}_Export.xlsx`);
         };
     </script>
 </body>

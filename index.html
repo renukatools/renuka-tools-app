@@ -28,7 +28,8 @@
             </div>
         </div>
         <div class="flex items-center space-x-4">
-            <span id="userBadge" class="text-xs font-bold text-gray-400"></span>
+            <!-- Multi-Role Switcher Injects Here -->
+            <div id="userBadge" class="flex items-center font-bold text-gray-400"></div>
             <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold hidden transition">Log Out</button>
         </div>
     </nav>
@@ -98,7 +99,7 @@
             </div>
         </div>
 
-        <!-- VIEW 2: QUOTE BUILDER ENGINE (Exactly as previous, with CRM injection) -->
+        <!-- VIEW 2: QUOTE BUILDER ENGINE -->
         <div id="view-builder" class="max-w-[98%] mx-auto mt-6 p-2 hidden grid grid-cols-12 gap-4">
             <!-- LEFT COLUMN: Quote Config & Item Builder -->
             <div class="col-span-12 lg:col-span-8 space-y-4">
@@ -271,8 +272,11 @@
 
         // State
         let currentUser = null;
-        let myRole = null;
-        let myHierarchyRoles = []; // Roles I am allowed to see (Self + children)
+        
+        // Multi-Role state
+        let myRoles = [];
+        let activeRole = null;
+        let myHierarchyRoles = []; 
         
         let appSchemas = []; 
         let mst = {};      
@@ -283,7 +287,7 @@
 
         document.getElementById('quoteId').value = `RT-${new Date().toISOString().slice(0,10).replace(/-/g,"")}-${Math.floor(100+Math.random()*900)}`;
 
-        // --- 1. RBAC & AUTHENTICATION ---
+        // --- 1. MULTI-CONTEXT RBAC & AUTHENTICATION ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -321,21 +325,30 @@
         };
 
         async function establishHierarchy(email) {
-            // Fetch Users to find my role
             const uSnap = await getDocs(collection(db, "users"));
-            uSnap.forEach(doc => { if (doc.data().param1 === email) myRole = doc.data().param2; });
+            uSnap.forEach(doc => { 
+                if (doc.data().param1 === email && doc.data().param2) {
+                    // Split comma-separated roles from Admin panel
+                    myRoles = doc.data().param2.split(',').map(r => r.trim());
+                } 
+            });
             
-            // If admin or no specific role found, give God view (can see all). Otherwise, build tree.
-            if (ADMIN_EMAILS.includes(email) || !myRole) {
+            const badgeContainer = document.getElementById('userBadge');
+            
+            if (ADMIN_EMAILS.includes(email) || myRoles.length === 0) {
                 myHierarchyRoles = ["ALL"];
-                document.getElementById('userBadge').innerText = `Admin View`;
+                activeRole = "Admin";
+                badgeContainer.innerHTML = `<span class="bg-blue-800 text-blue-100 px-2 py-1 text-xs rounded shadow">Admin View</span>`;
             } else {
-                myHierarchyRoles.push(myRole);
+                activeRole = myRoles[0]; // Default active context
+                myHierarchyRoles = [...myRoles];
+                
+                // Fetch complete role tree
                 const rSnap = await getDocs(collection(db, "roles"));
                 let roleMap = {};
-                rSnap.forEach(doc => { roleMap[doc.data().name] = doc.data().param1; }); // name -> reportsTo
+                rSnap.forEach(doc => { roleMap[doc.data().name] = doc.data().param1; });
                 
-                // Find all roles that ultimately report to myRole
+                // Recursively find all children for ALL roles assigned to user
                 let changed = true;
                 while(changed) {
                     changed = false;
@@ -345,7 +358,21 @@
                         }
                     }
                 }
-                document.getElementById('userBadge').innerText = `Role: ${myRole}`;
+
+                // Inject Context Switcher if user has multiple roles
+                if (myRoles.length > 1) {
+                    let opts = myRoles.map(r => `<option value="${r}">${r}</option>`).join('');
+                    badgeContainer.innerHTML = `
+                        <label class="mr-2 text-[10px] uppercase tracking-wider text-gray-400">Quoting As:</label>
+                        <select id="roleSwitcher" class="bg-gray-800 text-white border border-gray-600 rounded text-xs p-1 outline-none shadow focus:border-blue-500">
+                            ${opts}
+                        </select>`;
+                    document.getElementById('roleSwitcher').addEventListener('change', (e) => {
+                        activeRole = e.target.value;
+                    });
+                } else {
+                    badgeContainer.innerHTML = `<span class="bg-gray-700 px-2 py-1 text-xs rounded text-gray-300 shadow">Role: ${activeRole}</span>`;
+                }
             }
         }
 
@@ -432,7 +459,6 @@
             if(revChartInst) revChartInst.destroy();
             if(statChartInst) statChartInst.destroy();
 
-            // Very basic monthly revenue mock for chart (In reality, group quotesData by month)
             revChartInst = new Chart(ctxRev, {
                 type: 'bar',
                 data: { labels: ['Pipeline', 'Closed Won'], datasets: [{ label: 'Revenue (₹)', data: [pipelineVal, quotesData.filter(q=>q.status==='Won').reduce((a,b)=>a+b.grandTotal,0)], backgroundColor: ['#3b82f6', '#22c55e'] }] },
@@ -474,7 +500,7 @@
             });
         }
 
-        // --- 4. ENGINE BUILDER (Path B Dynamic UI) ---
+        // --- 4. ENGINE BUILDER ---
         function buildDynamicUI() {
             const pop = (id, arr, textFn) => { document.querySelectorAll(id).forEach(sel => { sel.innerHTML = ""; (arr || []).forEach((item, idx) => { let opt = document.createElement('option'); opt.value = idx; opt.text = textFn(item); sel.appendChild(opt); }); }); };
             
@@ -529,7 +555,6 @@
             });
         }
 
-        // View Toggles
         document.getElementById('iType').addEventListener('change', (e) => {
             ['viewCustom', 'viewStandard', 'viewTrading'].forEach(v => document.getElementById(v).classList.add('hidden'));
             document.getElementById(e.target.value === 'custom' ? 'viewCustom' : (e.target.value === 'standard' ? 'viewStandard' : 'viewTrading')).classList.remove('hidden');
@@ -544,7 +569,6 @@
             calcEngine();
         });
 
-        // Pricing Engine
         window.calcEngine = () => {
             if(!mst.customer_tiers || mst.customer_tiers.length === 0) return;
             const iType = document.getElementById('iType').value;
@@ -665,7 +689,7 @@
         });
         window.removeCartItem = (idx) => { cart.splice(idx, 1); updateCartUI(); };
 
-        let quoteGrandTotal = 0; // State for saving
+        let quoteGrandTotal = 0; 
         function updateCartUI() {
             const list = document.getElementById('cartItems'); document.getElementById('emptyCartMsg').style.display = cart.length ? 'none' : 'block';
             let html = "", tWt = 0, subNet = 0;
@@ -690,27 +714,26 @@
         // --- 5. CRM SAVE & PDF GENERATION ---
         document.getElementById('saveQuoteDbBtn').addEventListener('click', async () => {
             if(cart.length === 0) return alert("Cart is empty.");
-            
-            // 1. CRM Customer Save if checked
             const compName = document.getElementById('qCompany').value;
+            
+            // Save to CRM Master (Uses activeRole)
             if (document.getElementById('saveNewCrm').checked && compName) {
                 await addDoc(collection(db, "customers"), { 
                     name: compName, 
                     param1: document.getElementById('qContact').value || "", 
-                    param2: myRole || "Admin", 
+                    param2: activeRole || "Admin", 
                     isActive: true 
                 });
-                alert("Customer saved to CRM!");
             }
 
-            // 2. Save Quote
+            // Save Quote (Uses activeRole to determine ownership)
             const qData = {
                 quoteId: document.getElementById('quoteId').value,
                 company: compName || "Unknown",
                 grandTotal: quoteGrandTotal,
                 status: document.getElementById('dealStatus').value,
                 probability: document.getElementById('dealProb').value,
-                ownerRole: myRole || "Admin",
+                ownerRole: activeRole || "Admin",
                 createdBy: currentUser.email,
                 date: new Date().toISOString(),
                 cart: cart
@@ -720,7 +743,7 @@
                 await addDoc(collection(db, "quotes"), qData);
                 alert("Quote Saved Successfully to Pipeline!");
                 await fetchQuotes(); renderDashboard();
-                switchTab('dashboard'); // Auto-switch to dashboard to see it
+                switchTab('dashboard'); 
             } catch(e) { alert("Error saving quote."); }
         });
 
@@ -729,7 +752,6 @@
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
             const qId = document.getElementById('quoteId').value;
             
-            // PAGE 1
             doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(30, 58, 138); doc.text("RENUKA TOOLS", 20, 25);
             doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
             doc.text("M.I.D.C Waluj, Chhatrapati Sambhajinagar, Maharashtra, India", 20, 31); doc.text("GSTIN: 27AABCRXXXXR1Z0 | IEC: 031XXXXXXX", 20, 36);
@@ -742,7 +764,6 @@
             doc.setFont("helvetica", "normal");
             doc.text(`Dear Sir/Madam,\n\nWe thank you for your enquiry and the interest shown in Renuka Tools.\n\nBased on our technical evaluation of your requirements, we are pleased to submit our most competitive commercial offer for your consideration.\n\nPlease find the detailed commercial breakdown and terms on the following page. We look forward to a mutually beneficial business association.\n\n\nWarm Regards,\n\n${currentUser.email}\nRenuka Tools\nsales@renukatools.in`, 20, 95, { maxWidth: 170, lineHeightFactor: 1.5 });
 
-            // PAGE 2
             doc.addPage();
             doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(30, 58, 138); doc.text("COMMERCIAL QUOTATION", 20, 20);
             doc.setFontSize(10); doc.setTextColor(0,0,0); doc.text(`Quote Ref: ${qId}`, 150, 20);
