@@ -3,275 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renuka Tools | ERP Sales Interface</title>
+    <title>Renuka Tools | Enterprise Quoting & CRM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <!-- 3D Rendering Engine Restored -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Chart.js for Dashboard Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .tab-active { border-bottom: 3px solid #60a5fa; color: #60a5fa; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans">
 
     <!-- Navbar -->
-    <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Enterprise Quoting</h1>
-        <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold hidden">Log Out</button>
+    <nav class="bg-gray-900 text-white p-4 shadow-md flex justify-between items-center z-50 relative">
+        <div class="flex items-center space-x-8">
+            <h1 class="text-xl font-bold tracking-wider text-blue-400">RENUKA TOOLS</h1>
+            <div id="navTabs" class="hidden space-x-6 text-sm font-bold tracking-wide">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="pb-1 hover:text-blue-300 transition tab-active">Dashboard & CRM</button>
+                <button onclick="switchTab('builder')" id="tab-builder" class="pb-1 hover:text-blue-300 transition">Quote Builder Engine</button>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span id="userBadge" class="text-xs font-bold text-gray-400"></span>
+            <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold hidden transition">Log Out</button>
+        </div>
     </nav>
 
     <!-- Login Screen -->
-    <div id="loginScreen" class="max-w-md mx-auto mt-20 bg-white p-8 rounded shadow border">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">Sales Engineer Login</h2>
-        <input type="email" id="email" placeholder="Email Address" class="w-full border p-2 mb-4 rounded">
-        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded">
-        <button id="loginBtn" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">Access ERP</button>
+    <div id="loginScreen" class="fixed inset-0 bg-gray-100 z-40 flex items-center justify-center">
+        <div class="max-w-md w-full bg-white p-8 border rounded shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">ERP Authentication</h2>
+            <input type="email" id="email" placeholder="Email Address" class="w-full border p-3 mb-4 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            <button id="loginBtn" class="w-full bg-blue-700 text-white p-3 rounded font-bold hover:bg-blue-800 shadow">Access System</button>
+        </div>
     </div>
 
-    <!-- Main App Screen -->
-    <div id="appScreen" class="max-w-[98%] mx-auto mt-6 p-2 hidden grid grid-cols-12 gap-4">
+    <!-- MAIN APP WRAPPER -->
+    <div id="appScreen" class="hidden">
         
-        <!-- LEFT COLUMN: Quote Config & Item Builder -->
-        <div class="col-span-12 lg:col-span-8 space-y-4">
+        <!-- VIEW 1: DASHBOARD & CRM -->
+        <div id="view-dashboard" class="max-w-7xl mx-auto mt-6 p-4 space-y-6">
             
-            <!-- 1. Global Quote Configuration -->
-            <div class="bg-white p-5 rounded shadow border border-t-4 border-t-blue-800">
-                <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h3 class="text-lg font-bold text-gray-800">1. Quote Master Setup</h3>
-                    <input type="text" id="quoteId" readonly class="border-0 bg-transparent font-bold text-gray-500 text-right focus:outline-none">
+            <!-- Top Stats & AI Alerts -->
+            <div class="grid grid-cols-12 gap-6">
+                <!-- AI Alerts Box -->
+                <div class="col-span-12 lg:col-span-5 bg-gradient-to-r from-blue-900 to-indigo-900 rounded-lg p-5 text-white shadow-lg border border-blue-800">
+                    <h3 class="text-lg font-bold mb-3 flex items-center">🤖 System Action Alerts</h3>
+                    <ul id="aiAlerts" class="space-y-2 text-sm text-blue-100">
+                        <!-- AI Injects here -->
+                    </ul>
                 </div>
                 
-                <div class="grid grid-cols-4 gap-3 mb-4">
-                    <div class="col-span-2"><label class="block text-xs font-bold mb-1">Company Name</label><input type="text" id="qCompany" class="w-full border p-2 text-sm rounded"></div>
-                    <div><label class="block text-xs font-bold mb-1">Contact Person</label><input type="text" id="qContact" class="w-full border p-2 text-sm rounded"></div>
-                    <div><label class="block text-xs font-bold mb-1">Project Ref</label><input type="text" id="qProject" class="w-full border p-2 text-sm rounded"></div>
-                </div>
-
-                <div class="grid grid-cols-4 gap-3 mb-4 bg-gray-50 p-3 rounded border">
-                    <div>
-                        <label class="block text-xs font-bold mb-1 text-blue-800">Business Model</label>
-                        <select id="qModel" class="w-full border p-2 text-sm rounded bg-white font-bold">
-                            <option value="tools">Cutting Tools (Standard 18% GST)</option>
-                            <option value="jobwork_renuka">Job-Work (Renuka RM Scope - 18% GST)</option>
-                            <option value="jobwork_cust">Job-Work (Customer RM Scope - 12% GST)</option>
-                        </select>
+                <!-- Quick Stats -->
+                <div class="col-span-12 lg:col-span-7 grid grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-lg shadow border text-center">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Pipeline Value</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-2" id="statPipeline">₹ 0.00</p>
                     </div>
-                    <div><label class="block text-xs font-bold mb-1">Tax Region</label>
-                        <select id="qRegion" class="w-full border p-2 text-sm rounded">
-                            <option value="mh">Maharashtra (CGST+SGST)</option>
-                            <option value="inter">Interstate (IGST)</option>
-                            <option value="export">Export (0% Tax)</option>
-                        </select>
+                    <div class="bg-white p-5 rounded-lg shadow border text-center">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Active Quotes</p>
+                        <p class="text-2xl font-bold text-blue-600 mt-2" id="statActive">0</p>
                     </div>
-                    <div><label class="block text-xs font-bold mb-1">Payment Terms</label><select id="qPayTerms" class="w-full border p-2 text-sm rounded"><option value="">-- Skip / TBD --</option></select></div>
-                    <div><label class="block text-xs font-bold mb-1">INCO Terms</label><select id="qIncoTerms" class="w-full border p-2 text-sm rounded"><option value="">-- Skip / TBD --</option></select></div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold mb-1">Customer Tier</label><select id="qTier" class="w-full border p-2 text-sm rounded"></select></div>
-                    <div class="flex space-x-2">
-                        <div class="w-1/2"><label class="block text-xs font-bold mb-1">Freight Type</label>
-                            <select id="qFreightMode" class="w-full border p-2 text-sm rounded">
-                                <option value="manual">Manual Lump Sum (₹)</option>
-                                <option value="auto">Auto-Calc by Weight</option>
-                            </select>
-                        </div>
-                        <div class="w-1/2"><label class="block text-xs font-bold mb-1">Freight Value / Rate</label>
-                            <input type="number" id="qFreightVal" value="0" class="w-full border p-2 text-sm rounded">
-                        </div>
+                    <div class="bg-white p-5 rounded-lg shadow border text-center">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Won This Month</p>
+                        <p class="text-2xl font-bold text-green-600 mt-2" id="statWon">0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. Dynamic Line Item Builder -->
-            <div class="bg-white p-5 rounded shadow border border-t-4 border-t-green-600">
-                <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h3 class="text-lg font-bold text-gray-800">2. Add Line Item</h3>
-                    <select id="iType" class="border p-1 text-sm rounded bg-gray-100 font-bold text-gray-700">
-                        <option value="custom">⚙️ Custom / Indexable Tool</option>
-                        <option value="standard">📦 Standard Product / Spares</option>
-                        <option value="trading">🛒 Bought-Out / Trading Item</option>
-                    </select>
-                </div>
+            <!-- Charts -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-lg shadow border"><canvas id="revenueChart" height="200"></canvas></div>
+                <div class="bg-white p-5 rounded-lg shadow border"><canvas id="statusChart" height="200"></canvas></div>
+            </div>
 
-                <div class="mb-4">
-                    <label class="block text-xs font-bold mb-1">Printable Item Description (Shown on PDF)</label>
-                    <input type="text" id="iDesc" placeholder="e.g. Ø63mm Anti-Vibration Boring Bar" class="w-full border p-2 text-sm rounded font-semibold text-blue-900">
+            <!-- Quote Directory -->
+            <div class="bg-white p-5 rounded-lg shadow border">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Active Quotation Pipeline</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap text-sm">
+                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                            <tr><th class="p-3">Quote ID</th><th class="p-3">Customer</th><th class="p-3">Total Value</th><th class="p-3">Owner</th><th class="p-3">Status</th><th class="p-3">Probability</th></tr>
+                        </thead>
+                        <tbody id="quoteTableBody" class="divide-y divide-gray-100">
+                            <!-- Injected -->
+                        </tbody>
+                    </table>
                 </div>
+            </div>
+        </div>
 
-                <!-- A. TRADING & STANDARD VIEWS -->
-                <div id="viewTrading" class="hidden mb-4 p-4 bg-gray-50 border rounded">
-                    <label class="block text-xs font-bold mb-1">Procurement Cost (₹)</label>
-                    <input type="number" id="tCost" class="border p-2 w-1/3 rounded">
-                    <p class="text-xs text-gray-500 mt-1">Trading Margin will be auto-applied based on Customer Tier.</p>
-                </div>
+        <!-- VIEW 2: QUOTE BUILDER ENGINE (Exactly as previous, with CRM injection) -->
+        <div id="view-builder" class="max-w-[98%] mx-auto mt-6 p-2 hidden grid grid-cols-12 gap-4">
+            <!-- LEFT COLUMN: Quote Config & Item Builder -->
+            <div class="col-span-12 lg:col-span-8 space-y-4">
                 
-                <div id="viewStandard" class="hidden mb-4 p-4 bg-gray-50 border rounded">
-                    <label class="block text-xs font-bold mb-1">Select Standard Product</label>
-                    <select id="sProduct" class="border p-2 w-full rounded"></select>
-                </div>
-
-                <!-- B. CUSTOM TOOL / MACHINING VIEW -->
-                <div id="viewCustom" class="space-y-4">
-                    <div><label class="block text-xs font-bold mb-1">Tool Category</label><select id="cCategory" class="w-full border p-2 text-sm rounded bg-gray-50"></select></div>
+                <!-- 1. Global Quote Configuration -->
+                <div class="bg-white p-5 rounded shadow border border-t-4 border-t-blue-800">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 class="text-lg font-bold text-gray-800">1. Quote Master Setup</h3>
+                        <input type="text" id="quoteId" readonly class="border-0 bg-transparent font-bold text-gray-500 text-right focus:outline-none">
+                    </div>
                     
-                    <!-- Raw Material & 3D Render Config -->
-                    <div id="rmSection" class="p-4 bg-blue-50 border border-blue-100 rounded">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-bold text-sm text-blue-900">Finished Dimensions & Material Base</h4>
-                            <select id="cStockShape" class="border p-1 text-xs rounded font-bold">
-                                <option value="round">Round Bar / Stepped Tool</option>
-                                <option value="rect">Rectangular Block</option>
-                                <option value="blank">Taper Blank</option>
+                    <div class="grid grid-cols-4 gap-3 mb-4">
+                        <div class="col-span-2 relative">
+                            <label class="block text-xs font-bold mb-1">Company Name (Smart Search)</label>
+                            <input type="text" id="qCompany" list="crmList" class="w-full border p-2 text-sm rounded bg-yellow-50 focus:ring-2 focus:ring-blue-500" placeholder="Type to search CRM...">
+                            <datalist id="crmList"></datalist>
+                            <div id="crmSaveBox" class="hidden mt-1 flex items-center space-x-2">
+                                <input type="checkbox" id="saveNewCrm" class="rounded text-blue-600">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase">Save to CRM Master</label>
+                            </div>
+                        </div>
+                        <div><label class="block text-xs font-bold mb-1">Contact Person</label><input type="text" id="qContact" class="w-full border p-2 text-sm rounded"></div>
+                        <div><label class="block text-xs font-bold mb-1">Project Ref</label><input type="text" id="qProject" class="w-full border p-2 text-sm rounded"></div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-3 mb-4 bg-gray-50 p-3 rounded border">
+                        <div>
+                            <label class="block text-xs font-bold mb-1 text-blue-800">Business Model</label>
+                            <select id="qModel" class="w-full border p-2 text-sm rounded bg-white font-bold">
+                                <option value="tools">Cutting Tools (Standard 18% GST)</option>
+                                <option value="jobwork_renuka">Job-Work (Renuka RM - 18% GST)</option>
+                                <option value="jobwork_cust">Job-Work (Customer RM - 12% GST)</option>
                             </select>
                         </div>
+                        <div><label class="block text-xs font-bold mb-1">Tax Region</label>
+                            <select id="qRegion" class="w-full border p-2 text-sm rounded"><option value="mh">Maharashtra (CGST+SGST)</option><option value="inter">Interstate (IGST)</option><option value="export">Export (0% Tax)</option></select>
+                        </div>
+                        <div><label class="block text-xs font-bold mb-1">Payment Terms</label><select id="qPayTerms" class="w-full border p-2 text-sm rounded"><option value="">-- Skip --</option></select></div>
+                        <div><label class="block text-xs font-bold mb-1">INCO Terms</label><select id="qIncoTerms" class="w-full border p-2 text-sm rounded"><option value="">-- Skip --</option></select></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="block text-xs font-bold mb-1">Customer Tier</label><select id="qTier" class="w-full border p-2 text-sm rounded"></select></div>
+                        <div class="flex space-x-2">
+                            <div class="w-1/2"><label class="block text-xs font-bold mb-1">Freight Type</label><select id="qFreightMode" class="w-full border p-2 text-sm rounded"><option value="manual">Manual Lump Sum (₹)</option><option value="auto">Auto-Calc by Weight</option></select></div>
+                            <div class="w-1/2"><label class="block text-xs font-bold mb-1">Freight Value / Rate</label><input type="number" id="qFreightVal" value="0" class="w-full border p-2 text-sm rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Dynamic Line Item Builder -->
+                <div class="bg-white p-5 rounded shadow border border-t-4 border-t-green-600">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 class="text-lg font-bold text-gray-800">2. Add Line Item</h3>
+                        <select id="iType" class="border p-1 text-sm rounded bg-gray-100 font-bold text-gray-700"><option value="custom">⚙️ Custom / Indexable Tool</option><option value="standard">📦 Standard Product / Spares</option><option value="trading">🛒 Bought-Out / Trading Item</option></select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold mb-1">Printable Item Description (Shown on PDF)</label>
+                        <input type="text" id="iDesc" placeholder="e.g. Ø63mm Anti-Vibration Boring Bar" class="w-full border p-2 text-sm rounded font-semibold text-blue-900">
+                    </div>
+
+                    <!-- Trading & Standard -->
+                    <div id="viewTrading" class="hidden mb-4 p-4 bg-gray-50 border rounded"><label class="block text-xs font-bold mb-1">Procurement Cost (₹)</label><input type="number" id="tCost" class="border p-2 w-1/3 rounded calc-trigger"><p class="text-xs text-gray-500 mt-1">Trading Margin will be auto-applied.</p></div>
+                    <div id="viewStandard" class="hidden mb-4 p-4 bg-gray-50 border rounded"><label class="block text-xs font-bold mb-1">Select Standard Product</label><select id="sProduct" class="border p-2 w-full rounded calc-trigger"></select></div>
+
+                    <!-- Custom Tool -->
+                    <div id="viewCustom" class="space-y-4">
+                        <div><label class="block text-xs font-bold mb-1">Tool Category</label><select id="cCategory" class="w-full border p-2 text-sm rounded bg-gray-50 calc-trigger"></select></div>
                         
-                        <div class="grid grid-cols-2 gap-4">
-                            <!-- Input Dimensions -->
-                            <div id="dimRound" class="grid grid-cols-2 gap-2 text-xs">
-                                <label class="font-bold pt-2">Shank Dia:</label> <input type="number" id="sDia" value="32" class="border p-1 rounded w-full calc-trigger">
-                                <label class="font-bold pt-2">Shank Len:</label> <input type="number" id="sLen" value="100" class="border p-1 rounded w-full calc-trigger">
-                                <div class="col-span-2 border-b border-blue-200"></div>
-                                <label class="font-bold pt-2">Collar Dia:</label> <input type="number" id="cDia" value="63" class="border p-1 rounded w-full calc-trigger">
-                                <label class="font-bold pt-2">Collar Thick:</label> <input type="number" id="cLen" value="15" class="border p-1 rounded w-full calc-trigger">
-                                <div class="col-span-2 border-b border-blue-200"></div>
-                                <label class="font-bold pt-2">Head Dia:</label> <input type="number" id="hDia" value="50" class="border p-1 rounded w-full calc-trigger">
-                                <label class="font-bold pt-2">Head Len:</label> <input type="number" id="hLen" value="45" class="border p-1 rounded w-full calc-trigger">
-                            </div>
-
-                            <div id="dimRect" class="grid grid-cols-1 gap-2 text-xs hidden">
-                                <label class="font-bold pt-2">Finish Length (mm):</label> <input type="number" id="rcL" value="0" class="border p-1 rounded w-full calc-trigger">
-                                <label class="font-bold pt-2">Finish Width (mm):</label> <input type="number" id="rcW" value="0" class="border p-1 rounded w-full calc-trigger">
-                                <label class="font-bold pt-2">Finish Height (mm):</label> <input type="number" id="rcH" value="0" class="border p-1 rounded w-full calc-trigger">
-                            </div>
-
-                            <div id="dimBlank" class="grid grid-cols-1 gap-2 text-xs hidden">
-                                <label class="font-bold pt-2">Select Blank Type:</label><select id="bType" class="w-full border p-1 rounded calc-trigger"></select>
-                                <label class="font-bold pt-2">Finish GPL (mm):</label> <input type="number" id="bGpl" value="0" class="border p-1 rounded w-full calc-trigger">
+                        <!-- Parent Body & 3D -->
+                        <div id="rmSection" class="p-4 bg-blue-50 border border-blue-200 rounded shadow-sm">
+                            <div class="flex justify-between items-center mb-3 border-b border-blue-200 pb-2"><h4 class="font-bold text-sm text-blue-900">Parent Body - Finished Dimensions</h4><select id="cStockShape" class="border p-1 text-xs rounded font-bold"><option value="round">Round Bar / Stepped Tool</option><option value="rect">Rectangular Block</option><option value="blank">Taper Blank</option></select></div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div id="dimRound" class="grid grid-cols-2 gap-2 text-xs"><label class="font-bold pt-2">Shank Dia:</label> <input type="number" id="sDia" value="32" class="border p-1 rounded w-full calc-trigger"><label class="font-bold pt-2">Shank Len:</label> <input type="number" id="sLen" value="100" class="border p-1 rounded w-full calc-trigger"><div class="col-span-2 border-b border-blue-200"></div><label class="font-bold pt-2">Collar Dia:</label> <input type="number" id="cDia" value="63" class="border p-1 rounded w-full calc-trigger"><label class="font-bold pt-2">Collar Thick:</label> <input type="number" id="cLen" value="15" class="border p-1 rounded w-full calc-trigger"><div class="col-span-2 border-b border-blue-200"></div><label class="font-bold pt-2">Head Dia:</label> <input type="number" id="hDia" value="50" class="border p-1 rounded w-full calc-trigger"><label class="font-bold pt-2">Head Len:</label> <input type="number" id="hLen" value="45" class="border p-1 rounded w-full calc-trigger"></div>
+                                <div id="dimRect" class="grid grid-cols-1 gap-2 text-xs hidden"><label class="font-bold pt-2">Finish Length (mm):</label> <input type="number" id="rcL" value="0" class="border p-1 rounded w-full calc-trigger"><label class="font-bold pt-2">Finish Width (mm):</label> <input type="number" id="rcW" value="0" class="border p-1 rounded w-full calc-trigger"><label class="font-bold pt-2">Finish Height (mm):</label> <input type="number" id="rcH" value="0" class="border p-1 rounded w-full calc-trigger"></div>
+                                <div id="dimBlank" class="grid grid-cols-1 gap-2 text-xs hidden"><label class="font-bold pt-2">Select Blank:</label><select id="bType" class="w-full border p-1 rounded calc-trigger dynamic-blank-select"></select><label class="font-bold pt-2">Finish GPL (mm):</label> <input type="number" id="bGpl" value="0" class="border p-1 rounded w-full calc-trigger"></div>
+                                
+                                <div class="flex flex-col items-center justify-center bg-gray-900 rounded border relative overflow-hidden shadow-inner" id="canvasContainer" style="height: 200px;"><button id="downloadImgBtn" class="absolute bottom-1 right-1 bg-gray-700 text-white text-[10px] px-2 py-1 rounded hover:bg-gray-600">📥 Save Render</button></div>
                             </div>
                             
-                            <!-- 3D Visualizer Canvas (Only visible for Round/Blank) -->
-                            <div class="flex flex-col items-center justify-center bg-gray-900 rounded border relative overflow-hidden" id="canvasContainer" style="height: 200px;">
-                                <!-- ThreeJS Canvas injects here -->
-                                <button id="downloadImgBtn" class="absolute bottom-1 right-1 bg-gray-700 text-white text-[10px] px-2 py-1 rounded hover:bg-gray-600">📥 Save Image</button>
-                            </div>
+                            <div class="mt-4 flex items-center space-x-2"><label class="text-xs font-bold">Material Grade:</label><select id="cMatGrade" class="w-1/2 border p-1 rounded text-sm calc-trigger dynamic-mat-select"></select></div>
+                            <p class="text-[10px] text-gray-500 mt-1 italic">* 10mm machining allowance auto-added to calculate RM volume.</p>
                         </div>
-                        
-                        <div class="mt-3 flex items-center space-x-2">
-                            <label class="text-xs font-bold">Material Grade:</label>
-                            <select id="cMatGrade" class="w-1/2 border p-1 rounded text-sm calc-trigger"></select>
-                        </div>
-                        <p class="text-[10px] text-gray-500 mt-1 italic">* 10mm machining allowance is automatically added in background to calculate RM volume.</p>
+
+                        <!-- SUB-ASSEMBLY -->
+                        <div id="subAssemblyWrapper" class="space-y-3"></div>
+                        <button type="button" onclick="addSubComponent()" class="w-full border-2 border-dashed border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 font-bold py-2 rounded text-sm shadow-sm transition">+ Add Sub-Component (Cartridge, Clamp, etc.)</button>
+
+                        <!-- DYNAMIC BOM AUTO-GENERATOR -->
+                        <div id="dynamicBomContainer" class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200"></div>
                     </div>
 
-                    <!-- Operations BOM -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="border rounded p-3 bg-gray-50">
-                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm">Machining Ops</h4><button type="button" onclick="addBomRow('ops')" class="text-xs bg-gray-300 px-2 py-1 rounded">+ Add</button></div>
-                            <div id="bomOps" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                    <!-- PRICING & OVERRIDE -->
+                    <div class="mt-6 p-4 bg-gray-800 text-white rounded border border-gray-700 shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold text-lg">Pricing Engine</h4>
+                            <div class="flex space-x-4"><div class="text-right"><p class="text-xs text-gray-400">Calculated MRP</p><p class="font-bold text-gray-300" id="engMrp">₹ 0.00</p></div><div class="text-right"><p class="text-xs text-yellow-400">Manual Override MRP</p><input type="number" id="overrideMrp" placeholder="Must be ≥ Calc" class="w-32 bg-gray-700 border border-gray-600 text-white p-1 rounded text-right calc-trigger text-sm"></div></div>
                         </div>
-                        
-                        <div class="border rounded p-3 bg-gray-50">
-                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm">Features / Pocketing</h4><button type="button" onclick="addBomRow('feat')" class="text-xs bg-gray-300 px-2 py-1 rounded">+ Add</button></div>
-                            <div id="bomFeat" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
-                        </div>
-                        
-                        <div class="border rounded p-3 bg-gray-50">
-                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm">Assembly / Surface</h4><button type="button" onclick="addBomRow('assm')" class="text-xs bg-gray-300 px-2 py-1 rounded">+ Add</button></div>
-                            <div id="bomAssm" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
-                        </div>
-                        
-                        <div class="border rounded p-3 bg-gray-50 border-purple-200 bg-purple-50">
-                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm text-purple-900">BOM Spares</h4><button type="button" onclick="addBomRow('spare')" class="text-xs bg-purple-200 px-2 py-1 rounded">+ Add</button></div>
-                            <div id="bomSpares" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PRICING & OVERRIDE GUARDRAILS -->
-                <div class="mt-6 p-4 bg-gray-800 text-white rounded border border-gray-700">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-bold text-lg">Pricing Engine</h4>
-                        <div class="flex space-x-4">
-                            <div class="text-right">
-                                <p class="text-xs text-gray-400">Calculated MRP</p>
-                                <p class="font-bold text-gray-300" id="engMrp">₹ 0.00</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs text-yellow-400">Manual Override MRP (Optional)</p>
-                                <input type="number" id="overrideMrp" placeholder="Must be ≥ Calc" class="w-32 bg-gray-700 border border-gray-600 text-white p-1 rounded text-right calc-trigger text-sm">
-                            </div>
+                        <div class="flex justify-between items-center border-t border-gray-600 pt-4">
+                            <div class="flex space-x-6"><div><p class="text-xs text-gray-400">Max Discount</p><p class="font-bold text-lg text-yellow-400" id="maxDiscOut">0.0%</p></div><div><p class="text-xs text-green-400 font-bold">Offered Discount (%)</p><input type="number" id="offeredDisc" value="0" class="w-20 bg-gray-700 border border-green-500 text-white p-1 rounded text-center calc-trigger"></div></div>
+                            <div class="text-right"><p class="text-xs text-gray-400">Net Selling Price</p><p class="font-bold text-2xl text-green-400" id="netPriceOut">₹ 0.00</p></div>
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center border-t border-gray-600 pt-4">
-                        <div class="flex space-x-6">
-                            <div>
-                                <p class="text-xs text-gray-400">Max Permissible Discount</p>
-                                <p class="font-bold text-lg text-yellow-400" id="maxDiscOut">0.0%</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-green-400 font-bold">Offered Discount (%)</p>
-                                <input type="number" id="offeredDisc" value="0" class="w-20 bg-gray-700 border border-green-500 text-white p-1 rounded text-center calc-trigger">
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs text-gray-400">Final Net Selling Price</p>
-                            <p class="font-bold text-2xl text-green-400" id="netPriceOut">₹ 0.00</p>
+                    <div class="flex justify-between mt-4">
+                        <button id="adminAuditBtn" class="text-xs text-blue-600 hover:text-blue-800 underline font-bold hidden transition">👁️ Admin: Show Cost Breakup</button>
+                        <button id="addToCartBtn" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded font-bold shadow-lg transition">🛒 Add to Unified Quote</button>
+                    </div>
+
+                    <div id="adminAuditPanel" class="hidden mt-4 p-4 bg-yellow-50 border border-yellow-300 rounded text-xs text-gray-800 grid grid-cols-3 gap-2 shadow-inner"><p>Total Raw Vol: <span id="adVol" class="font-bold text-blue-700">0</span> cm³</p><p>Total Raw Wt: <span id="adWt" class="font-bold text-blue-700">0</span> kg</p><p>Total RM Cost: <span id="adRm" class="font-bold text-red-600">₹ 0</span></p><p class="col-span-3">BOM Ops/Spares/Assm Cost: <span id="adBom" class="font-bold text-red-600">₹ 0</span></p><p class="col-span-3 border-t border-yellow-200 pt-2">Base Mfg Cost (No Margins): <span id="adBase" class="font-bold">₹ 0</span></p><p class="col-span-3 text-right text-sm border-t border-yellow-200 pt-2 mt-2">Absolute Floor Price (Min): <span id="adFloor" class="font-bold text-blue-800">₹ 0</span></p></div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Shopping Cart & Save -->
+            <div class="col-span-12 lg:col-span-4">
+                <div class="bg-gray-800 text-white p-5 rounded shadow sticky top-6 border border-gray-700">
+                    <h3 class="text-lg font-bold mb-4 border-b border-gray-600 pb-2">Unified Quote Cart</h3>
+                    
+                    <div id="cartItems" class="space-y-2 mb-4 min-h-[150px] max-h-[250px] overflow-y-auto custom-scrollbar pr-2"><p class="text-gray-400 text-sm text-center mt-10" id="emptyCartMsg">No items added yet.</p></div>
+
+                    <div class="border-t border-gray-600 pt-4 mb-4 text-sm space-y-1">
+                        <div class="flex justify-between"><span class="text-gray-400">Total Items:</span><span id="cCount" class="font-bold">0</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Total Wt (Est):</span><span id="cWt" class="font-bold">0 kg</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Subtotal (Net):</span><span id="cSub" class="font-bold">₹ 0.00</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Freight:</span><span id="cFreight" class="font-bold">₹ 0.00</span></div>
+                        <div class="flex justify-between text-yellow-400 font-bold" id="taxLine"><span>Taxes:</span><span id="cTax">₹ 0.00</span></div>
+                        <div class="flex justify-between text-lg mt-3 pt-3 border-t border-gray-600"><span class="font-bold">Grand Total:</span><span id="cGrand" class="font-bold text-green-400 tracking-wide">₹ 0.00</span></div>
+                    </div>
+
+                    <!-- Deal Context & Save -->
+                    <div class="space-y-2 mb-4 border-t border-gray-600 pt-4">
+                        <div class="flex space-x-2">
+                            <div class="w-1/2"><label class="text-[10px] text-gray-400 uppercase">Sales Stage</label><select id="dealStatus" class="w-full bg-gray-700 border border-gray-600 rounded p-1 text-xs"><option value="Draft">Draft</option><option value="Sent" selected>Sent to Client</option><option value="Negotiating">Negotiating</option><option value="Won">Closed Won</option><option value="Lost">Closed Lost</option></select></div>
+                            <div class="w-1/2"><label class="text-[10px] text-gray-400 uppercase">Probability</label><select id="dealProb" class="w-full bg-gray-700 border border-gray-600 rounded p-1 text-xs"><option value="Hot">🔥 Hot (80%+)</option><option value="Warm" selected>☀️ Warm (50%)</option><option value="Cold">❄️ Cold (20%)</option></select></div>
                         </div>
                     </div>
-                </div>
 
-                <div class="flex justify-between mt-4">
-                    <button id="adminAuditBtn" class="text-xs text-blue-600 underline font-bold hidden">👁️ Admin: Show Cost Breakup</button>
-                    <button id="addToCartBtn" class="bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded font-bold shadow-lg">🛒 Add to Unified Quote</button>
+                    <button id="saveQuoteDbBtn" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold shadow mb-3 transition">💾 Save Quote to CRM</button>
+                    <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-bold shadow flex justify-center items-center transition">📄 Generate Executive PDF</button>
                 </div>
-
-                <!-- Admin Hidden Panel -->
-                <div id="adminAuditPanel" class="hidden mt-4 p-4 bg-yellow-50 border border-yellow-300 rounded text-xs text-gray-800 grid grid-cols-3 gap-2">
-                    <p>Raw Vol: <span id="adVol" class="font-bold">0</span> cm³</p>
-                    <p>Raw Wt: <span id="adWt" class="font-bold">0</span> kg</p>
-                    <p>RM Cost: <span id="adRm" class="font-bold text-red-600">₹ 0</span></p>
-                    <p>Ops Cost: <span id="adOp" class="font-bold text-red-600">₹ 0</span></p>
-                    <p>Spares Cost: <span id="adSp" class="font-bold text-red-600">₹ 0</span></p>
-                    <p>Base Mfg Cost: <span id="adBase" class="font-bold">₹ 0</span></p>
-                    <p class="col-span-3 text-right text-sm border-t border-yellow-200 pt-2 mt-2">Absolute Floor Price (Min): <span id="adFloor" class="font-bold text-blue-800">₹ 0</span></p>
-                </div>
-
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Unified Shopping Cart -->
-        <div class="col-span-12 lg:col-span-4">
-            <div class="bg-gray-800 text-white p-5 rounded shadow sticky top-6 border border-gray-700">
-                <h3 class="text-lg font-bold mb-4 border-b border-gray-600 pb-2">Unified Quote Cart</h3>
-                
-                <div id="cartItems" class="space-y-2 mb-4 min-h-[150px] max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
-                    <p class="text-gray-400 text-sm text-center mt-10" id="emptyCartMsg">No items added yet.</p>
-                </div>
-
-                <div class="border-t border-gray-600 pt-4 mb-4 text-sm space-y-1">
-                    <div class="flex justify-between"><span class="text-gray-400">Total Items:</span><span id="cCount">0</span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">Total Wt (Est):</span><span id="cWt">0 kg</span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">Subtotal (Net):</span><span id="cSub">₹ 0.00</span></div>
-                    <div class="flex justify-between"><span class="text-gray-400">Freight:</span><span id="cFreight">₹ 0.00</span></div>
-                    <div class="flex justify-between text-yellow-400" id="taxLine"><span>Taxes:</span><span id="cTax">₹ 0.00</span></div>
-                    <div class="flex justify-between text-lg mt-2 pt-2 border-t border-gray-600"><span class="font-bold">Grand Total:</span><span id="cGrand" class="font-bold text-green-400">₹ 0.00</span></div>
-                </div>
-
-                <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-bold shadow-lg flex justify-center items-center">
-                    📄 Generate Executive PDF
-                </button>
-            </div>
-        </div>
     </div>
 
+    <!-- LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
         // === REPLACE FIREBASE CONFIG ===
         const firebaseConfig = {
@@ -287,218 +266,346 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // === ROLE BASED ACCESS CONTROL ===
-        const ADMIN_EMAILS = ["anand@renukatools.in", "admin@renukatools.in"]; // ADD YOUR LOGIN EMAIL HERE
+        const ADMIN_EMAILS = ["anand@renukatools.in", "admin@renukatools.in"]; 
+        const CORE_CONFIG_IDS = ["customer_tiers", "tool_categories", "raw_materials", "blanks", "payment_terms", "inco_terms", "freight"];
 
-        const mst = {}; 
+        // State
+        let currentUser = null;
+        let myRole = null;
+        let myHierarchyRoles = []; // Roles I am allowed to see (Self + children)
+        
+        let appSchemas = []; 
+        let mst = {};      
+        let quotesData = [];
+        
         let cart = [];
         let curDraft = null;
 
         document.getElementById('quoteId').value = `RT-${new Date().toISOString().slice(0,10).replace(/-/g,"")}-${Math.floor(100+Math.random()*900)}`;
 
+        // --- 1. RBAC & AUTHENTICATION ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                currentUser = user;
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
+                document.getElementById('navTabs').classList.remove('hidden');
                 document.getElementById('logoutBtn').classList.remove('hidden');
                 
-                if (ADMIN_EMAILS.includes(user.email)) {
-                    document.getElementById('adminAuditBtn').classList.remove('hidden');
-                }
+                if (ADMIN_EMAILS.includes(user.email)) document.getElementById('adminAuditBtn').classList.remove('hidden');
 
-                await fetchMasters();
+                await establishHierarchy(user.email);
+                await fetchDatabaseArchitecture();
+                await fetchQuotes();
+                
                 initThreeJS();
+                renderDashboard();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('appScreen').classList.add('hidden');
-                document.getElementById('logoutBtn').classList.add('hidden');
             }
         });
 
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=>alert("Invalid Login"));
-        });
+        document.getElementById('loginBtn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=>alert("Invalid Login")));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // --- FETCH & POPULATE MASTERS ---
-        async function fetchMasters() {
-            const collections = ["customer_tiers", "tool_categories", "raw_materials", "blanks", "operations", "features", "assembly", "spares", "freight", "payment_terms", "inco_terms"];
-            for (let col of collections) {
-                mst[col] = [];
-                const snap = await getDocs(collection(db, col));
-                snap.forEach(doc => {
-                    if(doc.data().isActive !== false) mst[col].push({ id: doc.id, ...doc.data() });
-                });
+        // UI Tab Switcher
+        window.switchTab = (tab) => {
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-builder').classList.add('hidden');
+            document.getElementById('tab-dashboard').classList.remove('tab-active');
+            document.getElementById('tab-builder').classList.remove('tab-active');
+            
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('tab-active');
+        };
+
+        async function establishHierarchy(email) {
+            // Fetch Users to find my role
+            const uSnap = await getDocs(collection(db, "users"));
+            uSnap.forEach(doc => { if (doc.data().param1 === email) myRole = doc.data().param2; });
+            
+            // If admin or no specific role found, give God view (can see all). Otherwise, build tree.
+            if (ADMIN_EMAILS.includes(email) || !myRole) {
+                myHierarchyRoles = ["ALL"];
+                document.getElementById('userBadge').innerText = `Admin View`;
+            } else {
+                myHierarchyRoles.push(myRole);
+                const rSnap = await getDocs(collection(db, "roles"));
+                let roleMap = {};
+                rSnap.forEach(doc => { roleMap[doc.data().name] = doc.data().param1; }); // name -> reportsTo
+                
+                // Find all roles that ultimately report to myRole
+                let changed = true;
+                while(changed) {
+                    changed = false;
+                    for (let r in roleMap) {
+                        if (myHierarchyRoles.includes(roleMap[r]) && !myHierarchyRoles.includes(r)) {
+                            myHierarchyRoles.push(r); changed = true;
+                        }
+                    }
+                }
+                document.getElementById('userBadge').innerText = `Role: ${myRole}`;
             }
-            populateSelects();
         }
 
-        function populateSelects() {
-            const pop = (id, arr, textFn) => {
-                const sel = document.getElementById(id);
-                if(!sel) return;
-                arr.forEach((item, idx) => {
-                    let opt = document.createElement('option');
-                    opt.value = idx; opt.text = textFn(item);
-                    sel.appendChild(opt);
-                });
-            };
+        async function fetchDatabaseArchitecture() {
+            const schSnap = await getDocs(collection(db, "system_schemas"));
+            appSchemas = []; schSnap.forEach(doc => appSchemas.push(doc.data()));
+
+            for (let sch of appSchemas) {
+                mst[sch.id] = [];
+                const snap = await getDocs(collection(db, sch.id));
+                snap.forEach(doc => { if(doc.data().isActive !== false) mst[sch.id].push({ id: doc.id, ...doc.data() }); });
+            }
             
-            pop('qTier', mst.customer_tiers, i => `${i.name} (Floor: ${i.param1}%)`);
-            pop('qPayTerms', mst.payment_terms, i => i.name);
-            pop('qIncoTerms', mst.inco_terms, i => i.name);
-            pop('cCategory', mst.tool_categories, i => `${i.name}`);
-            pop('cMatGrade', mst.raw_materials, i => `${i.name} (₹${i.param2}/kg)`);
-            pop('bType', mst.blanks, i => `${i.name} (₹${i.param3})`);
-            pop('sProduct', mst.spares, i => `${i.name} (₹${i.param1})`);
+            // Filter customers based on Hierarchy
+            if(mst.customers && !myHierarchyRoles.includes("ALL")) {
+                mst.customers = mst.customers.filter(c => myHierarchyRoles.includes(c.param2));
+            }
             
-            calcEngine();
+            buildDynamicUI();
+            setupCrmSearch();
         }
 
-        // --- UI TOGGLES ---
-        document.getElementById('iType').addEventListener('change', (e) => {
-            document.getElementById('viewCustom').classList.add('hidden');
-            document.getElementById('viewStandard').classList.add('hidden');
-            document.getElementById('viewTrading').classList.add('hidden');
-            if(e.target.value === 'custom') document.getElementById('viewCustom').classList.remove('hidden');
-            if(e.target.value === 'standard') document.getElementById('viewStandard').classList.remove('hidden');
-            if(e.target.value === 'trading') document.getElementById('viewTrading').classList.remove('hidden');
-            calcEngine();
-        });
+        async function fetchQuotes() {
+            quotesData = [];
+            const snap = await getDocs(collection(db, "quotes"));
+            snap.forEach(doc => {
+                let q = { id: doc.id, ...doc.data() };
+                if(myHierarchyRoles.includes("ALL") || myHierarchyRoles.includes(q.ownerRole)) quotesData.push(q);
+            });
+            quotesData.sort((a,b) => new Date(b.date) - new Date(a.date));
+        }
 
-        document.getElementById('cStockShape').addEventListener('change', (e) => {
-            document.getElementById('dimRound').classList.add('hidden');
-            document.getElementById('dimRect').classList.add('hidden');
-            document.getElementById('dimBlank').classList.add('hidden');
-            document.getElementById('canvasContainer').classList.add('hidden');
-            
-            if(e.target.value === 'round') {
-                document.getElementById('dimRound').classList.remove('hidden');
-                document.getElementById('canvasContainer').classList.remove('hidden');
-            }
-            if(e.target.value === 'rect') document.getElementById('dimRect').classList.remove('hidden');
-            if(e.target.value === 'blank') {
-                document.getElementById('dimBlank').classList.remove('hidden');
-                document.getElementById('canvasContainer').classList.remove('hidden');
-            }
-            calcEngine();
-        });
+        // --- 2. DASHBOARD & AI CRM LOGIC ---
+        let revChartInst = null;
+        let statChartInst = null;
 
-        // --- BOM ROW BUILDER ---
-        window.addBomRow = (type) => {
-            let config = { 
-                ops: { arr: mst.operations, div: 'bomOps', l: 'Machine', u: 'Hrs' },
-                feat: { arr: mst.features, div: 'bomFeat', l: 'Feature', u: 'Qty' },
-                assm: { arr: mst.assembly, div: 'bomAssm', l: 'Process', u: 'NA' },
-                spare: { arr: mst.spares, div: 'bomSpares', l: 'Item', u: 'Qty' }
-            }[type];
+        function renderDashboard() {
+            let activeCount = 0, wonCount = 0, pipelineVal = 0;
+            let statusCounts = { 'Draft':0, 'Sent':0, 'Negotiating':0, 'Won':0, 'Lost':0 };
+            let aiMessages = [];
+            
+            const tbody = document.getElementById('quoteTableBody');
+            tbody.innerHTML = "";
 
-            const rowId = `row_${Math.random().toString(36).substr(2, 9)}`;
-            let selHtml = config.arr.map((item, idx) => `<option value="${idx}">${item.name}</option>`).join('');
+            quotesData.forEach(q => {
+                if (['Draft', 'Sent', 'Negotiating'].includes(q.status)) { activeCount++; pipelineVal += q.grandTotal; }
+                if (q.status === 'Won') wonCount++;
+                statusCounts[q.status] = (statusCounts[q.status] || 0) + 1;
+
+                // AI Logic Rules
+                const daysOld = Math.floor((new Date() - new Date(q.date)) / (1000*60*60*24));
+                if(q.probability === 'Hot' && q.status === 'Sent' && daysOld > 3) aiMessages.push(`🔥 <b>${q.quoteId}</b> (${q.company}) is HOT but aging. Follow up today!`);
+                if(q.status === 'Negotiating' && daysOld > 10) aiMessages.push(`⚠️ <b>${q.quoteId}</b> is stuck in negotiation for ${daysOld} days.`);
+
+                // Table Row
+                const probColor = q.probability === 'Hot' ? 'text-red-500' : (q.probability === 'Warm' ? 'text-yellow-500' : 'text-blue-500');
+                const row = `
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="p-3 font-bold text-blue-600">${q.quoteId}</td>
+                        <td class="p-3"><p class="font-bold text-gray-800">${q.company}</p><p class="text-xs text-gray-500">${new Date(q.date).toLocaleDateString()}</p></td>
+                        <td class="p-3 font-bold">₹ ${q.grandTotal.toFixed(2)}</td>
+                        <td class="p-3 text-xs">${q.createdBy}</td>
+                        <td class="p-3">
+                            <select onchange="updateQuoteStatus('${q.id}', this.value)" class="border rounded text-xs p-1 bg-gray-50">
+                                ${['Draft','Sent','Negotiating','Won','Lost'].map(s => `<option value="${s}" ${q.status===s?'selected':''}>${s}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td class="p-3 font-bold ${probColor}">${q.probability}</td>
+                    </tr>`;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('statPipeline').innerText = `₹ ${pipelineVal.toLocaleString('en-IN')}`;
+            document.getElementById('statActive').innerText = activeCount;
+            document.getElementById('statWon').innerText = wonCount;
             
-            let html = `
-                <div class="flex space-x-2 items-center text-xs" id="${rowId}">
-                    <select class="border p-1 w-full rounded bom-select calc-trigger" data-type="${type}">${selHtml}</select>
-                    ${config.u !== 'NA' ? `<input type="number" value="1" class="border p-1 w-16 rounded bom-qty calc-trigger" title="${config.u}">` : ''}
-                    <button type="button" onclick="document.getElementById('${rowId}').remove(); window.calcEngine();" class="text-red-500 font-bold">X</button>
-                </div>`;
-            document.getElementById(config.div).insertAdjacentHTML('beforeend', html);
+            const alertBox = document.getElementById('aiAlerts');
+            alertBox.innerHTML = aiMessages.length > 0 ? aiMessages.map(m => `<li>${m}</li>`).join('') : `<li>✅ Pipeline is healthy. No critical actions pending.</li>`;
+
+            // Charts
+            const ctxRev = document.getElementById('revenueChart').getContext('2d');
+            const ctxStat = document.getElementById('statusChart').getContext('2d');
             
+            if(revChartInst) revChartInst.destroy();
+            if(statChartInst) statChartInst.destroy();
+
+            // Very basic monthly revenue mock for chart (In reality, group quotesData by month)
+            revChartInst = new Chart(ctxRev, {
+                type: 'bar',
+                data: { labels: ['Pipeline', 'Closed Won'], datasets: [{ label: 'Revenue (₹)', data: [pipelineVal, quotesData.filter(q=>q.status==='Won').reduce((a,b)=>a+b.grandTotal,0)], backgroundColor: ['#3b82f6', '#22c55e'] }] },
+                options: { responsive: true, plugins: { title: { display: true, text: 'Revenue Overview' } } }
+            });
+
+            statChartInst = new Chart(ctxStat, {
+                type: 'doughnut',
+                data: { labels: Object.keys(statusCounts), datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#94a3b8', '#3b82f6', '#eab308', '#22c55e', '#ef4444'] }] },
+                options: { responsive: true, plugins: { title: { display: true, text: 'Deal Status Distribution' } } }
+            });
+        }
+
+        window.updateQuoteStatus = async (docId, newStatus) => {
+            await updateDoc(doc(db, "quotes", docId), { status: newStatus });
+            await fetchQuotes(); renderDashboard();
+        };
+
+        // --- 3. CRM SMART SEARCH ---
+        function setupCrmSearch() {
+            const list = document.getElementById('crmList');
+            list.innerHTML = "";
+            (mst.customers || []).forEach(c => {
+                let opt = document.createElement('option'); opt.value = c.name; list.appendChild(opt);
+            });
+
+            document.getElementById('qCompany').addEventListener('input', (e) => {
+                const val = e.target.value;
+                const match = (mst.customers || []).find(c => c.name.toLowerCase() === val.toLowerCase());
+                
+                if (match) {
+                    document.getElementById('qContact').value = match.param1 || "";
+                    document.getElementById('crmSaveBox').classList.add('hidden');
+                } else if (val.length > 2) {
+                    document.getElementById('crmSaveBox').classList.remove('hidden');
+                } else {
+                    document.getElementById('crmSaveBox').classList.add('hidden');
+                }
+            });
+        }
+
+        // --- 4. ENGINE BUILDER (Path B Dynamic UI) ---
+        function buildDynamicUI() {
+            const pop = (id, arr, textFn) => { document.querySelectorAll(id).forEach(sel => { sel.innerHTML = ""; (arr || []).forEach((item, idx) => { let opt = document.createElement('option'); opt.value = idx; opt.text = textFn(item); sel.appendChild(opt); }); }); };
+            
+            pop('#qTier', mst.customer_tiers, i => `${i.name} (Floor: ${i.param1}%)`);
+            pop('#qPayTerms', mst.payment_terms, i => i.name);
+            pop('#qIncoTerms', mst.inco_terms, i => i.name);
+            pop('#cCategory', mst.tool_categories, i => `${i.name}`);
+            pop('.dynamic-mat-select', mst.raw_materials, i => `${i.name} (₹${i.param2}/kg)`);
+            pop('.dynamic-blank-select', mst.blanks, i => `${i.name} (₹${i.param3})`);
+            if(mst.spares) pop('#sProduct', mst.spares, i => `${i.name} (₹${i.param1})`);
+
+            const bomContainer = document.getElementById('dynamicBomContainer');
+            bomContainer.innerHTML = '';
+            appSchemas.forEach(sch => {
+                if (CORE_CONFIG_IDS.includes(sch.id) || mst[sch.id].length === 0 || sch.category === 'crm') return; 
+                const uom = (sch.behavior === 'flat') ? 'NA' : 'Qty / Hrs';
+                const card = `<div class="border border-gray-200 rounded p-3 bg-white shadow-sm"><div class="flex justify-between items-center mb-2 border-b pb-1"><h4 class="font-bold text-sm text-gray-800">${sch.title}</h4><button type="button" onclick="addDynamicBomRow('${sch.id}', '${uom}')" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 px-2 py-1 rounded font-bold transition">+ Add</button></div><div id="bom_div_${sch.id}" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div></div>`;
+                bomContainer.insertAdjacentHTML('beforeend', card);
+            });
+            bindTriggers(); calcEngine();
+        }
+
+        window.addDynamicBomRow = (schemaId, uom) => {
+            const rowId = `bomrow_${Math.random().toString(36).substr(2, 9)}`;
+            let selHtml = mst[schemaId].map((item, idx) => `<option value="${idx}">${item.name}</option>`).join('');
+            let qtyHtml = (uom !== 'NA') ? `<input type="number" value="1" class="border p-1 w-16 rounded text-sm text-center calc-trigger bom-qty" title="${uom}">` : '';
+            let html = `<div class="flex space-x-2 items-center text-xs bom-row" id="${rowId}" data-schema="${schemaId}"><select class="border p-1 w-full rounded bom-select calc-trigger bg-gray-50">${selHtml}</select>${qtyHtml}<button type="button" onclick="document.getElementById('${rowId}').remove(); window.calcEngine();" class="text-red-500 hover:text-red-700 font-bold px-1">X</button></div>`;
+            document.getElementById(`bom_div_${schemaId}`).insertAdjacentHTML('beforeend', html);
+            bindTriggers(); calcEngine();
+        };
+
+        let subCompCount = 0;
+        window.addSubComponent = () => {
+            subCompCount++; const id = `subcomp_${subCompCount}`;
+            let matHtml = mst.raw_materials.map((i, idx) => `<option value="${idx}">${i.name} (₹${i.param2}/kg)</option>`).join('');
+            let blankHtml = mst.blanks.map((i, idx) => `<option value="${idx}">${i.name} (₹${i.param3})</option>`).join('');
+            const html = `<div class="sub-comp-block p-3 bg-gray-50 border border-gray-200 rounded shadow-sm relative mt-2" id="${id}"><button type="button" onclick="document.getElementById('${id}').remove(); window.calcEngine();" class="absolute top-2 right-2 text-xs text-red-500 font-bold hover:underline">Remove</button><div class="flex items-center space-x-2 mb-2 w-3/4"><input type="text" placeholder="Component Name" class="border p-1 text-xs rounded w-1/2 font-bold"><select class="sub-shape border p-1 text-xs rounded w-1/2 calc-trigger" onchange="toggleSubShape('${id}', this.value)"><option value="rect">Rectangular Block</option><option value="round">Round Stock</option><option value="blank">Taper Blank</option></select></div><div class="sub-dim-rect grid grid-cols-3 gap-2 text-xs mb-2"><div><label class="font-bold">L(mm):</label><input type="number" value="0" class="sub-rl border p-1 w-full rounded calc-trigger"></div><div><label class="font-bold">W(mm):</label><input type="number" value="0" class="sub-rw border p-1 w-full rounded calc-trigger"></div><div><label class="font-bold">H(mm):</label><input type="number" value="0" class="sub-rh border p-1 w-full rounded calc-trigger"></div></div><div class="sub-dim-round grid grid-cols-2 gap-2 text-xs mb-2 hidden"><div><label class="font-bold">Max Dia(mm):</label><input type="number" value="0" class="sub-rd border p-1 w-full rounded calc-trigger"></div><div><label class="font-bold">Len(mm):</label><input type="number" value="0" class="sub-rlen border p-1 w-full rounded calc-trigger"></div></div><div class="sub-dim-blank grid grid-cols-2 gap-2 text-xs mb-2 hidden"><div><label class="font-bold">Blank:</label><select class="sub-btype border p-1 w-full rounded calc-trigger">${blankHtml}</select></div><div><label class="font-bold">Finish GPL:</label><input type="number" value="0" class="border p-1 w-full rounded calc-trigger"></div></div><div class="flex items-center space-x-2"><label class="text-xs font-bold">Material:</label><select class="sub-mat border p-1 rounded text-xs calc-trigger w-1/2 bg-white">${matHtml}</select></div></div>`;
+            document.getElementById('subAssemblyWrapper').insertAdjacentHTML('beforeend', html);
+            bindTriggers(); calcEngine();
+        };
+
+        window.toggleSubShape = (id, shapeVal) => {
+            const block = document.getElementById(id);
+            ['rect', 'round', 'blank'].forEach(s => block.querySelector(`.sub-dim-${s}`).classList.add('hidden'));
+            block.querySelector(`.sub-dim-${shapeVal}`).classList.remove('hidden'); calcEngine();
+        };
+
+        function bindTriggers() {
             document.querySelectorAll('.calc-trigger').forEach(el => {
                 el.removeEventListener('input', calcEngine); el.addEventListener('input', calcEngine);
                 el.removeEventListener('change', calcEngine); el.addEventListener('change', calcEngine);
             });
-            calcEngine();
-        };
+        }
 
-        // --- MASTER ENGINE ---
-        document.querySelectorAll('.calc-trigger, #qTier, #qModel').forEach(el => {
-            el.addEventListener('input', calcEngine);
-            el.addEventListener('change', calcEngine);
+        // View Toggles
+        document.getElementById('iType').addEventListener('change', (e) => {
+            ['viewCustom', 'viewStandard', 'viewTrading'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(e.target.value === 'custom' ? 'viewCustom' : (e.target.value === 'standard' ? 'viewStandard' : 'viewTrading')).classList.remove('hidden');
+            calcEngine();
         });
 
+        document.getElementById('cStockShape').addEventListener('change', (e) => {
+            ['dimRound', 'dimRect', 'dimBlank', 'canvasContainer'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            if(e.target.value === 'round') { document.getElementById('dimRound').classList.remove('hidden'); document.getElementById('canvasContainer').classList.remove('hidden'); }
+            if(e.target.value === 'rect') document.getElementById('dimRect').classList.remove('hidden');
+            if(e.target.value === 'blank') { document.getElementById('dimBlank').classList.remove('hidden'); document.getElementById('canvasContainer').classList.remove('hidden'); }
+            calcEngine();
+        });
+
+        // Pricing Engine
         window.calcEngine = () => {
             if(!mst.customer_tiers || mst.customer_tiers.length === 0) return;
-
             const iType = document.getElementById('iType').value;
             const tier = mst.customer_tiers[document.getElementById('qTier').value];
-            const isMachiningCustomerRM = (document.getElementById('qModel').value === 'jobwork_cust');
-            
-            let baseCost = 0, quotePrice = 0, floorPrice = 0, weightKg = 0;
+            const isJobCustRM = (document.getElementById('qModel').value === 'jobwork_cust');
+            let baseCost = 0, quotePrice = 0, floorPrice = 0, totalWt = 0;
 
             if (iType === 'trading') {
                 baseCost = Number(document.getElementById('tCost').value);
-                floorPrice = baseCost * (1 + (tier.param1 / 100)); 
-                quotePrice = baseCost * (1 + (tier.param2 / 100));
-            } 
-            else if (iType === 'standard') {
+                floorPrice = baseCost * (1 + (tier.param1 / 100)); quotePrice = baseCost * (1 + (tier.param2 / 100));
+            } else if (iType === 'standard') {
                 const std = mst.spares[document.getElementById('sProduct').value];
-                quotePrice = std ? std.param1 : 0;
-                floorPrice = quotePrice * (1 - (std.param2 / 100)); 
-                baseCost = floorPrice; 
-            } 
-            else if (iType === 'custom') {
+                quotePrice = std ? std.param1 : 0; floorPrice = quotePrice * (1 - (std.param2 / 100)); baseCost = floorPrice; 
+            } else if (iType === 'custom') {
                 const cat = mst.tool_categories[document.getElementById('cCategory').value];
+                let totalRmCost = 0;
+
                 const shape = document.getElementById('cStockShape').value;
-                let rmCost = 0;
-
-                // 1. Raw Material Math & 3D Triggers
                 if (shape === 'round') {
-                    const sD = Number(document.getElementById('sDia').value);
-                    const sL = Number(document.getElementById('sLen').value);
-                    const cD = Number(document.getElementById('cDia').value);
-                    const cL = Number(document.getElementById('cLen').value);
-                    const hD = Number(document.getElementById('hDia').value);
-                    const hL = Number(document.getElementById('hLen').value);
-                    
-                    update3DModel(sD, sL, cD, cL, hD, hL); // Trigger 3D Render
-
-                    if (!isMachiningCustomerRM) {
-                        const maxDia = Math.max(sD, cD, hD) + 10;
-                        const totalLen = sL + cL + hL + 10;
-                        const vol = Math.PI * Math.pow(maxDia/20, 2) * (totalLen/10);
+                    const sD=Number(document.getElementById('sDia').value), sL=Number(document.getElementById('sLen').value), cD=Number(document.getElementById('cDia').value), cL=Number(document.getElementById('cLen').value), hD=Number(document.getElementById('hDia').value), hL=Number(document.getElementById('hLen').value);
+                    update3DModel(sD, sL, cD, cL, hD, hL); 
+                    if (!isJobCustRM) {
+                        const maxDia = Math.max(sD, cD, hD) + 10; const vol = Math.PI * Math.pow(maxDia/20, 2) * ((sL+cL+hL+10)/10);
                         const mat = mst.raw_materials[document.getElementById('cMatGrade').value];
-                        weightKg = (vol * (mat ? mat.param1 : 7.85)) / 1000;
-                        rmCost = weightKg * (mat ? mat.param2 : 150);
+                        const w = (vol * (mat ? mat.param1 : 7.85)) / 1000; totalWt += w; totalRmCost += (w * (mat ? mat.param2 : 150));
                         document.getElementById('adVol').innerText = vol.toFixed(2);
                     }
-                } 
-                else if (shape === 'rect' && !isMachiningCustomerRM) {
-                    const l = Number(document.getElementById('rcL').value) + 10;
-                    const w = Number(document.getElementById('rcW').value) + 10;
-                    const h = Number(document.getElementById('rcH').value) + 10;
-                    const vol = (l/10) * (w/10) * (h/10);
+                } else if (shape === 'rect' && !isJobCustRM) {
+                    const vol = ((Number(document.getElementById('rcL').value)+10)/10) * ((Number(document.getElementById('rcW').value)+10)/10) * ((Number(document.getElementById('rcH').value)+10)/10);
                     const mat = mst.raw_materials[document.getElementById('cMatGrade').value];
-                    weightKg = (vol * (mat ? mat.param1 : 7.85)) / 1000;
-                    rmCost = weightKg * (mat ? mat.param2 : 150);
-                    document.getElementById('adVol').innerText = vol.toFixed(2);
-                } 
-                else if (shape === 'blank') {
-                    // For blanks, draw a simple stepped tool representation in 3D
+                    const w = (vol * (mat ? mat.param1 : 7.85)) / 1000; totalWt += w; totalRmCost += (w * (mat ? mat.param2 : 150));
+                } else if (shape === 'blank') {
                     update3DModel(40, 50, 60, 20, 50, 40); 
-                    if (!isMachiningCustomerRM) {
-                        const b = mst.blanks[document.getElementById('bType').value];
-                        rmCost = b ? b.param3 : 0;
-                        weightKg = 1.5; 
-                    }
+                    if (!isJobCustRM) { const b = mst.blanks[document.getElementById('bType').value]; totalRmCost += (b ? b.param3 : 0); totalWt += 1.5; }
                 }
-                
-                document.getElementById('adWt').innerText = weightKg.toFixed(2);
-                document.getElementById('adRm').innerText = `₹ ${rmCost.toFixed(2)}`;
 
-                // 2. BOM Math
-                let opCost = 0, spCost = 0;
-                document.querySelectorAll('#bomOps .bom-select').forEach(sel => { const op = mst.operations[sel.value]; opCost += (op.param1 * Number(sel.nextElementSibling.value)) + op.param2; });
-                document.querySelectorAll('#bomFeat .bom-select').forEach(sel => { const feat = mst.features[sel.value]; opCost += (feat.param1 * Number(sel.nextElementSibling.value)); });
-                document.querySelectorAll('#bomAssm .bom-select').forEach(sel => { const assm = mst.assembly[sel.value]; opCost += assm.param1; });
-                document.querySelectorAll('#bomSpares .bom-select').forEach(sel => { const sp = mst.spares[sel.value]; spCost += (sp.param1 * Number(sel.nextElementSibling.value)); });
+                document.querySelectorAll('.sub-comp-block').forEach(b => {
+                    const sShape = b.querySelector('.sub-shape').value, sMat = mst.raw_materials[b.querySelector('.sub-mat').value];
+                    if (sShape === 'rect' && !isJobCustRM) {
+                        const vol = ((Number(b.querySelector('.sub-rl').value)+10)/10) * ((Number(b.querySelector('.sub-rw').value)+10)/10) * ((Number(b.querySelector('.sub-rh').value)+10)/10);
+                        const w = (vol * (sMat ? sMat.param1 : 7.85)) / 1000; totalWt += w; totalRmCost += (w * (sMat ? sMat.param2 : 150));
+                    } else if (sShape === 'round' && !isJobCustRM) {
+                        const vol = Math.PI * Math.pow((Number(b.querySelector('.sub-rd').value)+10)/20, 2) * ((Number(b.querySelector('.sub-rlen').value)+10)/10);
+                        const w = (vol * (sMat ? sMat.param1 : 7.85)) / 1000; totalWt += w; totalRmCost += (w * (sMat ? sMat.param2 : 150));
+                    } else if (sShape === 'blank' && !isJobCustRM) {
+                        const bk = mst.blanks[b.querySelector('.sub-btype').value]; totalRmCost += (bk ? bk.param3 : 0); totalWt += 1.0; 
+                    }
+                });
 
-                document.getElementById('adOp').innerText = `₹ ${opCost.toFixed(2)}`;
-                document.getElementById('adSp').innerText = `₹ ${spCost.toFixed(2)}`;
+                document.getElementById('adWt').innerText = totalWt.toFixed(2); document.getElementById('adRm').innerText = `₹ ${totalRmCost.toFixed(2)}`;
 
-                baseCost = rmCost + opCost + spCost;
-                const floorMargin = tier.param1 + (cat ? cat.param1 : 0);
-                floorPrice = baseCost * (1 + (floorMargin / 100));
+                let totalBomCost = 0;
+                document.querySelectorAll('.bom-row').forEach(row => {
+                    let itemData = mst[row.dataset.schema][row.querySelector('.bom-select').value];
+                    let qty = row.querySelector('.bom-qty') ? Number(row.querySelector('.bom-qty').value) : 1;
+                    if(itemData) totalBomCost += (itemData.param1 * qty) + (itemData.param2 || 0);
+                });
+                document.getElementById('adBom').innerText = `₹ ${totalBomCost.toFixed(2)}`;
+
+                baseCost = totalRmCost + totalBomCost;
+                floorPrice = baseCost * (1 + ((tier.param1 + (cat ? cat.param1 : 0)) / 100));
                 quotePrice = baseCost * (1 + ((cat ? cat.param2 : 100) / 100));
             }
 
@@ -506,181 +613,134 @@
             document.getElementById('adFloor').innerText = `₹ ${floorPrice.toFixed(2)}`;
             document.getElementById('engMrp').innerText = `₹ ${quotePrice.toFixed(2)}`;
 
-            // Guardrails
-            const overrideInp = document.getElementById('overrideMrp');
-            let finalMrp = quotePrice;
-            if (overrideInp.value && Number(overrideInp.value) >= quotePrice) {
-                finalMrp = Number(overrideInp.value); overrideInp.classList.remove('border-red-500');
-            } else if (overrideInp.value && Number(overrideInp.value) < quotePrice) {
-                overrideInp.classList.add('border-red-500'); finalMrp = quotePrice;
-            }
+            const overInp = document.getElementById('overrideMrp'); let fMrp = quotePrice;
+            if (overInp.value && Number(overInp.value) >= quotePrice) { fMrp = Number(overInp.value); overInp.classList.remove('border-red-500'); } 
+            else if (overInp.value && Number(overInp.value) < quotePrice) { overInp.classList.add('border-red-500'); fMrp = quotePrice; }
 
-            const maxDisc = ((finalMrp - floorPrice) / finalMrp) * 100;
-            document.getElementById('maxDiscOut').innerText = `${maxDisc.toFixed(1)}%`;
-
-            const offeredDiscInp = document.getElementById('offeredDisc');
-            let offeredDisc = Number(offeredDiscInp.value);
-            
+            const maxDisc = ((fMrp - floorPrice) / fMrp) * 100; document.getElementById('maxDiscOut').innerText = `${maxDisc.toFixed(1)}%`;
+            const offInp = document.getElementById('offeredDisc'); let offDisc = Number(offInp.value);
             const btn = document.getElementById('addToCartBtn');
-            if (offeredDisc > maxDisc) {
-                offeredDiscInp.classList.replace('border-green-500', 'border-red-500');
-                btn.disabled = true; btn.classList.replace('bg-green-600', 'bg-gray-400');
-            } else {
-                offeredDiscInp.classList.replace('border-red-500', 'border-green-500');
-                btn.disabled = false; btn.classList.replace('bg-gray-400', 'bg-green-600');
-            }
+            if (offDisc > maxDisc) { offInp.classList.replace('border-green-500', 'border-red-500'); btn.disabled = true; btn.classList.replace('bg-green-600', 'bg-gray-400'); } 
+            else { offInp.classList.replace('border-red-500', 'border-green-500'); btn.disabled = false; btn.classList.replace('bg-gray-400', 'bg-green-600'); }
 
-            const netPrice = finalMrp * (1 - (offeredDisc / 100));
-            document.getElementById('netPriceOut').innerText = `₹ ${netPrice.toFixed(2)}`;
-
-            curDraft = {
-                desc: document.getElementById('iDesc').value || "Unnamed Item",
-                type: iType, weight: weightKg, mrp: finalMrp, discPercent: offeredDisc, netPrice: netPrice
-            };
+            const netP = fMrp * (1 - (offDisc / 100)); document.getElementById('netPriceOut').innerText = `₹ ${netP.toFixed(2)}`;
+            curDraft = { desc: document.getElementById('iDesc').value || "Unnamed Item", weight: totalWt, mrp: fMrp, discPercent: offDisc, netPrice: netP };
         };
 
-        // --- THREE.JS VISUALIZER LOGIC ---
+        // 3D Canvas
         let scene, camera, renderer, toolGroup;
         function initThreeJS() {
             const container = document.getElementById('canvasContainer');
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x111827); // Tailwind gray-900
-
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 0, 300);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
+            scene = new THREE.Scene(); scene.background = new THREE.Color(0x111827);
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000); camera.position.set(0, 0, 300);
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(100, 100, 50);
-            scene.add(dirLight);
-
-            toolGroup = new THREE.Group();
-            scene.add(toolGroup);
-
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(100, 100, 50); scene.add(dirLight);
+            toolGroup = new THREE.Group(); scene.add(toolGroup);
             animate();
         }
-
         function update3DModel(sD, sL, cD, cL, hD, hL) {
-            if (!toolGroup) return;
-            while(toolGroup.children.length > 0) { toolGroup.remove(toolGroup.children[0]); }
-
+            if (!toolGroup) return; while(toolGroup.children.length > 0) { toolGroup.remove(toolGroup.children[0]); }
             const material = new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.8, roughness: 0.2 });
-
             const shank = new THREE.Mesh(new THREE.CylinderGeometry(sD/2, sD/2, sL, 32), material);
             const collar = new THREE.Mesh(new THREE.CylinderGeometry(cD/2, cD/2, cL, 32), material);
             const head = new THREE.Mesh(new THREE.CylinderGeometry(hD/2, hD/2, hL, 32), material);
-
-            const totalL = sL + cL + hL;
-            let currentY = -totalL / 2;
-            
-            shank.position.y = currentY + (sL / 2); currentY += sL;
-            collar.position.y = currentY + (cL / 2); currentY += cL;
-            head.position.y = currentY + (hL / 2);
-
+            const totalL = sL + cL + hL; let cY = -totalL / 2;
+            shank.position.y = cY + (sL / 2); cY += sL; collar.position.y = cY + (cL / 2); cY += cL; head.position.y = cY + (hL / 2);
             toolGroup.add(shank); toolGroup.add(collar); toolGroup.add(head);
-
-            toolGroup.rotation.x = Math.PI / 6;
-            toolGroup.rotation.z = -Math.PI / 4;
-            camera.position.z = totalL * 1.5;
+            toolGroup.rotation.x = Math.PI / 6; toolGroup.rotation.z = -Math.PI / 4; camera.position.z = totalL * 1.5;
         }
+        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-
-        document.getElementById('downloadImgBtn').addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = `ToolRender.png`;
-            link.href = renderer.domElement.toDataURL('image/png');
-            link.click();
-        });
-
-        // --- CART & UI UPDATES ---
-        document.getElementById('adminAuditBtn').addEventListener('click', () => document.getElementById('adminAuditPanel').classList.toggle('hidden'));
-        document.getElementById('qFreightMode').addEventListener('change', updateCartUI);
+        // Cart Actions
+        document.querySelectorAll('#qFreightMode, #qFreightVal, #qRegion, #qModel').forEach(el => el.addEventListener('change', updateCartUI));
         document.getElementById('qFreightVal').addEventListener('input', updateCartUI);
-        document.getElementById('qRegion').addEventListener('change', updateCartUI);
-        document.getElementById('qModel').addEventListener('change', updateCartUI);
-
+        
         document.getElementById('addToCartBtn').addEventListener('click', () => {
             if(!curDraft || document.getElementById('addToCartBtn').disabled) return;
-            cart.push({...curDraft});
-            updateCartUI();
-            document.getElementById('iDesc').value = "";
-            document.getElementById('overrideMrp').value = "";
-            document.getElementById('offeredDisc').value = "0";
+            cart.push({...curDraft}); updateCartUI();
+            document.getElementById('iDesc').value = ""; document.getElementById('overrideMrp').value = ""; document.getElementById('offeredDisc').value = "0";
             calcEngine();
         });
-
         window.removeCartItem = (idx) => { cart.splice(idx, 1); updateCartUI(); };
 
+        let quoteGrandTotal = 0; // State for saving
         function updateCartUI() {
-            const list = document.getElementById('cartItems');
-            document.getElementById('emptyCartMsg').style.display = cart.length ? 'none' : 'block';
-            
-            let html = "", totalWt = 0, subNet = 0;
+            const list = document.getElementById('cartItems'); document.getElementById('emptyCartMsg').style.display = cart.length ? 'none' : 'block';
+            let html = "", tWt = 0, subNet = 0;
             cart.forEach((item, i) => {
-                totalWt += item.weight; subNet += item.netPrice;
-                html += `
-                    <div class="bg-gray-700 p-2 rounded flex justify-between items-center text-xs">
-                        <div class="w-3/4">
-                            <p class="font-bold truncate">${item.desc}</p>
-                            <p class="text-gray-400">${item.discPercent > 0 ? `MRP: ₹${item.mrp.toFixed(2)} (-${item.discPercent}%)` : `MRP: ₹${item.mrp.toFixed(2)}`}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-green-400">₹ ${item.netPrice.toFixed(2)}</p>
-                            <button onclick="window.removeCartItem(${i})" class="text-red-400 hover:underline">Remove</button>
-                        </div>
-                    </div>`;
+                tWt += item.weight; subNet += item.netPrice;
+                html += `<div class="bg-gray-700 p-2 rounded flex justify-between items-center text-xs border border-gray-600"><div class="w-3/4"><p class="font-bold truncate">${item.desc}</p><p class="text-gray-400">${item.discPercent > 0 ? `MRP: ₹${item.mrp.toFixed(2)} (-${item.discPercent}%)` : `MRP: ₹${item.mrp.toFixed(2)}`}</p></div><div class="text-right"><p class="font-bold text-green-400">₹ ${item.netPrice.toFixed(2)}</p><button onclick="window.removeCartItem(${i})" class="text-red-400 hover:underline">Remove</button></div></div>`;
             });
             list.innerHTML = html;
 
-            let freight = (document.getElementById('qFreightMode').value === 'auto') ? (totalWt * Number(document.getElementById('qFreightVal').value || 0)) : Number(document.getElementById('qFreightVal').value || 0);
-
+            let freight = (document.getElementById('qFreightMode').value === 'auto') ? (tWt * Number(document.getElementById('qFreightVal').value || 0)) : Number(document.getElementById('qFreightVal').value || 0);
             const region = document.getElementById('qRegion').value;
-            let taxRate = (document.getElementById('qModel').value === 'jobwork_cust') ? 0.12 : 0.18;
-            if(region === 'export') taxRate = 0;
-            
+            let taxRate = (document.getElementById('qModel').value === 'jobwork_cust') ? 0.12 : 0.18; if(region === 'export') taxRate = 0;
             const taxes = (subNet + freight) * taxRate;
+            quoteGrandTotal = subNet + freight + taxes;
 
-            document.getElementById('cCount').innerText = cart.length;
-            document.getElementById('cWt').innerText = `${totalWt.toFixed(2)} kg`;
-            document.getElementById('cSub').innerText = `₹ ${subNet.toFixed(2)}`;
-            document.getElementById('cFreight').innerText = `₹ ${freight.toFixed(2)}`;
+            document.getElementById('cCount').innerText = cart.length; document.getElementById('cWt').innerText = `${tWt.toFixed(2)} kg`;
+            document.getElementById('cSub').innerText = `₹ ${subNet.toFixed(2)}`; document.getElementById('cFreight').innerText = `₹ ${freight.toFixed(2)}`;
             document.getElementById('taxLine').children[0].innerText = region === 'export' ? "Taxes (0%)" : (region === 'mh' ? `CGST+SGST (${taxRate*100}%)` : `IGST (${taxRate*100}%)`);
-            document.getElementById('cTax').innerText = `₹ ${taxes.toFixed(2)}`;
-            document.getElementById('cGrand').innerText = `₹ ${(subNet + freight + taxes).toFixed(2)}`;
+            document.getElementById('cTax').innerText = `₹ ${taxes.toFixed(2)}`; document.getElementById('cGrand').innerText = `₹ ${quoteGrandTotal.toFixed(2)}`;
         }
 
-        // --- PDF GENERATOR ---
+        // --- 5. CRM SAVE & PDF GENERATION ---
+        document.getElementById('saveQuoteDbBtn').addEventListener('click', async () => {
+            if(cart.length === 0) return alert("Cart is empty.");
+            
+            // 1. CRM Customer Save if checked
+            const compName = document.getElementById('qCompany').value;
+            if (document.getElementById('saveNewCrm').checked && compName) {
+                await addDoc(collection(db, "customers"), { 
+                    name: compName, 
+                    param1: document.getElementById('qContact').value || "", 
+                    param2: myRole || "Admin", 
+                    isActive: true 
+                });
+                alert("Customer saved to CRM!");
+            }
+
+            // 2. Save Quote
+            const qData = {
+                quoteId: document.getElementById('quoteId').value,
+                company: compName || "Unknown",
+                grandTotal: quoteGrandTotal,
+                status: document.getElementById('dealStatus').value,
+                probability: document.getElementById('dealProb').value,
+                ownerRole: myRole || "Admin",
+                createdBy: currentUser.email,
+                date: new Date().toISOString(),
+                cart: cart
+            };
+
+            try {
+                await addDoc(collection(db, "quotes"), qData);
+                alert("Quote Saved Successfully to Pipeline!");
+                await fetchQuotes(); renderDashboard();
+                switchTab('dashboard'); // Auto-switch to dashboard to see it
+            } catch(e) { alert("Error saving quote."); }
+        });
+
         document.getElementById('pdfBtn').addEventListener('click', () => {
             if(cart.length === 0) return alert("Cart is empty.");
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
             const qId = document.getElementById('quoteId').value;
-            const qComp = document.getElementById('qCompany').value || "Client Name";
-            const qCont = document.getElementById('qContact').value || "Contact Person";
-            const qProj = document.getElementById('qProject').value || "General Machining";
-
+            
             // PAGE 1
             doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(30, 58, 138); doc.text("RENUKA TOOLS", 20, 25);
             doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
             doc.text("M.I.D.C Waluj, Chhatrapati Sambhajinagar, Maharashtra, India", 20, 31); doc.text("GSTIN: 27AABCRXXXXR1Z0 | IEC: 031XXXXXXX", 20, 36);
             doc.setLineWidth(0.5); doc.setDrawColor(200, 200, 200); doc.line(20, 42, 190, 42);
 
-            doc.setTextColor(0, 0, 0); doc.setFontSize(11);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 55); doc.text(`Quote Ref: ${qId}`, 150, 61);
-            doc.setFont("helvetica", "bold"); doc.text(`To,`, 20, 55); doc.text(qCont, 20, 61); doc.text(qComp, 20, 67);
-            doc.text(`Subject: Commercial Offer for ${qProj}`, 20, 85);
+            doc.setTextColor(0, 0, 0); doc.setFontSize(11); doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 55); doc.text(`Quote Ref: ${qId}`, 150, 61);
+            doc.setFont("helvetica", "bold"); doc.text(`To,`, 20, 55); doc.text(document.getElementById('qContact').value || "Client", 20, 61); doc.text(document.getElementById('qCompany').value || "Company", 20, 67);
+            doc.text(`Subject: Commercial Offer for ${document.getElementById('qProject').value || "Project"}`, 20, 85);
             
             doc.setFont("helvetica", "normal");
-            let letter = `Dear Sir/Madam,\n\nWe thank you for your enquiry and the interest shown in Renuka Tools.\n\nBased on our technical evaluation of your requirements for the ${qProj} project, we are pleased to submit our most competitive commercial offer for your consideration.\n\nAt Renuka Tools, we specialize in high-precision manufacturing, ensuring rigorous quality control and optimal performance for every component we deliver.\n\nPlease find the detailed commercial breakdown and terms on the following page. We look forward to a mutually beneficial business association.\n\n\nWarm Regards,\n\nAnand Mulay\nProprietor, Renuka Tools\n+91 9999999999\nsales@renukatools.in`;
-            doc.text(letter, 20, 95, { maxWidth: 170, lineHeightFactor: 1.5 });
+            doc.text(`Dear Sir/Madam,\n\nWe thank you for your enquiry and the interest shown in Renuka Tools.\n\nBased on our technical evaluation of your requirements, we are pleased to submit our most competitive commercial offer for your consideration.\n\nPlease find the detailed commercial breakdown and terms on the following page. We look forward to a mutually beneficial business association.\n\n\nWarm Regards,\n\n${currentUser.email}\nRenuka Tools\nsales@renukatools.in`, 20, 95, { maxWidth: 170, lineHeightFactor: 1.5 });
 
             // PAGE 2
             doc.addPage();
@@ -688,10 +748,7 @@
             doc.setFontSize(10); doc.setTextColor(0,0,0); doc.text(`Quote Ref: ${qId}`, 150, 20);
 
             let tableData = cart.map((c, idx) => [idx+1, c.desc, "1.00", c.discPercent > 0 ? `${c.discPercent}%` : "-", `Rs. ${c.netPrice.toFixed(2)}`]);
-            doc.autoTable({
-                startY: 30, head: [['Sr.No', 'Item Description', 'Qty', 'Discount', 'Net Amount (INR)']], body: tableData, theme: 'grid',
-                headStyles: { fillColor: [30, 58, 138], textColor: 255 }, columnStyles: { 0: { halign: 'center' }, 2: { halign: 'center' }, 3: { halign: 'center' }, 4: { halign: 'right' } }
-            });
+            doc.autoTable({ startY: 30, head: [['Sr.No', 'Item Description', 'Qty', 'Discount', 'Net Amount (INR)']], body: tableData, theme: 'grid', headStyles: { fillColor: [30, 58, 138], textColor: 255 }, columnStyles: { 0: { halign: 'center' }, 2: { halign: 'center' }, 3: { halign: 'center' }, 4: { halign: 'right' } }});
 
             let finalY = doc.lastAutoTable.finalY + 10;
             doc.setFont("helvetica", "normal");
@@ -706,7 +763,6 @@
             const ptIdx = document.getElementById('qPayTerms').value; if(ptIdx) doc.text(`${tIdx++}. Payment: ${mst.payment_terms[ptIdx].name}`, 20, finalY+=6);
             const incIdx = document.getElementById('qIncoTerms').value; if(incIdx) doc.text(`${tIdx++}. INCO/Shipping: ${mst.inco_terms[incIdx].name}`, 20, finalY+=6);
             doc.text(`${tIdx++}. Validity: 30 Days from date of quotation.`, 20, finalY+=6);
-            doc.text(`${tIdx++}. Bank Details: State Bank of India | A/c: 3XXXXXX777 | IFSC: SBIN000XXXX`, 20, finalY+=6);
 
             doc.save(`${qId}_Proposal.pdf`);
         });
