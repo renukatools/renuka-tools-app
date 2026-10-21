@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Renuka Tools | ERP Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renuka Tools | ERP Admin Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>.custom-scrollbar::-webkit-scrollbar{width:6px;height:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}.active-nav{background-color:#1e40af;border-left:4px solid #60a5fa;color:white}</style>
 </head>
 <body class="bg-gray-100 h-screen flex overflow-hidden font-sans">
-    <div id="loginSection" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center hidden"><div class="max-w-md w-full bg-white p-8 border rounded shadow-2xl"><h2 class="text-2xl font-bold text-center text-gray-800 tracking-wide mb-6">RENUKA TOOLS<br><span class="text-sm text-gray-500">Admin Authentication</span></h2><input type="email" id="email" placeholder="Admin Email" class="w-full border p-3 mb-4 rounded focus:ring-2 focus:ring-blue-500 outline-none"><input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded focus:ring-2 focus:ring-blue-500 outline-none"><button id="loginBtn" class="w-full bg-blue-700 text-white p-3 rounded font-bold hover:bg-blue-800 shadow transition">Secure Login</button></div></div>
+    <div id="loginSection" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center hidden">
+        <div class="max-w-md w-full bg-white p-8 border rounded shadow-lg">
+            <h2 class="text-2xl font-bold text-center text-gray-800 tracking-wide mb-6">RENUKA TOOLS<br><span class="text-sm text-gray-500">Master Admin Secure Login</span></h2>
+            <input type="email" id="email" placeholder="Admin Email" class="w-full border p-3 mb-4 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            <button id="loginBtn" class="w-full bg-blue-700 text-white p-3 rounded font-bold hover:bg-blue-800 shadow transition">Access Master DB</button>
+        </div>
+    </div>
 
+    <!-- LEFT SIDEBAR -->
     <div id="sidebar" class="w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl z-20">
         <div class="p-5 bg-gray-950 border-b border-gray-800"><h1 class="text-xl font-bold text-white tracking-wider">ERP ADMIN</h1><p class="text-xs text-blue-400 mt-1">Master Data Control</p></div>
         <div class="flex-1 overflow-y-auto custom-scrollbar py-4">
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">CRM & Access</p></div><div id="nav-crm" class="space-y-1 mb-4"></div>
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Manufacturing Engine</p></div><div id="nav-mfg" class="space-y-1 mb-4"></div>
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Commercial & Spares</p></div><div id="nav-com" class="space-y-1 mb-4"></div>
-            <div class="px-4 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">System Settings</p></div>
+            
+            <div class="px-4 mt-6 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">System Settings</p></div>
             <button onclick="window.showProfile()" id="btnProfile" class="w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-gray-400">🏢 Company Profile</button>
         </div>
-        <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2"><button id="schemaBuilderBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded text-sm font-bold shadow transition">⚙️ Custom Master</button><button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button></div>
+        <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2">
+            <button id="schemaBuilderBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded text-sm font-bold shadow transition">⚙️ Custom Master</button>
+            <button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button>
+        </div>
     </div>
 
+    <!-- MAIN CONTENT AREA -->
     <div class="flex-1 flex flex-col h-full bg-gray-50">
         <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center z-10"><h2 id="pageTitle" class="text-2xl font-bold text-gray-800">Dashboard</h2><div class="flex space-x-3" id="topActionButtons"></div></header>
         <main class="flex-1 overflow-y-auto p-6 custom-scrollbar">
-            <!-- Dynamic Tables -->
+            
             <div id="tableContainer" class="bg-white rounded-lg shadow border min-h-[500px]"></div>
             
-            <!-- Company Profile Settings -->
             <div id="profileContainer" class="hidden bg-white rounded-lg shadow border p-8 max-w-4xl mx-auto">
                 <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Global Organization Profile</h3>
                 <div class="grid grid-cols-2 gap-6">
@@ -45,6 +60,7 @@
                 </div>
                 <div class="mt-8 pt-4 border-t text-right"><button id="saveProfileBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded font-bold shadow transition">💾 Save Organization Profile</button></div>
             </div>
+
         </main>
     </div>
 
@@ -59,35 +75,54 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
-  authDomain: "renuka-tools-quote.firebaseapp.com",
-  databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "renuka-tools-quote",
-  storageBucket: "renuka-tools-quote.firebasestorage.app",
-  messagingSenderId: "300959855269",
-  appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
+        // PERFECTLY SYNCHRONIZED PRODUCTION FIREBASE KEYS
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
+            authDomain: "renuka-tools-quote.firebaseapp.com",
+            databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "renuka-tools-quote",
+            storageBucket: "renuka-tools-quote.firebasestorage.app",
+            messagingSenderId: "300959855269",
+            appId: "1:300959855269:web:d8d19e979ac3616b10934c" 
+        };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        // SECURE ADMIN GATE
+        const ADMIN_EMAILS = ["anand@renukatools.in", "admin@renukatools.in"];
 
         let appSchemas = []; let mst = {}; let currentTabId = "roles"; let pendingImportCollection = ""; let base64Logo = "";
 
         const defaultSchemas = [
-            { id: "roles", category: "crm", title: "Sales Roles", cols: ["Role Name", "Reports To", "Region"], params: 3, behavior: "crm" },
+            { id: "roles", category: "crm", title: "Sales Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
             { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override"], params: 4, behavior: "crm" },
-            { id: "customers", category: "crm", title: "Customer Directory", cols: ["Company Name", "Contact", "Owner Role", "GST No"], params: 4, behavior: "crm" },
+            { id: "customers", category: "crm", title: "Customer Directory", cols: ["Company Name", "Contact Person", "Owner Role", "GST No"], params: 4, behavior: "crm" },
             { id: "raw_materials", category: "mfg", title: "Raw Materials", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3, behavior: "variable" },
             { id: "blanks", category: "mfg", title: "Taper Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 4, behavior: "lookup" },
             { id: "operations", category: "mfg", title: "Machine Operations", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 3, behavior: "variable" },
-            { id: "features", category: "mfg", title: "Features & Pockets", cols: ["Feature Name", "Rate per Qty (₹)"], params: 2, behavior: "variable" },
+            { id: "features", category: "mfg", title: "Features & Pocketing", cols: ["Feature Name", "Rate per Qty (₹)"], params: 2, behavior: "variable" },
             { id: "assembly", category: "mfg", title: "Assembly & Surface", cols: ["Process Name", "Flat Cost (₹)"], params: 2, behavior: "flat" },
             { id: "customer_tiers", category: "com", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 3, behavior: "margin" },
             { id: "tool_categories", category: "com", title: "Tool Categories", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 3, behavior: "margin" },
-            { id: "spares", category: "com", title: "Spares & Items", cols: ["Item Name", "List Price (₹)", "Max Disc (%)"], params: 3, behavior: "lookup" },
-            { id: "freight", category: "com", title: "Freight Options", cols: ["Method", "Rate (₹/kg)", "Flat Cost (₹)"], params: 3, behavior: "variable" },
+            { id: "spares", category: "com", title: "Spares & Standard Items", cols: ["Item Name", "List Price (₹)", "Max Disc (%)"], params: 3, behavior: "lookup" },
+            { id: "freight", category: "com", title: "Freight & Transport", cols: ["Method", "Rate (₹/kg)", "Flat Cost (₹)"], params: 3, behavior: "variable" },
             { id: "payment_terms", category: "com", title: "Payment Terms", cols: ["Description"], params: 1, behavior: "lookup" },
-            { id: "inco_terms", category: "com", title: "INCO Terms", cols: ["Term Description"], params: 1, behavior: "lookup" }
+            { id: "inco_terms", category: "com", title: "INCO / Shipping", cols: ["Term Description"], params: 1, behavior: "lookup" }
         ];
 
-        onAuthStateChanged(auth, async (user) => { if (user) { document.getElementById('loginSection').classList.add('hidden'); await initializeSchemas(); fetchProfile(); } else { document.getElementById('loginSection').classList.remove('hidden'); } });
+        onAuthStateChanged(auth, async (user) => { 
+            if (user) { 
+                if (!ADMIN_EMAILS.includes(user.email)) {
+                    alert("Unauthorized Access. Admin Privileges Required.");
+                    signOut(auth);
+                    return;
+                }
+                document.getElementById('loginSection').classList.add('hidden'); 
+                await initializeSchemas(); 
+                fetchProfile(); 
+            } 
+            else { document.getElementById('loginSection').classList.remove('hidden'); } 
+        });
+
         document.getElementById('loginBtn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(() => alert("Invalid credentials")));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
@@ -128,7 +163,6 @@
             document.getElementById(`tbody_${sch.id}`).innerHTML = html;
         }
 
-        // --- COMPANY PROFILE LOGIC ---
         window.showProfile = () => {
             document.querySelectorAll('#sidebar button').forEach(b => b.classList.remove('active-nav'));
             document.getElementById('btnProfile').classList.add('active-nav');
@@ -159,13 +193,14 @@
             await setDoc(doc(db, "settings", "company_profile"), profile); alert("Company Profile Updated!");
         });
 
-        // Modal & Excel Logic
         window.openEntryModal = async (schemaId, docId = "") => {
             const sch = appSchemas.find(s => s.id === schemaId); let eData = {}; if (docId) eData = mst[schemaId].find(x => x.id === docId) || {};
-            document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`; document.getElementById('activeCollection').value = sch.id; document.getElementById('activeDocId').value = docId;
+            document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`;
+            document.getElementById('activeCollection').value = sch.id; document.getElementById('activeDocId').value = docId;
             [2,3,4].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden')); document.getElementById('inp2').classList.remove('hidden'); document.getElementById('sel2').classList.add('hidden'); document.getElementById('inp3').classList.remove('hidden'); document.getElementById('sel3').classList.add('hidden'); document.getElementById('multiCheck3').classList.add('hidden'); document.getElementById('inp4').classList.remove('hidden'); document.getElementById('sel4').classList.add('hidden');
             document.getElementById('inp1').value = eData.name || ""; document.getElementById('inp2').value = eData.param1 || ""; document.getElementById('inp3').value = eData.param2 || ""; document.getElementById('inp4').value = eData.param3 || ""; document.getElementById('isActive').checked = eData.isActive !== false;
             document.getElementById('lbl1').innerText = sch.cols[0]; if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; } if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; } if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
+
             if (schemaId === 'roles') { document.getElementById('inp2').classList.add('hidden'); let sel2 = document.getElementById('sel2'); sel2.classList.remove('hidden'); if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); } sel2.innerHTML = `<option value="ALL">ALL (Top Level)</option>` + mst.roles.map(r => `<option value="${r.name}">${r.name}</option>`).join(''); sel2.value = eData.param1 || "ALL"; }
             if (schemaId === 'customers') { document.getElementById('inp3').classList.add('hidden'); let sel3 = document.getElementById('sel3'); sel3.classList.remove('hidden'); if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); } sel3.innerHTML = `<option value="Admin">Admin</option>` + mst.roles.map(r => `<option value="${r.name}">${r.name}</option>`).join(''); sel3.value = eData.param2 || "Admin"; }
             if (schemaId === 'users') { document.getElementById('inp3').classList.add('hidden'); let mc = document.getElementById('multiCheck3'); mc.classList.remove('hidden'); if(!mst.roles) { const rS = await getDocs(collection(db, "roles")); mst.roles = []; rS.forEach(d => mst.roles.push(d.data())); } let assignedRoles = (eData.param2 || "").split(',').map(s=>s.trim()); mc.innerHTML = mst.roles.map(r => `<label class="flex items-center space-x-2 text-sm text-gray-800 cursor-pointer p-1 hover:bg-blue-100 rounded"><input type="checkbox" value="${r.name}" class="role-check w-4 h-4 text-blue-600 rounded" ${assignedRoles.includes(r.name) ? 'checked' : ''}><span>${r.name}</span></label>`).join(''); document.getElementById('inp4').classList.add('hidden'); let sel4 = document.getElementById('sel4'); sel4.classList.remove('hidden'); sel4.value = eData.param3 || "No"; }
@@ -181,6 +216,7 @@
             if (col === 'users') dataObj.param3 = document.getElementById('sel4').value; else if (sch.params >= 4) dataObj.param3 = isText ? document.getElementById('inp4').value : Number(document.getElementById('inp4').value);
             try { if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); document.getElementById('dataModal').classList.add('hidden'); renderActiveTable(); } catch (err) { alert("Error saving data."); }
         });
+
         window.deleteItem = async (col, id) => { if(confirm("Permanently delete?")) { await deleteDoc(doc(db, col, id)); renderActiveTable(); } };
         document.getElementById('schemaBuilderBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.remove('hidden')); document.getElementById('cancelSchemaBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.add('hidden')); document.getElementById('schType').addEventListener('change', (e) => { const val = Number(e.target.value); document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2); document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3); document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4); });
         document.getElementById('saveSchemaBtn').addEventListener('click', async () => { const title = document.getElementById('schTitle').value; if(!title) return alert("Title required"); const id = title.toLowerCase().replace(/[^a-z0-9]/g, '_'); const behavior = document.getElementById('schBehavior').value; const params = Number(document.getElementById('schType').value); let cols = [document.getElementById('schCol1').value]; if(params >= 2) cols.push(document.getElementById('schCol2').value); if(params >= 3) cols.push(document.getElementById('schCol3').value); if(params >= 4) cols.push(document.getElementById('schCol4').value); await setDoc(doc(db, "system_schemas", id), { id, title, params, cols, behavior, category: "com" }); document.getElementById('schemaModal').classList.add('hidden'); await initializeSchemas(); });
