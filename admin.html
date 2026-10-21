@@ -14,8 +14,14 @@
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">CRM & Access</p></div><div id="nav-crm" class="space-y-1 mb-4"></div>
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Manufacturing Engine</p></div><div id="nav-mfg" class="space-y-1 mb-4"></div>
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Commercial & Spares</p></div><div id="nav-com" class="space-y-1 mb-4"></div>
+            
             <div class="px-4 mt-6 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">System Settings</p></div>
             <button onclick="window.showProfile()" id="btnProfile" class="w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-gray-400">🏢 Company Profile</button>
+            
+            <div class="px-4 mt-6 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Module Access</p></div>
+            <a href="index.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-blue-400">🛒 Sales Engine</a>
+            <a href="design.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-purple-400">📐 Design Library</a>
+            <a href="purchase.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-emerald-400">📦 Purchase Portal</a>
         </div>
         <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2"><button id="schemaBuilderBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded text-sm font-bold shadow transition">⚙️ Custom Master</button><button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button></div>
     </div>
@@ -27,7 +33,7 @@
             <div id="profileContainer" class="hidden bg-white rounded-lg shadow border p-8 max-w-4xl mx-auto">
                 <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Global Organization Profile</h3>
                 <div class="grid grid-cols-2 gap-6">
-                    <div class="col-span-2 flex items-center space-x-4"><div class="w-24 h-24 bg-gray-100 border rounded flex items-center justify-center overflow-hidden shadow-inner"><img id="logoPreview" class="max-h-full hidden"></div><div><label class="block text-xs font-bold mb-1 text-gray-600">Company Logo</label><input type="file" id="logoUpload" accept="image/*" class="text-sm"></div></div>
+                    <div class="col-span-2 flex items-center space-x-4"><div class="w-24 h-24 bg-gray-100 border rounded flex items-center justify-center overflow-hidden shadow-inner"><img id="logoPreview" class="max-h-full hidden"></div><div><label class="block text-xs font-bold mb-1 text-gray-600">Company Logo (For UI & PDF)</label><input type="file" id="logoUpload" accept="image/*" class="text-sm"></div></div>
                     <div><label class="block text-xs font-bold mb-1">Company Name</label><input type="text" id="cpName" class="w-full border p-2 rounded text-sm font-bold" value="RENUKA TOOLS"></div><div><label class="block text-xs font-bold mb-1">Email Address</label><input type="text" id="cpEmail" class="w-full border p-2 rounded text-sm"></div>
                     <div class="col-span-2"><label class="block text-xs font-bold mb-1">Registered Address</label><input type="text" id="cpAddress" class="w-full border p-2 rounded text-sm"></div>
                     <div><label class="block text-xs font-bold mb-1">GST Number</label><input type="text" id="cpGst" class="w-full border p-2 rounded text-sm"></div><div><label class="block text-xs font-bold mb-1">PAN Number</label><input type="text" id="cpPan" class="w-full border p-2 rounded text-sm"></div>
@@ -64,7 +70,7 @@
         let appSchemas = []; let mst = {}; let currentTabId = "roles"; let pendingImportCollection = ""; let base64Logo = "";
         
         const defaultSchemas = [
-            { id: "roles", category: "crm", title: "Sales Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
+            { id: "roles", category: "crm", title: "System Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
             { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override", "Show Cost Breakup"], params: 5, behavior: "crm" },
             { id: "customers", category: "crm", title: "Customer Directory", cols: ["Company Name", "Contact Person", "Owner Role", "GST No"], params: 4, behavior: "crm" },
             { id: "raw_materials", category: "mfg", title: "Raw Materials", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3, behavior: "variable" },
