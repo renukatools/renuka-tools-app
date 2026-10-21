@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- 3D Rendering Engine Restored -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -115,33 +117,53 @@
                 <div id="viewCustom" class="space-y-4">
                     <div><label class="block text-xs font-bold mb-1">Tool Category</label><select id="cCategory" class="w-full border p-2 text-sm rounded bg-gray-50"></select></div>
                     
-                    <!-- Raw Material Config -->
+                    <!-- Raw Material & 3D Render Config -->
                     <div id="rmSection" class="p-4 bg-blue-50 border border-blue-100 rounded">
                         <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-bold text-sm text-blue-900">Raw Material Sizing</h4>
+                            <h4 class="font-bold text-sm text-blue-900">Finished Dimensions & Material Base</h4>
                             <select id="cStockShape" class="border p-1 text-xs rounded font-bold">
-                                <option value="round">Round Bar</option>
+                                <option value="round">Round Bar / Stepped Tool</option>
                                 <option value="rect">Rectangular Block</option>
                                 <option value="blank">Taper Blank</option>
                             </select>
                         </div>
                         
-                        <div id="dimRound" class="grid grid-cols-2 gap-4">
-                            <div><label class="text-xs font-bold">Max Outer Dia (mm)</label><input type="number" id="rDia" value="0" class="w-full border p-1 rounded calc-trigger"></div>
-                            <div><label class="text-xs font-bold">Overall Length (mm)</label><input type="number" id="rLen" value="0" class="w-full border p-1 rounded calc-trigger"></div>
-                        </div>
-                        <div id="dimRect" class="grid grid-cols-3 gap-4 hidden">
-                            <div><label class="text-xs font-bold">Length (mm)</label><input type="number" id="rcL" value="0" class="w-full border p-1 rounded calc-trigger"></div>
-                            <div><label class="text-xs font-bold">Width (mm)</label><input type="number" id="rcW" value="0" class="w-full border p-1 rounded calc-trigger"></div>
-                            <div><label class="text-xs font-bold">Height (mm)</label><input type="number" id="rcH" value="0" class="w-full border p-1 rounded calc-trigger"></div>
-                        </div>
-                        <div id="dimBlank" class="grid grid-cols-2 gap-4 hidden">
-                            <div><label class="text-xs font-bold">Select Blank Type</label><select id="bType" class="w-full border p-1 rounded calc-trigger"></select></div>
-                            <div><label class="text-xs font-bold">Finish GPL (mm)</label><input type="number" id="bGpl" value="0" class="w-full border p-1 rounded calc-trigger"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Input Dimensions -->
+                            <div id="dimRound" class="grid grid-cols-2 gap-2 text-xs">
+                                <label class="font-bold pt-2">Shank Dia:</label> <input type="number" id="sDia" value="32" class="border p-1 rounded w-full calc-trigger">
+                                <label class="font-bold pt-2">Shank Len:</label> <input type="number" id="sLen" value="100" class="border p-1 rounded w-full calc-trigger">
+                                <div class="col-span-2 border-b border-blue-200"></div>
+                                <label class="font-bold pt-2">Collar Dia:</label> <input type="number" id="cDia" value="63" class="border p-1 rounded w-full calc-trigger">
+                                <label class="font-bold pt-2">Collar Thick:</label> <input type="number" id="cLen" value="15" class="border p-1 rounded w-full calc-trigger">
+                                <div class="col-span-2 border-b border-blue-200"></div>
+                                <label class="font-bold pt-2">Head Dia:</label> <input type="number" id="hDia" value="50" class="border p-1 rounded w-full calc-trigger">
+                                <label class="font-bold pt-2">Head Len:</label> <input type="number" id="hLen" value="45" class="border p-1 rounded w-full calc-trigger">
+                            </div>
+
+                            <div id="dimRect" class="grid grid-cols-1 gap-2 text-xs hidden">
+                                <label class="font-bold pt-2">Finish Length (mm):</label> <input type="number" id="rcL" value="0" class="border p-1 rounded w-full calc-trigger">
+                                <label class="font-bold pt-2">Finish Width (mm):</label> <input type="number" id="rcW" value="0" class="border p-1 rounded w-full calc-trigger">
+                                <label class="font-bold pt-2">Finish Height (mm):</label> <input type="number" id="rcH" value="0" class="border p-1 rounded w-full calc-trigger">
+                            </div>
+
+                            <div id="dimBlank" class="grid grid-cols-1 gap-2 text-xs hidden">
+                                <label class="font-bold pt-2">Select Blank Type:</label><select id="bType" class="w-full border p-1 rounded calc-trigger"></select>
+                                <label class="font-bold pt-2">Finish GPL (mm):</label> <input type="number" id="bGpl" value="0" class="border p-1 rounded w-full calc-trigger">
+                            </div>
+                            
+                            <!-- 3D Visualizer Canvas (Only visible for Round/Blank) -->
+                            <div class="flex flex-col items-center justify-center bg-gray-900 rounded border relative overflow-hidden" id="canvasContainer" style="height: 200px;">
+                                <!-- ThreeJS Canvas injects here -->
+                                <button id="downloadImgBtn" class="absolute bottom-1 right-1 bg-gray-700 text-white text-[10px] px-2 py-1 rounded hover:bg-gray-600">📥 Save Image</button>
+                            </div>
                         </div>
                         
-                        <div class="mt-3"><label class="text-xs font-bold">Material Grade</label><select id="cMatGrade" class="w-full border p-1 rounded text-sm calc-trigger"></select></div>
-                        <p class="text-[10px] text-gray-500 mt-1 italic">* 10mm machining allowance is auto-added to all raw dimensions.</p>
+                        <div class="mt-3 flex items-center space-x-2">
+                            <label class="text-xs font-bold">Material Grade:</label>
+                            <select id="cMatGrade" class="w-1/2 border p-1 rounded text-sm calc-trigger"></select>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1 italic">* 10mm machining allowance is automatically added in background to calculate RM volume.</p>
                     </div>
 
                     <!-- Operations BOM -->
@@ -179,7 +201,7 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-xs text-yellow-400">Manual Override MRP (Optional)</p>
-                                <input type="number" id="overrideMrp" placeholder="Must be ≥ Calculated" class="w-32 bg-gray-700 border border-gray-600 text-white p-1 rounded text-right calc-trigger text-sm">
+                                <input type="number" id="overrideMrp" placeholder="Must be ≥ Calc" class="w-32 bg-gray-700 border border-gray-600 text-white p-1 rounded text-right calc-trigger text-sm">
                             </div>
                         </div>
                     </div>
@@ -240,14 +262,12 @@
                 </div>
 
                 <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-bold shadow-lg flex justify-center items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Generate Executive PDF
+                    📄 Generate Executive PDF
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
@@ -270,7 +290,6 @@
         // === ROLE BASED ACCESS CONTROL ===
         const ADMIN_EMAILS = ["anand@renukatools.in", "admin@renukatools.in"]; // ADD YOUR LOGIN EMAIL HERE
 
-        // State
         const mst = {}; 
         let cart = [];
         let curDraft = null;
@@ -288,6 +307,7 @@
                 }
 
                 await fetchMasters();
+                initThreeJS();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('appScreen').classList.add('hidden');
@@ -332,10 +352,10 @@
             pop('bType', mst.blanks, i => `${i.name} (₹${i.param3})`);
             pop('sProduct', mst.spares, i => `${i.name} (₹${i.param1})`);
             
-            calcEngine(); // Init
+            calcEngine();
         }
 
-        // --- DYNAMIC UI TOGGLES ---
+        // --- UI TOGGLES ---
         document.getElementById('iType').addEventListener('change', (e) => {
             document.getElementById('viewCustom').classList.add('hidden');
             document.getElementById('viewStandard').classList.add('hidden');
@@ -350,9 +370,17 @@
             document.getElementById('dimRound').classList.add('hidden');
             document.getElementById('dimRect').classList.add('hidden');
             document.getElementById('dimBlank').classList.add('hidden');
-            if(e.target.value === 'round') document.getElementById('dimRound').classList.remove('hidden');
+            document.getElementById('canvasContainer').classList.add('hidden');
+            
+            if(e.target.value === 'round') {
+                document.getElementById('dimRound').classList.remove('hidden');
+                document.getElementById('canvasContainer').classList.remove('hidden');
+            }
             if(e.target.value === 'rect') document.getElementById('dimRect').classList.remove('hidden');
-            if(e.target.value === 'blank') document.getElementById('dimBlank').classList.remove('hidden');
+            if(e.target.value === 'blank') {
+                document.getElementById('dimBlank').classList.remove('hidden');
+                document.getElementById('canvasContainer').classList.remove('hidden');
+            }
             calcEngine();
         });
 
@@ -376,7 +404,6 @@
                 </div>`;
             document.getElementById(config.div).insertAdjacentHTML('beforeend', html);
             
-            // Re-bind listeners to new triggers
             document.querySelectorAll('.calc-trigger').forEach(el => {
                 el.removeEventListener('input', calcEngine); el.addEventListener('input', calcEngine);
                 el.removeEventListener('change', calcEngine); el.addEventListener('change', calcEngine);
@@ -384,7 +411,7 @@
             calcEngine();
         };
 
-        // --- THE MASTER CALCULATION ENGINE ---
+        // --- MASTER ENGINE ---
         document.querySelectorAll('.calc-trigger, #qTier, #qModel').forEach(el => {
             el.addEventListener('input', calcEngine);
             el.addEventListener('change', calcEngine);
@@ -401,13 +428,13 @@
 
             if (iType === 'trading') {
                 baseCost = Number(document.getElementById('tCost').value);
-                floorPrice = baseCost * (1 + (tier.param1 / 100)); // Floor Margin
-                quotePrice = baseCost * (1 + (tier.param2 / 100)); // Trading Margin
+                floorPrice = baseCost * (1 + (tier.param1 / 100)); 
+                quotePrice = baseCost * (1 + (tier.param2 / 100));
             } 
             else if (iType === 'standard') {
                 const std = mst.spares[document.getElementById('sProduct').value];
                 quotePrice = std ? std.param1 : 0;
-                floorPrice = quotePrice * (1 - (std.param2 / 100)); // Apply max discount back to floor
+                floorPrice = quotePrice * (1 - (std.param2 / 100)); 
                 baseCost = floorPrice; 
             } 
             else if (iType === 'custom') {
@@ -415,93 +442,79 @@
                 const shape = document.getElementById('cStockShape').value;
                 let rmCost = 0;
 
-                // 1. Raw Material Math
-                if (!isMachiningCustomerRM) {
-                    if (shape === 'round') {
-                        const d = Number(document.getElementById('rDia').value) + 10;
-                        const l = Number(document.getElementById('rLen').value) + 10;
-                        const vol = Math.PI * Math.pow(d/20, 2) * (l/10);
+                // 1. Raw Material Math & 3D Triggers
+                if (shape === 'round') {
+                    const sD = Number(document.getElementById('sDia').value);
+                    const sL = Number(document.getElementById('sLen').value);
+                    const cD = Number(document.getElementById('cDia').value);
+                    const cL = Number(document.getElementById('cLen').value);
+                    const hD = Number(document.getElementById('hDia').value);
+                    const hL = Number(document.getElementById('hLen').value);
+                    
+                    update3DModel(sD, sL, cD, cL, hD, hL); // Trigger 3D Render
+
+                    if (!isMachiningCustomerRM) {
+                        const maxDia = Math.max(sD, cD, hD) + 10;
+                        const totalLen = sL + cL + hL + 10;
+                        const vol = Math.PI * Math.pow(maxDia/20, 2) * (totalLen/10);
                         const mat = mst.raw_materials[document.getElementById('cMatGrade').value];
                         weightKg = (vol * (mat ? mat.param1 : 7.85)) / 1000;
                         rmCost = weightKg * (mat ? mat.param2 : 150);
                         document.getElementById('adVol').innerText = vol.toFixed(2);
-                    } else if (shape === 'rect') {
-                        const l = Number(document.getElementById('rcL').value) + 10;
-                        const w = Number(document.getElementById('rcW').value) + 10;
-                        const h = Number(document.getElementById('rcH').value) + 10;
-                        const vol = (l/10) * (w/10) * (h/10);
-                        const mat = mst.raw_materials[document.getElementById('cMatGrade').value];
-                        weightKg = (vol * (mat ? mat.param1 : 7.85)) / 1000;
-                        rmCost = weightKg * (mat ? mat.param2 : 150);
-                        document.getElementById('adVol').innerText = vol.toFixed(2);
-                    } else if (shape === 'blank') {
+                    }
+                } 
+                else if (shape === 'rect' && !isMachiningCustomerRM) {
+                    const l = Number(document.getElementById('rcL').value) + 10;
+                    const w = Number(document.getElementById('rcW').value) + 10;
+                    const h = Number(document.getElementById('rcH').value) + 10;
+                    const vol = (l/10) * (w/10) * (h/10);
+                    const mat = mst.raw_materials[document.getElementById('cMatGrade').value];
+                    weightKg = (vol * (mat ? mat.param1 : 7.85)) / 1000;
+                    rmCost = weightKg * (mat ? mat.param2 : 150);
+                    document.getElementById('adVol').innerText = vol.toFixed(2);
+                } 
+                else if (shape === 'blank') {
+                    // For blanks, draw a simple stepped tool representation in 3D
+                    update3DModel(40, 50, 60, 20, 50, 40); 
+                    if (!isMachiningCustomerRM) {
                         const b = mst.blanks[document.getElementById('bType').value];
                         rmCost = b ? b.param3 : 0;
-                        weightKg = 1.5; // Dummy estimate for blanks
+                        weightKg = 1.5; 
                     }
                 }
+                
                 document.getElementById('adWt').innerText = weightKg.toFixed(2);
                 document.getElementById('adRm').innerText = `₹ ${rmCost.toFixed(2)}`;
 
                 // 2. BOM Math
                 let opCost = 0, spCost = 0;
-                
-                // Ops (Variable Rate x Hrs + Setup)
-                document.querySelectorAll('#bomOps .bom-select').forEach(sel => {
-                    const op = mst.operations[sel.value];
-                    const hrs = Number(sel.nextElementSibling.value);
-                    opCost += (op.param1 * hrs) + op.param2;
-                });
-                
-                // Features (Variable Rate x Qty)
-                document.querySelectorAll('#bomFeat .bom-select').forEach(sel => {
-                    const feat = mst.features[sel.value];
-                    const qty = Number(sel.nextElementSibling.value);
-                    opCost += (feat.param1 * qty);
-                });
-                
-                // Assembly (Flat)
-                document.querySelectorAll('#bomAssm .bom-select').forEach(sel => {
-                    const assm = mst.assembly[sel.value];
-                    opCost += assm.param1;
-                });
-
-                // Spares (List Price x Qty)
-                document.querySelectorAll('#bomSpares .bom-select').forEach(sel => {
-                    const sp = mst.spares[sel.value];
-                    const qty = Number(sel.nextElementSibling.value);
-                    spCost += (sp.param1 * qty);
-                });
+                document.querySelectorAll('#bomOps .bom-select').forEach(sel => { const op = mst.operations[sel.value]; opCost += (op.param1 * Number(sel.nextElementSibling.value)) + op.param2; });
+                document.querySelectorAll('#bomFeat .bom-select').forEach(sel => { const feat = mst.features[sel.value]; opCost += (feat.param1 * Number(sel.nextElementSibling.value)); });
+                document.querySelectorAll('#bomAssm .bom-select').forEach(sel => { const assm = mst.assembly[sel.value]; opCost += assm.param1; });
+                document.querySelectorAll('#bomSpares .bom-select').forEach(sel => { const sp = mst.spares[sel.value]; spCost += (sp.param1 * Number(sel.nextElementSibling.value)); });
 
                 document.getElementById('adOp').innerText = `₹ ${opCost.toFixed(2)}`;
                 document.getElementById('adSp').innerText = `₹ ${spCost.toFixed(2)}`;
 
                 baseCost = rmCost + opCost + spCost;
-                
-                // 3. Custom Margins
-                const floorMargin = tier.param1 + (cat ? cat.param1 : 0); // Tier Floor + Criticality
-                const escalation = cat ? cat.param2 : 100;
-                
+                const floorMargin = tier.param1 + (cat ? cat.param1 : 0);
                 floorPrice = baseCost * (1 + (floorMargin / 100));
-                quotePrice = baseCost * (1 + (escalation / 100));
+                quotePrice = baseCost * (1 + ((cat ? cat.param2 : 100) / 100));
             }
 
             document.getElementById('adBase').innerText = `₹ ${baseCost.toFixed(2)}`;
             document.getElementById('adFloor').innerText = `₹ ${floorPrice.toFixed(2)}`;
             document.getElementById('engMrp').innerText = `₹ ${quotePrice.toFixed(2)}`;
 
-            // Manual Override Guardrail
+            // Guardrails
             const overrideInp = document.getElementById('overrideMrp');
             let finalMrp = quotePrice;
             if (overrideInp.value && Number(overrideInp.value) >= quotePrice) {
-                finalMrp = Number(overrideInp.value);
-                overrideInp.classList.remove('border-red-500');
+                finalMrp = Number(overrideInp.value); overrideInp.classList.remove('border-red-500');
             } else if (overrideInp.value && Number(overrideInp.value) < quotePrice) {
-                overrideInp.classList.add('border-red-500'); // Warning
-                finalMrp = quotePrice;
+                overrideInp.classList.add('border-red-500'); finalMrp = quotePrice;
             }
 
-            // Discount Math
             const maxDisc = ((finalMrp - floorPrice) / finalMrp) * 100;
             document.getElementById('maxDiscOut').innerText = `${maxDisc.toFixed(1)}%`;
 
@@ -522,28 +535,83 @@
 
             curDraft = {
                 desc: document.getElementById('iDesc').value || "Unnamed Item",
-                type: iType,
-                weight: weightKg,
-                mrp: finalMrp,
-                discPercent: offeredDisc,
-                netPrice: netPrice
+                type: iType, weight: weightKg, mrp: finalMrp, discPercent: offeredDisc, netPrice: netPrice
             };
         };
 
-        // UI Toggles
+        // --- THREE.JS VISUALIZER LOGIC ---
+        let scene, camera, renderer, toolGroup;
+        function initThreeJS() {
+            const container = document.getElementById('canvasContainer');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111827); // Tailwind gray-900
+
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 300);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(100, 100, 50);
+            scene.add(dirLight);
+
+            toolGroup = new THREE.Group();
+            scene.add(toolGroup);
+
+            animate();
+        }
+
+        function update3DModel(sD, sL, cD, cL, hD, hL) {
+            if (!toolGroup) return;
+            while(toolGroup.children.length > 0) { toolGroup.remove(toolGroup.children[0]); }
+
+            const material = new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.8, roughness: 0.2 });
+
+            const shank = new THREE.Mesh(new THREE.CylinderGeometry(sD/2, sD/2, sL, 32), material);
+            const collar = new THREE.Mesh(new THREE.CylinderGeometry(cD/2, cD/2, cL, 32), material);
+            const head = new THREE.Mesh(new THREE.CylinderGeometry(hD/2, hD/2, hL, 32), material);
+
+            const totalL = sL + cL + hL;
+            let currentY = -totalL / 2;
+            
+            shank.position.y = currentY + (sL / 2); currentY += sL;
+            collar.position.y = currentY + (cL / 2); currentY += cL;
+            head.position.y = currentY + (hL / 2);
+
+            toolGroup.add(shank); toolGroup.add(collar); toolGroup.add(head);
+
+            toolGroup.rotation.x = Math.PI / 6;
+            toolGroup.rotation.z = -Math.PI / 4;
+            camera.position.z = totalL * 1.5;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        document.getElementById('downloadImgBtn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `ToolRender.png`;
+            link.href = renderer.domElement.toDataURL('image/png');
+            link.click();
+        });
+
+        // --- CART & UI UPDATES ---
         document.getElementById('adminAuditBtn').addEventListener('click', () => document.getElementById('adminAuditPanel').classList.toggle('hidden'));
         document.getElementById('qFreightMode').addEventListener('change', updateCartUI);
         document.getElementById('qFreightVal').addEventListener('input', updateCartUI);
         document.getElementById('qRegion').addEventListener('change', updateCartUI);
         document.getElementById('qModel').addEventListener('change', updateCartUI);
 
-        // --- SHOPPING CART ---
         document.getElementById('addToCartBtn').addEventListener('click', () => {
             if(!curDraft || document.getElementById('addToCartBtn').disabled) return;
             cart.push({...curDraft});
             updateCartUI();
-            
-            // Reset core inputs for next item
             document.getElementById('iDesc').value = "";
             document.getElementById('overrideMrp').value = "";
             document.getElementById('offeredDisc').value = "0";
@@ -558,8 +626,7 @@
             
             let html = "", totalWt = 0, subNet = 0;
             cart.forEach((item, i) => {
-                totalWt += item.weight;
-                subNet += item.netPrice;
+                totalWt += item.weight; subNet += item.netPrice;
                 html += `
                     <div class="bg-gray-700 p-2 rounded flex justify-between items-center text-xs">
                         <div class="w-3/4">
@@ -574,123 +641,75 @@
             });
             list.innerHTML = html;
 
-            // Freight Logic
-            let freight = 0;
-            if(document.getElementById('qFreightMode').value === 'auto') {
-                freight = totalWt * Number(document.getElementById('qFreightVal').value || 0);
-            } else {
-                freight = Number(document.getElementById('qFreightVal').value || 0);
-            }
+            let freight = (document.getElementById('qFreightMode').value === 'auto') ? (totalWt * Number(document.getElementById('qFreightVal').value || 0)) : Number(document.getElementById('qFreightVal').value || 0);
 
-            // Tax Logic
             const region = document.getElementById('qRegion').value;
-            const model = document.getElementById('qModel').value;
-            let taxRate = (model === 'jobwork_cust') ? 0.12 : 0.18;
+            let taxRate = (document.getElementById('qModel').value === 'jobwork_cust') ? 0.12 : 0.18;
             if(region === 'export') taxRate = 0;
             
-            const baseForTax = subNet + freight;
-            const taxes = baseForTax * taxRate;
-            const grandTotal = baseForTax + taxes;
+            const taxes = (subNet + freight) * taxRate;
 
             document.getElementById('cCount').innerText = cart.length;
             document.getElementById('cWt').innerText = `${totalWt.toFixed(2)} kg`;
             document.getElementById('cSub').innerText = `₹ ${subNet.toFixed(2)}`;
             document.getElementById('cFreight').innerText = `₹ ${freight.toFixed(2)}`;
-            
-            let taxStr = region === 'export' ? "Taxes (0%)" : (region === 'mh' ? `CGST+SGST (${(taxRate*100)}%)` : `IGST (${(taxRate*100)}%)`);
-            document.getElementById('taxLine').children[0].innerText = taxStr;
+            document.getElementById('taxLine').children[0].innerText = region === 'export' ? "Taxes (0%)" : (region === 'mh' ? `CGST+SGST (${taxRate*100}%)` : `IGST (${taxRate*100}%)`);
             document.getElementById('cTax').innerText = `₹ ${taxes.toFixed(2)}`;
-            document.getElementById('cGrand').innerText = `₹ ${grandTotal.toFixed(2)}`;
+            document.getElementById('cGrand').innerText = `₹ ${(subNet + freight + taxes).toFixed(2)}`;
         }
 
-        // --- PROFESSIONAL PDF GENERATOR ---
+        // --- PDF GENERATOR ---
         document.getElementById('pdfBtn').addEventListener('click', () => {
             if(cart.length === 0) return alert("Cart is empty.");
-            
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
             const qId = document.getElementById('quoteId').value;
             const qComp = document.getElementById('qCompany').value || "Client Name";
             const qCont = document.getElementById('qContact').value || "Contact Person";
             const qProj = document.getElementById('qProject').value || "General Machining";
 
-            // --- PAGE 1: COVER LETTER ---
-            doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(30, 58, 138);
-            doc.text("RENUKA TOOLS", 20, 25);
+            // PAGE 1
+            doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(30, 58, 138); doc.text("RENUKA TOOLS", 20, 25);
             doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
-            doc.text("M.I.D.C Waluj, Chhatrapati Sambhajinagar, Maharashtra, India", 20, 31);
-            doc.text("GSTIN: 27AABCRXXXXR1Z0 | IEC: 031XXXXXXX", 20, 36);
-
+            doc.text("M.I.D.C Waluj, Chhatrapati Sambhajinagar, Maharashtra, India", 20, 31); doc.text("GSTIN: 27AABCRXXXXR1Z0 | IEC: 031XXXXXXX", 20, 36);
             doc.setLineWidth(0.5); doc.setDrawColor(200, 200, 200); doc.line(20, 42, 190, 42);
 
             doc.setTextColor(0, 0, 0); doc.setFontSize(11);
-            doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 55);
-            doc.text(`Quote Ref: ${qId}`, 150, 61);
-
-            doc.setFont("helvetica", "bold"); doc.text(`To,`, 20, 55);
-            doc.text(qCont, 20, 61); doc.text(qComp, 20, 67);
-            
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 55); doc.text(`Quote Ref: ${qId}`, 150, 61);
+            doc.setFont("helvetica", "bold"); doc.text(`To,`, 20, 55); doc.text(qCont, 20, 61); doc.text(qComp, 20, 67);
             doc.text(`Subject: Commercial Offer for ${qProj}`, 20, 85);
             
             doc.setFont("helvetica", "normal");
             let letter = `Dear Sir/Madam,\n\nWe thank you for your enquiry and the interest shown in Renuka Tools.\n\nBased on our technical evaluation of your requirements for the ${qProj} project, we are pleased to submit our most competitive commercial offer for your consideration.\n\nAt Renuka Tools, we specialize in high-precision manufacturing, ensuring rigorous quality control and optimal performance for every component we deliver.\n\nPlease find the detailed commercial breakdown and terms on the following page. We look forward to a mutually beneficial business association.\n\n\nWarm Regards,\n\nAnand Mulay\nProprietor, Renuka Tools\n+91 9999999999\nsales@renukatools.in`;
-            
             doc.text(letter, 20, 95, { maxWidth: 170, lineHeightFactor: 1.5 });
 
-            // --- PAGE 2: COMMERCIAL OFFER GRID ---
+            // PAGE 2
             doc.addPage();
-            doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(30, 58, 138);
-            doc.text("COMMERCIAL QUOTATION", 20, 20);
-            doc.setFontSize(10); doc.setTextColor(0,0,0);
-            doc.text(`Quote Ref: ${qId}`, 150, 20);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(30, 58, 138); doc.text("COMMERCIAL QUOTATION", 20, 20);
+            doc.setFontSize(10); doc.setTextColor(0,0,0); doc.text(`Quote Ref: ${qId}`, 150, 20);
 
-            // Table Data Gen (Stealth classifications omitted)
-            let tableData = [];
-            cart.forEach((c, idx) => {
-                let priceStr = `Rs. ${c.netPrice.toFixed(2)}`;
-                let discStr = c.discPercent > 0 ? `${c.discPercent}%` : "-";
-                tableData.push([idx+1, c.desc, "1.00", discStr, priceStr]);
-            });
-
+            let tableData = cart.map((c, idx) => [idx+1, c.desc, "1.00", c.discPercent > 0 ? `${c.discPercent}%` : "-", `Rs. ${c.netPrice.toFixed(2)}`]);
             doc.autoTable({
-                startY: 30,
-                head: [['Sr.No', 'Item Description', 'Qty', 'Discount', 'Net Amount (INR)']],
-                body: tableData,
-                theme: 'grid',
-                headStyles: { fillColor: [30, 58, 138], textColor: 255 },
-                columnStyles: { 0: { halign: 'center' }, 2: { halign: 'center' }, 3: { halign: 'center' }, 4: { halign: 'right' } }
+                startY: 30, head: [['Sr.No', 'Item Description', 'Qty', 'Discount', 'Net Amount (INR)']], body: tableData, theme: 'grid',
+                headStyles: { fillColor: [30, 58, 138], textColor: 255 }, columnStyles: { 0: { halign: 'center' }, 2: { halign: 'center' }, 3: { halign: 'center' }, 4: { halign: 'right' } }
             });
 
             let finalY = doc.lastAutoTable.finalY + 10;
-            
-            // Totals Block
             doc.setFont("helvetica", "normal");
             doc.text(`Subtotal:`, 130, finalY); doc.text(document.getElementById('cSub').innerText, 190, finalY, {align: 'right'}); finalY += 6;
             doc.text(`Freight/Pkg:`, 130, finalY); doc.text(document.getElementById('cFreight').innerText, 190, finalY, {align: 'right'}); finalY += 6;
             doc.text(document.getElementById('taxLine').children[0].innerText, 130, finalY); doc.text(document.getElementById('cTax').innerText, 190, finalY, {align: 'right'}); finalY += 6;
-            
-            doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-            doc.text(`Grand Total:`, 130, finalY); doc.text(document.getElementById('cGrand').innerText, 190, finalY, {align: 'right'});
+            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text(`Grand Total:`, 130, finalY); doc.text(document.getElementById('cGrand').innerText, 190, finalY, {align: 'right'});
 
-            // Commercial Terms Footer
             finalY += 20;
-            doc.setFontSize(11); doc.text("Standard Terms & Conditions", 20, finalY);
-            doc.setFontSize(9); doc.setFont("helvetica", "normal");
-            
+            doc.setFontSize(11); doc.text("Standard Terms & Conditions", 20, finalY); doc.setFontSize(9); doc.setFont("helvetica", "normal");
             let tIdx = 1;
-            const ptIdx = document.getElementById('qPayTerms').value;
-            if(ptIdx) { doc.text(`${tIdx++}. Payment: ${mst.payment_terms[ptIdx].name}`, 20, finalY+=6); }
-            
-            const incIdx = document.getElementById('qIncoTerms').value;
-            if(incIdx) { doc.text(`${tIdx++}. INCO/Shipping: ${mst.inco_terms[incIdx].name}`, 20, finalY+=6); }
-            
+            const ptIdx = document.getElementById('qPayTerms').value; if(ptIdx) doc.text(`${tIdx++}. Payment: ${mst.payment_terms[ptIdx].name}`, 20, finalY+=6);
+            const incIdx = document.getElementById('qIncoTerms').value; if(incIdx) doc.text(`${tIdx++}. INCO/Shipping: ${mst.inco_terms[incIdx].name}`, 20, finalY+=6);
             doc.text(`${tIdx++}. Validity: 30 Days from date of quotation.`, 20, finalY+=6);
             doc.text(`${tIdx++}. Bank Details: State Bank of India | A/c: 3XXXXXX777 | IFSC: SBIN000XXXX`, 20, finalY+=6);
 
             doc.save(`${qId}_Proposal.pdf`);
         });
-
     </script>
 </body>
 </html>
