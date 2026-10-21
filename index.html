@@ -3,164 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renuka Tools | Quote Generator</title>
+    <title>Renuka Tools | ERP Sales Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Three.js for 3D Rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans">
 
-    <!-- Navigation -->
+    <!-- Navbar -->
     <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Sales Engine</h1>
+        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Enterprise Quoting</h1>
         <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold hidden">Log Out</button>
     </nav>
 
     <!-- Login Screen -->
     <div id="loginScreen" class="max-w-md mx-auto mt-20 bg-white p-8 rounded shadow border">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">Sales Login</h2>
-        <input type="email" id="email" placeholder="Email Address" class="w-full border p-2 mb-4 rounded focus:ring-2 focus:ring-blue-500">
-        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded focus:ring-2 focus:ring-blue-500">
-        <button id="loginBtn" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">Login</button>
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Sales Engineer Login</h2>
+        <input type="email" id="email" placeholder="Email Address" class="w-full border p-2 mb-4 rounded">
+        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded">
+        <button id="loginBtn" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">Access ERP</button>
     </div>
 
-    <!-- Main Application -->
-    <div id="appScreen" class="max-w-7xl mx-auto mt-6 p-4 hidden grid grid-cols-12 gap-6">
+    <!-- Main App Screen -->
+    <div id="appScreen" class="max-w-[98%] mx-auto mt-6 p-2 hidden grid grid-cols-12 gap-4">
         
-        <!-- LEFT COLUMN: Configurator -->
-        <div class="col-span-12 lg:col-span-8 space-y-6">
+        <!-- LEFT COLUMN: Quote Config & Item Builder -->
+        <div class="col-span-12 lg:col-span-8 space-y-4">
             
-            <!-- Quote Metadata -->
-            <div class="bg-white p-6 rounded shadow border">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">1. Client & Project Details</h3>
-                <div class="grid grid-cols-3 gap-4">
-                    <div><label class="block text-sm font-bold text-gray-700 mb-1">Company Name</label><input type="text" id="clientCompany" class="w-full border p-2 rounded"></div>
-                    <div><label class="block text-sm font-bold text-gray-700 mb-1">Contact Person</label><input type="text" id="clientName" class="w-full border p-2 rounded"></div>
-                    <div><label class="block text-sm font-bold text-gray-700 mb-1">Project / Application</label><input type="text" id="projectName" class="w-full border p-2 rounded"></div>
-                    
-                    <div class="col-span-2">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Customer Tier (Margin Profile)</label>
-                        <select id="custTier" class="w-full border p-2 rounded bg-gray-50"></select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Quote ID</label>
-                        <input type="text" id="quoteId" readonly class="w-full border p-2 rounded bg-gray-200 font-bold text-gray-600">
-                    </div>
+            <!-- 1. Global Quote Configuration -->
+            <div class="bg-white p-5 rounded shadow border border-t-4 border-t-blue-800">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="text-lg font-bold text-gray-800">1. Quote Master Setup</h3>
+                    <input type="text" id="quoteId" readonly class="border-0 bg-transparent font-bold text-gray-500 text-right focus:outline-none">
                 </div>
-            </div>
-
-            <!-- Tool Configurator -->
-            <div class="bg-white p-6 rounded shadow border">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">2. Tool Geometry & Manufacturing</h3>
                 
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Tool Item Name / Description</label>
-                        <input type="text" id="toolName" placeholder="e.g., ISO Finish Boring Bar" class="w-full border p-2 rounded">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Tool Category (Escalation Profile)</label>
-                        <select id="toolCat" class="w-full border p-2 rounded bg-gray-50"></select>
-                    </div>
+                <div class="grid grid-cols-4 gap-3 mb-4">
+                    <div class="col-span-2"><label class="block text-xs font-bold mb-1">Company Name</label><input type="text" id="qCompany" class="w-full border p-2 text-sm rounded"></div>
+                    <div><label class="block text-xs font-bold mb-1">Contact Person</label><input type="text" id="qContact" class="w-full border p-2 text-sm rounded"></div>
+                    <div><label class="block text-xs font-bold mb-1">Project Ref</label><input type="text" id="qProject" class="w-full border p-2 text-sm rounded"></div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-6 mb-6">
-                    <!-- Dimensions Input -->
-                    <div class="bg-blue-50 p-4 rounded border border-blue-100">
-                        <h4 class="font-bold text-blue-900 mb-3">Stepped Dimensions (mm)</h4>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <label class="font-bold">Shank Dia:</label> <input type="number" id="sDia" value="32" class="border p-1 rounded w-full tool-dim">
-                            <label class="font-bold">Shank Length:</label> <input type="number" id="sLen" value="100" class="border p-1 rounded w-full tool-dim">
-                            <div class="col-span-2 border-b my-1 border-blue-200"></div>
-                            <label class="font-bold">Collar Dia:</label> <input type="number" id="cDia" value="63" class="border p-1 rounded w-full tool-dim">
-                            <label class="font-bold">Collar Thick:</label> <input type="number" id="cLen" value="15" class="border p-1 rounded w-full tool-dim">
-                            <div class="col-span-2 border-b my-1 border-blue-200"></div>
-                            <label class="font-bold">Head Dia:</label> <input type="number" id="hDia" value="50" class="border p-1 rounded w-full tool-dim">
-                            <label class="font-bold">Head Length:</label> <input type="number" id="hLen" value="45" class="border p-1 rounded w-full tool-dim">
+                <div class="grid grid-cols-4 gap-3 mb-4 bg-gray-50 p-3 rounded border">
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-blue-800">Business Model</label>
+                        <select id="qModel" class="w-full border p-2 text-sm rounded bg-white font-bold">
+                            <option value="tools">Cutting Tools (Standard 18% GST)</option>
+                            <option value="jobwork_renuka">Job-Work (Renuka RM Scope - 18% GST)</option>
+                            <option value="jobwork_cust">Job-Work (Customer RM Scope - 12% GST)</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-xs font-bold mb-1">Tax Region</label>
+                        <select id="qRegion" class="w-full border p-2 text-sm rounded">
+                            <option value="mh">Maharashtra (CGST+SGST)</option>
+                            <option value="inter">Interstate (IGST)</option>
+                            <option value="export">Export (0% Tax)</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-xs font-bold mb-1">Payment Terms</label><select id="qPayTerms" class="w-full border p-2 text-sm rounded"><option value="">-- Skip / TBD --</option></select></div>
+                    <div><label class="block text-xs font-bold mb-1">INCO Terms</label><select id="qIncoTerms" class="w-full border p-2 text-sm rounded"><option value="">-- Skip / TBD --</option></select></div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold mb-1">Customer Tier</label><select id="qTier" class="w-full border p-2 text-sm rounded"></select></div>
+                    <div class="flex space-x-2">
+                        <div class="w-1/2"><label class="block text-xs font-bold mb-1">Freight Type</label>
+                            <select id="qFreightMode" class="w-full border p-2 text-sm rounded">
+                                <option value="manual">Manual Lump Sum (₹)</option>
+                                <option value="auto">Auto-Calc by Weight</option>
+                            </select>
+                        </div>
+                        <div class="w-1/2"><label class="block text-xs font-bold mb-1">Freight Value / Rate</label>
+                            <input type="number" id="qFreightVal" value="0" class="w-full border p-2 text-sm rounded">
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- 2. Dynamic Line Item Builder -->
+            <div class="bg-white p-5 rounded shadow border border-t-4 border-t-green-600">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="text-lg font-bold text-gray-800">2. Add Line Item</h3>
+                    <select id="iType" class="border p-1 text-sm rounded bg-gray-100 font-bold text-gray-700">
+                        <option value="custom">⚙️ Custom / Indexable Tool</option>
+                        <option value="standard">📦 Standard Product / Spares</option>
+                        <option value="trading">🛒 Bought-Out / Trading Item</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-bold mb-1">Printable Item Description (Shown on PDF)</label>
+                    <input type="text" id="iDesc" placeholder="e.g. Ø63mm Anti-Vibration Boring Bar" class="w-full border p-2 text-sm rounded font-semibold text-blue-900">
+                </div>
+
+                <!-- A. TRADING & STANDARD VIEWS -->
+                <div id="viewTrading" class="hidden mb-4 p-4 bg-gray-50 border rounded">
+                    <label class="block text-xs font-bold mb-1">Procurement Cost (₹)</label>
+                    <input type="number" id="tCost" class="border p-2 w-1/3 rounded">
+                    <p class="text-xs text-gray-500 mt-1">Trading Margin will be auto-applied based on Customer Tier.</p>
+                </div>
+                
+                <div id="viewStandard" class="hidden mb-4 p-4 bg-gray-50 border rounded">
+                    <label class="block text-xs font-bold mb-1">Select Standard Product</label>
+                    <select id="sProduct" class="border p-2 w-full rounded"></select>
+                </div>
+
+                <!-- B. CUSTOM TOOL / MACHINING VIEW -->
+                <div id="viewCustom" class="space-y-4">
+                    <div><label class="block text-xs font-bold mb-1">Tool Category</label><select id="cCategory" class="w-full border p-2 text-sm rounded bg-gray-50"></select></div>
                     
-                    <!-- 3D Visualizer -->
-                    <div class="flex flex-col items-center justify-center bg-gray-900 rounded border relative overflow-hidden" id="canvasContainer" style="height: 250px;">
-                        <!-- ThreeJS Canvas will inject here -->
-                        <button id="downloadImgBtn" class="absolute bottom-2 right-2 bg-gray-700 text-white text-xs px-2 py-1 rounded hover:bg-gray-600">📥 Save Image</button>
+                    <!-- Raw Material Config -->
+                    <div id="rmSection" class="p-4 bg-blue-50 border border-blue-100 rounded">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-sm text-blue-900">Raw Material Sizing</h4>
+                            <select id="cStockShape" class="border p-1 text-xs rounded font-bold">
+                                <option value="round">Round Bar</option>
+                                <option value="rect">Rectangular Block</option>
+                                <option value="blank">Taper Blank</option>
+                            </select>
+                        </div>
+                        
+                        <div id="dimRound" class="grid grid-cols-2 gap-4">
+                            <div><label class="text-xs font-bold">Max Outer Dia (mm)</label><input type="number" id="rDia" value="0" class="w-full border p-1 rounded calc-trigger"></div>
+                            <div><label class="text-xs font-bold">Overall Length (mm)</label><input type="number" id="rLen" value="0" class="w-full border p-1 rounded calc-trigger"></div>
+                        </div>
+                        <div id="dimRect" class="grid grid-cols-3 gap-4 hidden">
+                            <div><label class="text-xs font-bold">Length (mm)</label><input type="number" id="rcL" value="0" class="w-full border p-1 rounded calc-trigger"></div>
+                            <div><label class="text-xs font-bold">Width (mm)</label><input type="number" id="rcW" value="0" class="w-full border p-1 rounded calc-trigger"></div>
+                            <div><label class="text-xs font-bold">Height (mm)</label><input type="number" id="rcH" value="0" class="w-full border p-1 rounded calc-trigger"></div>
+                        </div>
+                        <div id="dimBlank" class="grid grid-cols-2 gap-4 hidden">
+                            <div><label class="text-xs font-bold">Select Blank Type</label><select id="bType" class="w-full border p-1 rounded calc-trigger"></select></div>
+                            <div><label class="text-xs font-bold">Finish GPL (mm)</label><input type="number" id="bGpl" value="0" class="w-full border p-1 rounded calc-trigger"></div>
+                        </div>
+                        
+                        <div class="mt-3"><label class="text-xs font-bold">Material Grade</label><select id="cMatGrade" class="w-full border p-1 rounded text-sm calc-trigger"></select></div>
+                        <p class="text-[10px] text-gray-500 mt-1 italic">* 10mm machining allowance is auto-added to all raw dimensions.</p>
+                    </div>
+
+                    <!-- Operations BOM -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="border rounded p-3 bg-gray-50">
+                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm">Machining Ops</h4><button type="button" onclick="addBomRow('ops')" class="text-xs bg-gray-300 px-2 py-1 rounded">+ Add</button></div>
+                            <div id="bomOps" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        
+                        <div class="border rounded p-3 bg-gray-50">
+                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm">Features / Pocketing</h4><button type="button" onclick="addBomRow('feat')" class="text-xs bg-gray-300 px-2 py-1 rounded">+ Add</button></div>
+                            <div id="bomFeat" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        
+                        <div class="border rounded p-3 bg-gray-50">
+                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm">Assembly / Surface</h4><button type="button" onclick="addBomRow('assm')" class="text-xs bg-gray-300 px-2 py-1 rounded">+ Add</button></div>
+                            <div id="bomAssm" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        
+                        <div class="border rounded p-3 bg-gray-50 border-purple-200 bg-purple-50">
+                            <div class="flex justify-between items-center mb-2"><h4 class="font-bold text-sm text-purple-900">BOM Spares</h4><button type="button" onclick="addBomRow('spare')" class="text-xs bg-purple-200 px-2 py-1 rounded">+ Add</button></div>
+                            <div id="bomSpares" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Manufacturing Variables -->
-                <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Raw Material</label>
-                        <select id="rawMaterial" class="w-full border p-2 rounded bg-gray-50"></select>
+                <!-- PRICING & OVERRIDE GUARDRAILS -->
+                <div class="mt-6 p-4 bg-gray-800 text-white rounded border border-gray-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg">Pricing Engine</h4>
+                        <div class="flex space-x-4">
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">Calculated MRP</p>
+                                <p class="font-bold text-gray-300" id="engMrp">₹ 0.00</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-yellow-400">Manual Override MRP (Optional)</p>
+                                <input type="number" id="overrideMrp" placeholder="Must be ≥ Calculated" class="w-32 bg-gray-700 border border-gray-600 text-white p-1 rounded text-right calc-trigger text-sm">
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Primary Operation</label>
-                        <select id="primaryOp" class="w-full border p-2 rounded bg-gray-50"></select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Est. Machining Hrs</label>
-                        <input type="number" id="machiningHrs" value="4" class="w-full border p-2 rounded">
+
+                    <div class="flex justify-between items-center border-t border-gray-600 pt-4">
+                        <div class="flex space-x-6">
+                            <div>
+                                <p class="text-xs text-gray-400">Max Permissible Discount</p>
+                                <p class="font-bold text-lg text-yellow-400" id="maxDiscOut">0.0%</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-green-400 font-bold">Offered Discount (%)</p>
+                                <input type="number" id="offeredDisc" value="0" class="w-20 bg-gray-700 border border-green-500 text-white p-1 rounded text-center calc-trigger">
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-gray-400">Final Net Selling Price</p>
+                            <p class="font-bold text-2xl text-green-400" id="netPriceOut">₹ 0.00</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex justify-between items-center mt-6">
-                    <button id="auditToggleBtn" class="text-sm text-gray-500 hover:text-blue-600 underline">Show Cost Audit (Admin)</button>
-                    <button id="addToCartBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold shadow-lg">🛒 Add to Quote</button>
+                <div class="flex justify-between mt-4">
+                    <button id="adminAuditBtn" class="text-xs text-blue-600 underline font-bold hidden">👁️ Admin: Show Cost Breakup</button>
+                    <button id="addToCartBtn" class="bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded font-bold shadow-lg">🛒 Add to Unified Quote</button>
                 </div>
 
-                <!-- Admin Cost Audit Box (Hidden by default) -->
-                <div id="auditBox" class="hidden mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-gray-700">
-                    <h4 class="font-bold text-yellow-800 mb-2">Internal Cost Breakdown</h4>
-                    <div class="grid grid-cols-2 gap-2" id="auditData">
-                        <p>Raw Material Vol: <span id="auditVol" class="font-bold">0</span> cm³</p>
-                        <p>Raw Material Wt: <span id="auditWt" class="font-bold">0</span> kg</p>
-                        <p>Material Cost: <span id="auditMatCost" class="font-bold text-red-600">₹ 0</span></p>
-                        <p>Machining Cost: <span id="auditMfgCost" class="font-bold text-red-600">₹ 0</span></p>
-                        <p>Base Mfg Cost: <span id="auditBaseCost" class="font-bold">₹ 0</span></p>
-                        <p>Floor Price: <span id="auditFloorCost" class="font-bold text-blue-600">₹ 0</span></p>
-                    </div>
+                <!-- Admin Hidden Panel -->
+                <div id="adminAuditPanel" class="hidden mt-4 p-4 bg-yellow-50 border border-yellow-300 rounded text-xs text-gray-800 grid grid-cols-3 gap-2">
+                    <p>Raw Vol: <span id="adVol" class="font-bold">0</span> cm³</p>
+                    <p>Raw Wt: <span id="adWt" class="font-bold">0</span> kg</p>
+                    <p>RM Cost: <span id="adRm" class="font-bold text-red-600">₹ 0</span></p>
+                    <p>Ops Cost: <span id="adOp" class="font-bold text-red-600">₹ 0</span></p>
+                    <p>Spares Cost: <span id="adSp" class="font-bold text-red-600">₹ 0</span></p>
+                    <p>Base Mfg Cost: <span id="adBase" class="font-bold">₹ 0</span></p>
+                    <p class="col-span-3 text-right text-sm border-t border-yellow-200 pt-2 mt-2">Absolute Floor Price (Min): <span id="adFloor" class="font-bold text-blue-800">₹ 0</span></p>
                 </div>
+
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Shopping Cart -->
+        <!-- RIGHT COLUMN: Unified Shopping Cart -->
         <div class="col-span-12 lg:col-span-4">
-            <div class="bg-gray-800 text-white p-6 rounded shadow sticky top-6 border border-gray-700">
-                <h3 class="text-lg font-bold mb-4 border-b border-gray-600 pb-2">Shopping Cart</h3>
+            <div class="bg-gray-800 text-white p-5 rounded shadow sticky top-6 border border-gray-700">
+                <h3 class="text-lg font-bold mb-4 border-b border-gray-600 pb-2">Unified Quote Cart</h3>
                 
-                <div id="cartItems" class="space-y-3 mb-6 min-h-[150px] max-h-[300px] overflow-y-auto pr-2">
-                    <!-- Cart items inject here -->
-                    <p class="text-gray-400 text-sm text-center mt-10" id="emptyCartMsg">Cart is empty.</p>
+                <div id="cartItems" class="space-y-2 mb-4 min-h-[150px] max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
+                    <p class="text-gray-400 text-sm text-center mt-10" id="emptyCartMsg">No items added yet.</p>
                 </div>
 
-                <div class="border-t border-gray-600 pt-4 mb-6">
-                    <div class="flex justify-between text-sm mb-1">
-                        <span class="text-gray-400">Total Items:</span>
-                        <span id="cartCount" class="font-bold">0</span>
-                    </div>
-                    <div class="flex justify-between text-sm mb-1">
-                        <span class="text-gray-400">Total Floor Price:</span>
-                        <span id="cartFloor" class="text-yellow-400">₹ 0.00</span>
-                    </div>
-                    <div class="flex justify-between text-lg mt-2">
-                        <span class="font-bold">Total Quote Price:</span>
-                        <span id="cartTotal" class="font-bold text-green-400">₹ 0.00</span>
-                    </div>
+                <div class="border-t border-gray-600 pt-4 mb-4 text-sm space-y-1">
+                    <div class="flex justify-between"><span class="text-gray-400">Total Items:</span><span id="cCount">0</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Total Wt (Est):</span><span id="cWt">0 kg</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Subtotal (Net):</span><span id="cSub">₹ 0.00</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Freight:</span><span id="cFreight">₹ 0.00</span></div>
+                    <div class="flex justify-between text-yellow-400" id="taxLine"><span>Taxes:</span><span id="cTax">₹ 0.00</span></div>
+                    <div class="flex justify-between text-lg mt-2 pt-2 border-t border-gray-600"><span class="font-bold">Grand Total:</span><span id="cGrand" class="font-bold text-green-400">₹ 0.00</span></div>
                 </div>
 
-                <button id="saveQuoteBtn" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold shadow-lg mb-3">💾 Save Quote to DB</button>
-                <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-bold shadow-lg">📄 Generate PDF Proposal</button>
+                <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 p-3 rounded font-bold shadow-lg flex justify-center items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Generate Executive PDF
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // === REPLACE WITH YOUR CONFIG ===
+        // === REPLACE FIREBASE CONFIG ===
         const firebaseConfig = {
             apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
   authDomain: "renuka-tools-quote.firebaseapp.com",
@@ -174,25 +267,27 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // State Variables
-        let masterData = { tiers: [], categories: [], materials: [], operations: [] };
-        let shoppingCart = [];
-        let currentItemDraft = null;
+        // === ROLE BASED ACCESS CONTROL ===
+        const ADMIN_EMAILS = ["anand@renukatools.in", "admin@renukatools.in"]; // ADD YOUR LOGIN EMAIL HERE
 
-        // Generate ID
-        const dateStr = new Date().toISOString().slice(0, 7).replace("-", "");
-        const randId = Math.floor(100 + Math.random() * 900);
-        document.getElementById('quoteId').value = `RT-${dateStr}-${randId}`;
+        // State
+        const mst = {}; 
+        let cart = [];
+        let curDraft = null;
 
-        // Auth Logic
+        document.getElementById('quoteId').value = `RT-${new Date().toISOString().slice(0,10).replace(/-/g,"")}-${Math.floor(100+Math.random()*900)}`;
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
                 document.getElementById('logoutBtn').classList.remove('hidden');
-                await loadMasters();
-                initThreeJS();
-                calculateDraft();
+                
+                if (ADMIN_EMAILS.includes(user.email)) {
+                    document.getElementById('adminAuditBtn').classList.remove('hidden');
+                }
+
+                await fetchMasters();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('appScreen').classList.add('hidden');
@@ -201,311 +296,399 @@
         });
 
         document.getElementById('loginBtn').addEventListener('click', () => {
-            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
-                .catch(() => alert("Invalid credentials"));
+            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=>alert("Invalid Login"));
         });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // --- FETCH DYNAMIC MASTERS ---
-        async function loadMasters() {
-            // Fetch Tiers
-            const tSnap = await getDocs(collection(db, "customer_tiers"));
-            tSnap.forEach(doc => masterData.tiers.push({ id: doc.id, ...doc.data() }));
-            populateDropdown('custTier', masterData.tiers, (item) => `${item.name} (Floor: ${item.param1}%)`);
-
-            // Fetch Categories
-            const cSnap = await getDocs(collection(db, "tool_categories"));
-            cSnap.forEach(doc => masterData.categories.push({ id: doc.id, ...doc.data() }));
-            populateDropdown('toolCat', masterData.categories, (item) => `${item.name} (Escalation: +${item.param2}%)`);
-
-            // Fetch Materials
-            const mSnap = await getDocs(collection(db, "raw_materials"));
-            mSnap.forEach(doc => masterData.materials.push({ id: doc.id, ...doc.data() }));
-            populateDropdown('rawMaterial', masterData.materials, (item) => `${item.name} (₹${item.param2}/kg)`);
-
-            // Fetch Operations
-            const oSnap = await getDocs(collection(db, "operations"));
-            oSnap.forEach(doc => masterData.operations.push({ id: doc.id, ...doc.data() }));
-            populateDropdown('primaryOp', masterData.operations, (item) => `${item.name} (₹${item.param1}/hr)`);
+        // --- FETCH & POPULATE MASTERS ---
+        async function fetchMasters() {
+            const collections = ["customer_tiers", "tool_categories", "raw_materials", "blanks", "operations", "features", "assembly", "spares", "freight", "payment_terms", "inco_terms"];
+            for (let col of collections) {
+                mst[col] = [];
+                const snap = await getDocs(collection(db, col));
+                snap.forEach(doc => {
+                    if(doc.data().isActive !== false) mst[col].push({ id: doc.id, ...doc.data() });
+                });
+            }
+            populateSelects();
         }
 
-        function populateDropdown(elementId, dataArray, textFormatter) {
-            const select = document.getElementById(elementId);
-            select.innerHTML = "";
-            dataArray.forEach((item, index) => {
-                let opt = document.createElement('option');
-                opt.value = index; // Store array index for easy retrieval
-                opt.text = textFormatter(item);
-                select.appendChild(opt);
-            });
-        }
-
-        // --- THE CALCULATION ENGINE ---
-        function calculateDraft() {
-            if (masterData.materials.length === 0) return; // Wait for load
-
-            // 1. Dimensions
-            const sD = Number(document.getElementById('sDia').value);
-            const sL = Number(document.getElementById('sLen').value);
-            const cD = Number(document.getElementById('cDia').value);
-            const cL = Number(document.getElementById('cLen').value);
-            const hD = Number(document.getElementById('hDia').value);
-            const hL = Number(document.getElementById('hLen').value);
-
-            // 2. Bound Math
-            const maxDia = Math.max(sD, cD, hD) + 10; 
-            const totalLen = sL + cL + hL + 10;
-            const volCm3 = Math.PI * Math.pow(maxDia / 20, 2) * (totalLen / 10);
-
-            // 3. Cost Math
-            const matIdx = document.getElementById('rawMaterial').value;
-            const opIdx = document.getElementById('primaryOp').value;
-            const tierIdx = document.getElementById('custTier').value;
-            const catIdx = document.getElementById('toolCat').value;
-
-            const selectedMat = masterData.materials[matIdx];
-            const selectedOp = masterData.operations[opIdx];
-            const selectedTier = masterData.tiers[tierIdx];
-            const selectedCat = masterData.categories[catIdx];
-
-            const weightKg = (volCm3 * (selectedMat ? selectedMat.param1 : 7.85)) / 1000;
-            const matCost = weightKg * (selectedMat ? selectedMat.param2 : 150);
-            
-            const hrs = Number(document.getElementById('machiningHrs').value);
-            const opCost = (hrs * (selectedOp ? selectedOp.param1 : 800)) + (selectedOp ? selectedOp.param2 : 0);
-            
-            const baseCost = matCost + opCost;
-            
-            // Margins
-            const floorMargin = selectedTier ? selectedTier.param1 : 25;
-            const escalation = selectedCat ? selectedCat.param2 : 100;
-            
-            const floorPrice = baseCost * (1 + (floorMargin / 100));
-            const quotePrice = baseCost * (1 + (escalation / 100));
-
-            // Update Draft Object
-            currentItemDraft = {
-                name: document.getElementById('toolName').value || "Custom Stepped Tool",
-                baseCost: baseCost,
-                floorPrice: floorPrice,
-                quotePrice: quotePrice,
-                maxDiscount: ((quotePrice - floorPrice) / quotePrice) * 100
+        function populateSelects() {
+            const pop = (id, arr, textFn) => {
+                const sel = document.getElementById(id);
+                if(!sel) return;
+                arr.forEach((item, idx) => {
+                    let opt = document.createElement('option');
+                    opt.value = idx; opt.text = textFn(item);
+                    sel.appendChild(opt);
+                });
             };
-
-            // Update Audit UI
-            document.getElementById('auditVol').innerText = volCm3.toFixed(2);
-            document.getElementById('auditWt').innerText = weightKg.toFixed(2);
-            document.getElementById('auditMatCost').innerText = `₹ ${matCost.toFixed(2)}`;
-            document.getElementById('auditMfgCost').innerText = `₹ ${opCost.toFixed(2)}`;
-            document.getElementById('auditBaseCost').innerText = `₹ ${baseCost.toFixed(2)}`;
-            document.getElementById('auditFloorCost').innerText = `₹ ${floorPrice.toFixed(2)}`;
-
-            update3DModel(sD, sL, cD, cL, hD, hL);
+            
+            pop('qTier', mst.customer_tiers, i => `${i.name} (Floor: ${i.param1}%)`);
+            pop('qPayTerms', mst.payment_terms, i => i.name);
+            pop('qIncoTerms', mst.inco_terms, i => i.name);
+            pop('cCategory', mst.tool_categories, i => `${i.name}`);
+            pop('cMatGrade', mst.raw_materials, i => `${i.name} (₹${i.param2}/kg)`);
+            pop('bType', mst.blanks, i => `${i.name} (₹${i.param3})`);
+            pop('sProduct', mst.spares, i => `${i.name} (₹${i.param1})`);
+            
+            calcEngine(); // Init
         }
 
-        // Event Listeners for Recalculation
-        document.querySelectorAll('.tool-dim, select, #machiningHrs, #toolName').forEach(el => {
-            el.addEventListener('input', calculateDraft);
-            el.addEventListener('change', calculateDraft);
+        // --- DYNAMIC UI TOGGLES ---
+        document.getElementById('iType').addEventListener('change', (e) => {
+            document.getElementById('viewCustom').classList.add('hidden');
+            document.getElementById('viewStandard').classList.add('hidden');
+            document.getElementById('viewTrading').classList.add('hidden');
+            if(e.target.value === 'custom') document.getElementById('viewCustom').classList.remove('hidden');
+            if(e.target.value === 'standard') document.getElementById('viewStandard').classList.remove('hidden');
+            if(e.target.value === 'trading') document.getElementById('viewTrading').classList.remove('hidden');
+            calcEngine();
         });
 
-        document.getElementById('auditToggleBtn').addEventListener('click', () => {
-            document.getElementById('auditBox').classList.toggle('hidden');
+        document.getElementById('cStockShape').addEventListener('change', (e) => {
+            document.getElementById('dimRound').classList.add('hidden');
+            document.getElementById('dimRect').classList.add('hidden');
+            document.getElementById('dimBlank').classList.add('hidden');
+            if(e.target.value === 'round') document.getElementById('dimRound').classList.remove('hidden');
+            if(e.target.value === 'rect') document.getElementById('dimRect').classList.remove('hidden');
+            if(e.target.value === 'blank') document.getElementById('dimBlank').classList.remove('hidden');
+            calcEngine();
         });
 
-        // --- SHOPPING CART LOGIC ---
-        document.getElementById('addToCartBtn').addEventListener('click', () => {
-            if (!currentItemDraft) return;
-            shoppingCart.push({...currentItemDraft});
-            renderCart();
-            // Reset tool name for next item
-            document.getElementById('toolName').value = "";
-        });
+        // --- BOM ROW BUILDER ---
+        window.addBomRow = (type) => {
+            let config = { 
+                ops: { arr: mst.operations, div: 'bomOps', l: 'Machine', u: 'Hrs' },
+                feat: { arr: mst.features, div: 'bomFeat', l: 'Feature', u: 'Qty' },
+                assm: { arr: mst.assembly, div: 'bomAssm', l: 'Process', u: 'NA' },
+                spare: { arr: mst.spares, div: 'bomSpares', l: 'Item', u: 'Qty' }
+            }[type];
 
-        function renderCart() {
-            const cartDiv = document.getElementById('cartItems');
-            document.getElementById('emptyCartMsg').style.display = shoppingCart.length > 0 ? 'none' : 'block';
+            const rowId = `row_${Math.random().toString(36).substr(2, 9)}`;
+            let selHtml = config.arr.map((item, idx) => `<option value="${idx}">${item.name}</option>`).join('');
             
-            let html = "";
-            let totalFloor = 0;
-            let totalQuote = 0;
+            let html = `
+                <div class="flex space-x-2 items-center text-xs" id="${rowId}">
+                    <select class="border p-1 w-full rounded bom-select calc-trigger" data-type="${type}">${selHtml}</select>
+                    ${config.u !== 'NA' ? `<input type="number" value="1" class="border p-1 w-16 rounded bom-qty calc-trigger" title="${config.u}">` : ''}
+                    <button type="button" onclick="document.getElementById('${rowId}').remove(); window.calcEngine();" class="text-red-500 font-bold">X</button>
+                </div>`;
+            document.getElementById(config.div).insertAdjacentHTML('beforeend', html);
+            
+            // Re-bind listeners to new triggers
+            document.querySelectorAll('.calc-trigger').forEach(el => {
+                el.removeEventListener('input', calcEngine); el.addEventListener('input', calcEngine);
+                el.removeEventListener('change', calcEngine); el.addEventListener('change', calcEngine);
+            });
+            calcEngine();
+        };
 
-            shoppingCart.forEach((item, idx) => {
-                totalFloor += item.floorPrice;
-                totalQuote += item.quotePrice;
+        // --- THE MASTER CALCULATION ENGINE ---
+        document.querySelectorAll('.calc-trigger, #qTier, #qModel').forEach(el => {
+            el.addEventListener('input', calcEngine);
+            el.addEventListener('change', calcEngine);
+        });
+
+        window.calcEngine = () => {
+            if(!mst.customer_tiers || mst.customer_tiers.length === 0) return;
+
+            const iType = document.getElementById('iType').value;
+            const tier = mst.customer_tiers[document.getElementById('qTier').value];
+            const isMachiningCustomerRM = (document.getElementById('qModel').value === 'jobwork_cust');
+            
+            let baseCost = 0, quotePrice = 0, floorPrice = 0, weightKg = 0;
+
+            if (iType === 'trading') {
+                baseCost = Number(document.getElementById('tCost').value);
+                floorPrice = baseCost * (1 + (tier.param1 / 100)); // Floor Margin
+                quotePrice = baseCost * (1 + (tier.param2 / 100)); // Trading Margin
+            } 
+            else if (iType === 'standard') {
+                const std = mst.spares[document.getElementById('sProduct').value];
+                quotePrice = std ? std.param1 : 0;
+                floorPrice = quotePrice * (1 - (std.param2 / 100)); // Apply max discount back to floor
+                baseCost = floorPrice; 
+            } 
+            else if (iType === 'custom') {
+                const cat = mst.tool_categories[document.getElementById('cCategory').value];
+                const shape = document.getElementById('cStockShape').value;
+                let rmCost = 0;
+
+                // 1. Raw Material Math
+                if (!isMachiningCustomerRM) {
+                    if (shape === 'round') {
+                        const d = Number(document.getElementById('rDia').value) + 10;
+                        const l = Number(document.getElementById('rLen').value) + 10;
+                        const vol = Math.PI * Math.pow(d/20, 2) * (l/10);
+                        const mat = mst.raw_materials[document.getElementById('cMatGrade').value];
+                        weightKg = (vol * (mat ? mat.param1 : 7.85)) / 1000;
+                        rmCost = weightKg * (mat ? mat.param2 : 150);
+                        document.getElementById('adVol').innerText = vol.toFixed(2);
+                    } else if (shape === 'rect') {
+                        const l = Number(document.getElementById('rcL').value) + 10;
+                        const w = Number(document.getElementById('rcW').value) + 10;
+                        const h = Number(document.getElementById('rcH').value) + 10;
+                        const vol = (l/10) * (w/10) * (h/10);
+                        const mat = mst.raw_materials[document.getElementById('cMatGrade').value];
+                        weightKg = (vol * (mat ? mat.param1 : 7.85)) / 1000;
+                        rmCost = weightKg * (mat ? mat.param2 : 150);
+                        document.getElementById('adVol').innerText = vol.toFixed(2);
+                    } else if (shape === 'blank') {
+                        const b = mst.blanks[document.getElementById('bType').value];
+                        rmCost = b ? b.param3 : 0;
+                        weightKg = 1.5; // Dummy estimate for blanks
+                    }
+                }
+                document.getElementById('adWt').innerText = weightKg.toFixed(2);
+                document.getElementById('adRm').innerText = `₹ ${rmCost.toFixed(2)}`;
+
+                // 2. BOM Math
+                let opCost = 0, spCost = 0;
+                
+                // Ops (Variable Rate x Hrs + Setup)
+                document.querySelectorAll('#bomOps .bom-select').forEach(sel => {
+                    const op = mst.operations[sel.value];
+                    const hrs = Number(sel.nextElementSibling.value);
+                    opCost += (op.param1 * hrs) + op.param2;
+                });
+                
+                // Features (Variable Rate x Qty)
+                document.querySelectorAll('#bomFeat .bom-select').forEach(sel => {
+                    const feat = mst.features[sel.value];
+                    const qty = Number(sel.nextElementSibling.value);
+                    opCost += (feat.param1 * qty);
+                });
+                
+                // Assembly (Flat)
+                document.querySelectorAll('#bomAssm .bom-select').forEach(sel => {
+                    const assm = mst.assembly[sel.value];
+                    opCost += assm.param1;
+                });
+
+                // Spares (List Price x Qty)
+                document.querySelectorAll('#bomSpares .bom-select').forEach(sel => {
+                    const sp = mst.spares[sel.value];
+                    const qty = Number(sel.nextElementSibling.value);
+                    spCost += (sp.param1 * qty);
+                });
+
+                document.getElementById('adOp').innerText = `₹ ${opCost.toFixed(2)}`;
+                document.getElementById('adSp').innerText = `₹ ${spCost.toFixed(2)}`;
+
+                baseCost = rmCost + opCost + spCost;
+                
+                // 3. Custom Margins
+                const floorMargin = tier.param1 + (cat ? cat.param1 : 0); // Tier Floor + Criticality
+                const escalation = cat ? cat.param2 : 100;
+                
+                floorPrice = baseCost * (1 + (floorMargin / 100));
+                quotePrice = baseCost * (1 + (escalation / 100));
+            }
+
+            document.getElementById('adBase').innerText = `₹ ${baseCost.toFixed(2)}`;
+            document.getElementById('adFloor').innerText = `₹ ${floorPrice.toFixed(2)}`;
+            document.getElementById('engMrp').innerText = `₹ ${quotePrice.toFixed(2)}`;
+
+            // Manual Override Guardrail
+            const overrideInp = document.getElementById('overrideMrp');
+            let finalMrp = quotePrice;
+            if (overrideInp.value && Number(overrideInp.value) >= quotePrice) {
+                finalMrp = Number(overrideInp.value);
+                overrideInp.classList.remove('border-red-500');
+            } else if (overrideInp.value && Number(overrideInp.value) < quotePrice) {
+                overrideInp.classList.add('border-red-500'); // Warning
+                finalMrp = quotePrice;
+            }
+
+            // Discount Math
+            const maxDisc = ((finalMrp - floorPrice) / finalMrp) * 100;
+            document.getElementById('maxDiscOut').innerText = `${maxDisc.toFixed(1)}%`;
+
+            const offeredDiscInp = document.getElementById('offeredDisc');
+            let offeredDisc = Number(offeredDiscInp.value);
+            
+            const btn = document.getElementById('addToCartBtn');
+            if (offeredDisc > maxDisc) {
+                offeredDiscInp.classList.replace('border-green-500', 'border-red-500');
+                btn.disabled = true; btn.classList.replace('bg-green-600', 'bg-gray-400');
+            } else {
+                offeredDiscInp.classList.replace('border-red-500', 'border-green-500');
+                btn.disabled = false; btn.classList.replace('bg-gray-400', 'bg-green-600');
+            }
+
+            const netPrice = finalMrp * (1 - (offeredDisc / 100));
+            document.getElementById('netPriceOut').innerText = `₹ ${netPrice.toFixed(2)}`;
+
+            curDraft = {
+                desc: document.getElementById('iDesc').value || "Unnamed Item",
+                type: iType,
+                weight: weightKg,
+                mrp: finalMrp,
+                discPercent: offeredDisc,
+                netPrice: netPrice
+            };
+        };
+
+        // UI Toggles
+        document.getElementById('adminAuditBtn').addEventListener('click', () => document.getElementById('adminAuditPanel').classList.toggle('hidden'));
+        document.getElementById('qFreightMode').addEventListener('change', updateCartUI);
+        document.getElementById('qFreightVal').addEventListener('input', updateCartUI);
+        document.getElementById('qRegion').addEventListener('change', updateCartUI);
+        document.getElementById('qModel').addEventListener('change', updateCartUI);
+
+        // --- SHOPPING CART ---
+        document.getElementById('addToCartBtn').addEventListener('click', () => {
+            if(!curDraft || document.getElementById('addToCartBtn').disabled) return;
+            cart.push({...curDraft});
+            updateCartUI();
+            
+            // Reset core inputs for next item
+            document.getElementById('iDesc').value = "";
+            document.getElementById('overrideMrp').value = "";
+            document.getElementById('offeredDisc').value = "0";
+            calcEngine();
+        });
+
+        window.removeCartItem = (idx) => { cart.splice(idx, 1); updateCartUI(); };
+
+        function updateCartUI() {
+            const list = document.getElementById('cartItems');
+            document.getElementById('emptyCartMsg').style.display = cart.length ? 'none' : 'block';
+            
+            let html = "", totalWt = 0, subNet = 0;
+            cart.forEach((item, i) => {
+                totalWt += item.weight;
+                subNet += item.netPrice;
                 html += `
-                    <div class="bg-gray-700 p-3 rounded flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-sm">${item.name}</p>
-                            <p class="text-xs text-gray-400">Max Disc: ${item.maxDiscount.toFixed(1)}%</p>
+                    <div class="bg-gray-700 p-2 rounded flex justify-between items-center text-xs">
+                        <div class="w-3/4">
+                            <p class="font-bold truncate">${item.desc}</p>
+                            <p class="text-gray-400">${item.discPercent > 0 ? `MRP: ₹${item.mrp.toFixed(2)} (-${item.discPercent}%)` : `MRP: ₹${item.mrp.toFixed(2)}`}</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-bold text-green-400">₹ ${item.quotePrice.toFixed(2)}</p>
-                            <button onclick="window.removeItem(${idx})" class="text-xs text-red-400 hover:underline">Remove</button>
+                            <p class="font-bold text-green-400">₹ ${item.netPrice.toFixed(2)}</p>
+                            <button onclick="window.removeCartItem(${i})" class="text-red-400 hover:underline">Remove</button>
                         </div>
                     </div>`;
             });
+            list.innerHTML = html;
 
-            cartDiv.innerHTML = html;
-            document.getElementById('cartCount').innerText = shoppingCart.length;
-            document.getElementById('cartFloor').innerText = `₹ ${totalFloor.toFixed(2)}`;
-            document.getElementById('cartTotal').innerText = `₹ ${totalQuote.toFixed(2)}`;
+            // Freight Logic
+            let freight = 0;
+            if(document.getElementById('qFreightMode').value === 'auto') {
+                freight = totalWt * Number(document.getElementById('qFreightVal').value || 0);
+            } else {
+                freight = Number(document.getElementById('qFreightVal').value || 0);
+            }
+
+            // Tax Logic
+            const region = document.getElementById('qRegion').value;
+            const model = document.getElementById('qModel').value;
+            let taxRate = (model === 'jobwork_cust') ? 0.12 : 0.18;
+            if(region === 'export') taxRate = 0;
+            
+            const baseForTax = subNet + freight;
+            const taxes = baseForTax * taxRate;
+            const grandTotal = baseForTax + taxes;
+
+            document.getElementById('cCount').innerText = cart.length;
+            document.getElementById('cWt').innerText = `${totalWt.toFixed(2)} kg`;
+            document.getElementById('cSub').innerText = `₹ ${subNet.toFixed(2)}`;
+            document.getElementById('cFreight').innerText = `₹ ${freight.toFixed(2)}`;
+            
+            let taxStr = region === 'export' ? "Taxes (0%)" : (region === 'mh' ? `CGST+SGST (${(taxRate*100)}%)` : `IGST (${(taxRate*100)}%)`);
+            document.getElementById('taxLine').children[0].innerText = taxStr;
+            document.getElementById('cTax').innerText = `₹ ${taxes.toFixed(2)}`;
+            document.getElementById('cGrand').innerText = `₹ ${grandTotal.toFixed(2)}`;
         }
 
-        window.removeItem = (idx) => {
-            shoppingCart.splice(idx, 1);
-            renderCart();
-        };
-
-        // --- SAVING & PDF ---
-        document.getElementById('saveQuoteBtn').addEventListener('click', async () => {
-            if (shoppingCart.length === 0) return alert("Cart is empty!");
-            const quoteData = {
-                quoteId: document.getElementById('quoteId').value,
-                company: document.getElementById('clientCompany').value,
-                contact: document.getElementById('clientName').value,
-                project: document.getElementById('projectName').value,
-                date: new Date().toISOString(),
-                items: shoppingCart,
-                totalQuote: shoppingCart.reduce((sum, item) => sum + item.quotePrice, 0)
-            };
-            try {
-                await addDoc(collection(db, "quotes"), quoteData);
-                alert(`Quote ${quoteData.quoteId} saved successfully to database!`);
-            } catch (e) {
-                alert("Error saving quote.");
-            }
-        });
-
+        // --- PROFESSIONAL PDF GENERATOR ---
         document.getElementById('pdfBtn').addEventListener('click', () => {
-            if (shoppingCart.length === 0) return alert("Cart is empty!");
+            if(cart.length === 0) return alert("Cart is empty.");
+            
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            doc.setFontSize(22);
-            doc.text("RENUKA TOOLS", 20, 20);
-            doc.setFontSize(12);
-            doc.text(`Quote ID: ${document.getElementById('quoteId').value}`, 20, 30);
-            doc.text(`Company: ${document.getElementById('clientCompany').value}`, 20, 40);
+            const qId = document.getElementById('quoteId').value;
+            const qComp = document.getElementById('qCompany').value || "Client Name";
+            const qCont = document.getElementById('qContact').value || "Contact Person";
+            const qProj = document.getElementById('qProject').value || "General Machining";
+
+            // --- PAGE 1: COVER LETTER ---
+            doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(30, 58, 138);
+            doc.text("RENUKA TOOLS", 20, 25);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
+            doc.text("M.I.D.C Waluj, Chhatrapati Sambhajinagar, Maharashtra, India", 20, 31);
+            doc.text("GSTIN: 27AABCRXXXXR1Z0 | IEC: 031XXXXXXX", 20, 36);
+
+            doc.setLineWidth(0.5); doc.setDrawColor(200, 200, 200); doc.line(20, 42, 190, 42);
+
+            doc.setTextColor(0, 0, 0); doc.setFontSize(11);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 55);
+            doc.text(`Quote Ref: ${qId}`, 150, 61);
+
+            doc.setFont("helvetica", "bold"); doc.text(`To,`, 20, 55);
+            doc.text(qCont, 20, 61); doc.text(qComp, 20, 67);
             
-            let y = 60;
-            doc.setFontSize(14);
-            doc.text("Item Breakdown:", 20, y);
-            y += 10;
+            doc.text(`Subject: Commercial Offer for ${qProj}`, 20, 85);
             
-            doc.setFontSize(10);
-            let total = 0;
-            shoppingCart.forEach((item, idx) => {
-                doc.text(`${idx + 1}. ${item.name}`, 20, y);
-                doc.text(`Rs. ${item.quotePrice.toFixed(2)}`, 150, y);
-                total += item.quotePrice;
-                y += 10;
-            });
+            doc.setFont("helvetica", "normal");
+            let letter = `Dear Sir/Madam,\n\nWe thank you for your enquiry and the interest shown in Renuka Tools.\n\nBased on our technical evaluation of your requirements for the ${qProj} project, we are pleased to submit our most competitive commercial offer for your consideration.\n\nAt Renuka Tools, we specialize in high-precision manufacturing, ensuring rigorous quality control and optimal performance for every component we deliver.\n\nPlease find the detailed commercial breakdown and terms on the following page. We look forward to a mutually beneficial business association.\n\n\nWarm Regards,\n\nAnand Mulay\nProprietor, Renuka Tools\n+91 9999999999\nsales@renukatools.in`;
             
-            y += 10;
-            doc.setFontSize(14);
-            doc.text(`Total Amount: Rs. ${total.toFixed(2)}`, 20, y);
-            
-            doc.save(`${document.getElementById('quoteId').value}_Proposal.pdf`);
-        });
+            doc.text(letter, 20, 95, { maxWidth: 170, lineHeightFactor: 1.5 });
 
-        // --- THREE.JS VISUALIZER ---
-        let scene, camera, renderer, toolGroup;
+            // --- PAGE 2: COMMERCIAL OFFER GRID ---
+            doc.addPage();
+            doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(30, 58, 138);
+            doc.text("COMMERCIAL QUOTATION", 20, 20);
+            doc.setFontSize(10); doc.setTextColor(0,0,0);
+            doc.text(`Quote Ref: ${qId}`, 150, 20);
 
-        function initThreeJS() {
-            const container = document.getElementById('canvasContainer');
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x111827); // Tailwind gray-900
-
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 0, 300);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); // preserveDrawingBuffer allows image download
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(renderer.domElement);
-
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(100, 100, 50);
-            scene.add(dirLight);
-
-            toolGroup = new THREE.Group();
-            scene.add(toolGroup);
-
-            // Handle Resize
-            window.addEventListener('resize', () => {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
+            // Table Data Gen (Stealth classifications omitted)
+            let tableData = [];
+            cart.forEach((c, idx) => {
+                let priceStr = `Rs. ${c.netPrice.toFixed(2)}`;
+                let discStr = c.discPercent > 0 ? `${c.discPercent}%` : "-";
+                tableData.push([idx+1, c.desc, "1.00", discStr, priceStr]);
             });
 
-            animate();
-        }
-
-        function update3DModel(sD, sL, cD, cL, hD, hL) {
-            if (!toolGroup) return;
-            
-            // Clear existing meshes
-            while(toolGroup.children.length > 0){ 
-                toolGroup.remove(toolGroup.children[0]); 
-            }
-
-            const material = new THREE.MeshStandardMaterial({ 
-                color: 0x9ca3af, // Steel color
-                metalness: 0.8,
-                roughness: 0.2
+            doc.autoTable({
+                startY: 30,
+                head: [['Sr.No', 'Item Description', 'Qty', 'Discount', 'Net Amount (INR)']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [30, 58, 138], textColor: 255 },
+                columnStyles: { 0: { halign: 'center' }, 2: { halign: 'center' }, 3: { halign: 'center' }, 4: { halign: 'right' } }
             });
 
-            // Create geometries (Radius is Dia/2)
-            const shankGeo = new THREE.CylinderGeometry(sD/2, sD/2, sL, 32);
-            const collarGeo = new THREE.CylinderGeometry(cD/2, cD/2, cL, 32);
-            const headGeo = new THREE.CylinderGeometry(hD/2, hD/2, hL, 32);
-
-            const shank = new THREE.Mesh(shankGeo, material);
-            const collar = new THREE.Mesh(collarGeo, material);
-            const head = new THREE.Mesh(headGeo, material);
-
-            // Position them end-to-end along the Y axis
-            // Tool is centered at origin. 
-            // Total length
-            const totalL = sL + cL + hL;
+            let finalY = doc.lastAutoTable.finalY + 10;
             
-            // Start from bottom (Shank end)
-            let currentY = -totalL / 2;
+            // Totals Block
+            doc.setFont("helvetica", "normal");
+            doc.text(`Subtotal:`, 130, finalY); doc.text(document.getElementById('cSub').innerText, 190, finalY, {align: 'right'}); finalY += 6;
+            doc.text(`Freight/Pkg:`, 130, finalY); doc.text(document.getElementById('cFreight').innerText, 190, finalY, {align: 'right'}); finalY += 6;
+            doc.text(document.getElementById('taxLine').children[0].innerText, 130, finalY); doc.text(document.getElementById('cTax').innerText, 190, finalY, {align: 'right'}); finalY += 6;
             
-            shank.position.y = currentY + (sL / 2);
-            currentY += sL;
+            doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+            doc.text(`Grand Total:`, 130, finalY); doc.text(document.getElementById('cGrand').innerText, 190, finalY, {align: 'right'});
+
+            // Commercial Terms Footer
+            finalY += 20;
+            doc.setFontSize(11); doc.text("Standard Terms & Conditions", 20, finalY);
+            doc.setFontSize(9); doc.setFont("helvetica", "normal");
             
-            collar.position.y = currentY + (cL / 2);
-            currentY += cL;
+            let tIdx = 1;
+            const ptIdx = document.getElementById('qPayTerms').value;
+            if(ptIdx) { doc.text(`${tIdx++}. Payment: ${mst.payment_terms[ptIdx].name}`, 20, finalY+=6); }
             
-            head.position.y = currentY + (hL / 2);
+            const incIdx = document.getElementById('qIncoTerms').value;
+            if(incIdx) { doc.text(`${tIdx++}. INCO/Shipping: ${mst.inco_terms[incIdx].name}`, 20, finalY+=6); }
+            
+            doc.text(`${tIdx++}. Validity: 30 Days from date of quotation.`, 20, finalY+=6);
+            doc.text(`${tIdx++}. Bank Details: State Bank of India | A/c: 3XXXXXX777 | IFSC: SBIN000XXXX`, 20, finalY+=6);
 
-            toolGroup.add(shank);
-            toolGroup.add(collar);
-            toolGroup.add(head);
-
-            // Rotate slightly for isometric view
-            toolGroup.rotation.x = Math.PI / 6;
-            toolGroup.rotation.z = -Math.PI / 4;
-
-            // Auto-scale camera to fit tool
-            camera.position.z = totalL * 1.5;
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-
-        document.getElementById('downloadImgBtn').addEventListener('click', () => {
-            const dataURL = renderer.domElement.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = `${document.getElementById('quoteId').value}_ToolRender.png`;
-            link.href = dataURL;
-            link.click();
+            doc.save(`${qId}_Proposal.pdf`);
         });
 
     </script>

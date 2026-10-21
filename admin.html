@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renuka Tools - Admin Dashboard</title>
+    <title>Renuka Tools - Master Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS Library for Excel Import/Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
     <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | Master Control</h1>
+        <h1 class="text-xl font-bold tracking-wide">RENUKA TOOLS | ERP Master Control</h1>
         <div class="space-x-4">
-            <button id="schemaBuilderBtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm font-bold hidden">⚙️ Create New Master</button>
+            <button id="schemaBuilderBtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm font-bold hidden">⚙️ Custom Master</button>
             <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold hidden">Log Out</button>
         </div>
     </nav>
@@ -21,84 +20,85 @@
     <!-- Login Section -->
     <div id="loginSection" class="max-w-md mx-auto mt-20 bg-white p-8 border rounded shadow">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Admin Login</h2>
-        <input type="email" id="email" placeholder="Admin Email" class="w-full border p-2 mb-4 rounded">
-        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded">
+        <input type="email" id="email" placeholder="Admin Email" class="w-full border p-2 mb-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="password" id="password" placeholder="Password" class="w-full border p-2 mb-6 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
         <button id="loginBtn" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-bold">Secure Login</button>
     </div>
 
     <!-- Dashboard Section -->
-    <div id="dashboardSection" class="max-w-7xl mx-auto mt-8 p-4 hidden">
-        <!-- Dynamic Tabs -->
-        <div id="tabContainer" class="flex space-x-2 border-b mb-6 overflow-x-auto pb-1"></div>
-        
-        <!-- Dynamic Tables Area -->
-        <div id="tableContainer" class="bg-white p-6 rounded shadow border">
-            <!-- Tables injected here via JS -->
-        </div>
+    <div id="dashboardSection" class="max-w-[95%] mx-auto mt-8 p-4 hidden">
+        <div id="tabContainer" class="flex space-x-1 border-b mb-6 overflow-x-auto pb-1 custom-scrollbar"></div>
+        <div id="tableContainer" class="bg-white p-6 rounded shadow border min-h-[500px]"></div>
     </div>
 
-    <!-- Hidden File Input for Excel Import -->
     <input type="file" id="excelUpload" class="hidden" accept=".xlsx, .xls">
 
-    <!-- DATA ENTRY MODAL -->
+    <!-- DATA ENTRY MODAL (With Active Toggle) -->
     <div id="dataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded shadow-lg w-96">
-            <h3 id="modalTitle" class="text-xl font-bold mb-4">Add Item</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-800">Add Item</h3>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="isActive" class="w-4 h-4 text-blue-600 rounded" checked>
+                    <label class="text-sm font-bold text-gray-700">Active</label>
+                </div>
+            </div>
+            
             <input type="hidden" id="activeCollection">
             <input type="hidden" id="activeDocId">
             
             <div class="mb-4">
-                <label id="lbl1" class="block text-sm font-bold mb-1"></label>
-                <input type="text" id="inp1" class="w-full border p-2 rounded">
+                <label id="lbl1" class="block text-sm font-bold mb-1 text-gray-600"></label>
+                <input type="text" id="inp1" class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
-            <div class="mb-4">
-                <label id="lbl2" class="block text-sm font-bold mb-1"></label>
+            <div class="mb-4 hidden" id="grp2">
+                <label id="lbl2" class="block text-sm font-bold mb-1 text-gray-600"></label>
                 <input type="number" step="0.01" id="inp2" class="w-full border p-2 rounded">
             </div>
-            <div class="mb-4" id="grp3">
-                <label id="lbl3" class="block text-sm font-bold mb-1"></label>
+            <div class="mb-4 hidden" id="grp3">
+                <label id="lbl3" class="block text-sm font-bold mb-1 text-gray-600"></label>
                 <input type="number" step="0.01" id="inp3" class="w-full border p-2 rounded">
             </div>
             <div class="mb-6 hidden" id="grp4">
-                <label id="lbl4" class="block text-sm font-bold mb-1"></label>
+                <label id="lbl4" class="block text-sm font-bold mb-1 text-gray-600"></label>
                 <input type="number" step="0.01" id="inp4" class="w-full border p-2 rounded">
             </div>
             
-            <div class="flex justify-end space-x-2">
-                <button id="cancelModalBtn" class="px-4 py-2 bg-gray-300 rounded font-bold">Cancel</button>
-                <button id="saveDataBtn" class="px-4 py-2 bg-blue-600 text-white font-bold rounded">Save Data</button>
+            <div class="flex justify-end space-x-2 border-t pt-4">
+                <button id="cancelModalBtn" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded font-bold">Cancel</button>
+                <button id="saveDataBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded">Save Data</button>
             </div>
         </div>
     </div>
 
-    <!-- NEW MASTER SCHEMA BUILDER MODAL -->
+    <!-- SCHEMA BUILDER MODAL -->
     <div id="schemaModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded shadow-lg w-[500px]">
-            <h3 class="text-xl font-bold mb-4 text-purple-800">Define New Master Structure</h3>
-            <p class="text-xs text-gray-500 mb-4">This will create a brand new tab and database collection.</p>
-            
-            <label class="block text-sm font-bold mb-1">Master Title (e.g., Sub-Contractors)</label>
-            <input type="text" id="schTitle" class="w-full border p-2 rounded mb-4">
+            <h3 class="text-xl font-bold mb-2 text-purple-800">Define New Master</h3>
+            <label class="block text-sm font-bold mb-1">Master Title</label>
+            <input type="text" id="schTitle" class="w-full border p-2 rounded mb-4" placeholder="e.g. Laser Marking">
             
             <label class="block text-sm font-bold mb-1">Calculation Behavior</label>
             <select id="schBehavior" class="w-full border p-2 rounded mb-4 bg-purple-50 font-semibold">
-                <option value="flat">Flat Cost Adder (₹) - Adds directly to Base Cost</option>
-                <option value="variable">Variable Cost Adder (₹ × Input) - Multiplies by quantity</option>
-                <option value="margin">Margin Modifier (%) - Adjusts final profit margin</option>
-                <option value="lookup">Standalone Lookup - No math, just a dropdown</option>
+                <option value="flat">Flat Cost Adder (₹)</option>
+                <option value="variable">Variable Cost Adder (₹ × Qty/Hrs)</option>
+                <option value="margin">Margin Modifier (%)</option>
+                <option value="lookup">Standalone Lookup (Dropdown only)</option>
             </select>
             
-            <label class="block text-sm font-bold mb-1">Structure Type</label>
+            <label class="block text-sm font-bold mb-1">Data Columns Needed</label>
             <select id="schType" class="w-full border p-2 rounded mb-4">
-                <option value="2">2 Parameters (Name + 2 numeric fields)</option>
-                <option value="3">3 Parameters (Name + 3 numeric fields)</option>
+                <option value="1">1 Column (Name only)</option>
+                <option value="2">2 Columns (Name + 1 Value)</option>
+                <option value="3">3 Columns (Name + 2 Values)</option>
+                <option value="4">4 Columns (Name + 3 Values)</option>
             </select>
 
             <div class="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded border">
-                <div><label class="text-xs font-bold">Column 1 Name (Text)</label><input type="text" id="schCol1" value="Name" class="w-full border p-1 rounded text-sm"></div>
-                <div><label class="text-xs font-bold">Column 2 Name (Number)</label><input type="text" id="schCol2" placeholder="e.g. Rate" class="w-full border p-1 rounded text-sm"></div>
-                <div><label class="text-xs font-bold">Column 3 Name (Number)</label><input type="text" id="schCol3" placeholder="e.g. Margin" class="w-full border p-1 rounded text-sm"></div>
-                <div id="schCol4Grp" class="hidden"><label class="text-xs font-bold">Column 4 Name (Number)</label><input type="text" id="schCol4" placeholder="e.g. Cost" class="w-full border p-1 rounded text-sm"></div>
+                <div><label class="text-xs font-bold">Col 1 (Text)</label><input type="text" id="schCol1" value="Name" class="w-full border p-1 rounded text-sm"></div>
+                <div id="schCol2Grp" class="hidden"><label class="text-xs font-bold">Col 2 (Number)</label><input type="text" id="schCol2" class="w-full border p-1 rounded text-sm"></div>
+                <div id="schCol3Grp" class="hidden"><label class="text-xs font-bold">Col 3 (Number)</label><input type="text" id="schCol3" class="w-full border p-1 rounded text-sm"></div>
+                <div id="schCol4Grp" class="hidden"><label class="text-xs font-bold">Col 4 (Number)</label><input type="text" id="schCol4" class="w-full border p-1 rounded text-sm"></div>
             </div>
 
             <div class="flex justify-end space-x-2">
@@ -114,7 +114,7 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // === PASTE FIREBASE CONFIG HERE ===
+        // === PASTE YOUR FIREBASE CONFIG HERE ===
         const firebaseConfig = {
             apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs",
   authDomain: "renuka-tools-quote.firebaseapp.com",
@@ -132,17 +132,21 @@
         let currentTabId = "customer_tiers"; 
         let pendingImportCollection = "";
 
-        // Default Masters now include the mathematical behavior mapping
+        // The Ultimate ERP Master Architecture
         const defaultSchemas = [
-            { id: "customer_tiers", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 2, behavior: "margin" },
-            { id: "tool_categories", title: "Tool Categories", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 2, behavior: "margin" },
-            { id: "raw_materials", title: "Raw Materials", cols: ["Grade", "Density", "Cost (₹/kg)"], params: 2, behavior: "variable" },
-            { id: "operations", title: "Operations Cost", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 2, behavior: "variable" },
-            { id: "blanks", title: "Standard Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 3, behavior: "lookup" },
-            { id: "standard_items", title: "Standard Products", cols: ["Item Name", "List Price (₹)", "Max Discount (%)"], params: 2, behavior: "lookup" }
+            { id: "customer_tiers", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 3, behavior: "margin" },
+            { id: "tool_categories", title: "Tool Categories", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 3, behavior: "margin" },
+            { id: "raw_materials", title: "Raw Materials", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3, behavior: "variable" },
+            { id: "blanks", title: "Taper Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 4, behavior: "lookup" },
+            { id: "operations", title: "Machine Operations", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 3, behavior: "variable" },
+            { id: "features", title: "Features & Pocketing", cols: ["Feature Name", "Rate per Qty (₹)"], params: 2, behavior: "variable" },
+            { id: "assembly", title: "Assembly & Surface", cols: ["Process Name", "Flat Cost (₹)"], params: 2, behavior: "flat" },
+            { id: "spares", title: "Spares & Standard Items", cols: ["Item Name", "List Price (₹)", "Max Disc (%)"], params: 3, behavior: "lookup" },
+            { id: "freight", title: "Freight & Transport", cols: ["Method", "Rate (₹/kg)", "Flat Cost (₹)"], params: 3, behavior: "variable" },
+            { id: "payment_terms", title: "Payment Terms", cols: ["Description"], params: 1, behavior: "lookup" },
+            { id: "inco_terms", title: "INCO / Shipping Terms", cols: ["Term Description"], params: 1, behavior: "lookup" }
         ];
 
-        // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('loginSection').classList.add('hidden');
@@ -163,22 +167,22 @@
         });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // --- SCHEMA BOOTSTRAPPER ---
         async function initializeSchemas() {
             const snap = await getDocs(collection(db, "system_schemas"));
-            if (snap.empty) {
+            appSchemas = [];
+            
+            // Auto-inject full 11-master schema if empty OR missing critical masters
+            if (snap.empty || snap.size < 11) {
                 for (let schema of defaultSchemas) {
                     await setDoc(doc(db, "system_schemas", schema.id), schema);
                 }
                 appSchemas = defaultSchemas;
             } else {
-                appSchemas = [];
                 snap.forEach(doc => appSchemas.push(doc.data()));
             }
             renderArchitecture();
         }
 
-        // --- RENDER DYNAMIC UI ---
         function renderArchitecture() {
             const tabsDiv = document.getElementById('tabContainer');
             const tablesDiv = document.getElementById('tableContainer');
@@ -191,34 +195,30 @@
                 
                 tabsDiv.innerHTML += `
                     <button onclick="window.switchTab('${sch.id}')" 
-                        class="tab-btn px-4 py-2 font-bold whitespace-nowrap ${isActive ? 'bg-white border-t border-l border-r rounded-t text-blue-900' : 'text-gray-600 hover:text-blue-900'}">
+                        class="tab-btn px-4 py-2 font-bold text-sm whitespace-nowrap ${isActive ? 'bg-white border-t border-l border-r rounded-t text-blue-900 shadow-sm' : 'text-gray-500 hover:text-blue-900 bg-gray-100 border'}">
                         ${sch.title}
                     </button>`;
 
+                let thHtml = sch.cols.map(c => `<th class="p-3">${c}</th>`).join('');
+                
                 let tableHtml = `
                     <div id="section_${sch.id}" class="tab-section ${isActive ? '' : 'hidden'}">
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex justify-between items-center mb-6">
                             <div>
-                                <h3 class="text-lg font-bold">${sch.title} Data</h3>
-                                <p class="text-xs text-purple-600 font-bold uppercase tracking-wide">Behavior: ${sch.behavior}</p>
+                                <h3 class="text-xl font-bold text-gray-800">${sch.title}</h3>
+                                <p class="text-xs text-blue-600 font-bold uppercase tracking-wide">Behavior Rule: ${sch.behavior}</p>
                             </div>
                             <div class="flex space-x-2">
-                                <button onclick="window.downloadTemplate('${sch.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm font-bold">📥 Template</button>
-                                <button onclick="window.triggerImport('${sch.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm font-bold">📤 Import Excel</button>
-                                <button onclick="window.exportExcel('${sch.id}')" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded text-sm font-bold">📊 Export Excel</button>
-                                <button onclick="window.openEntryModal('${sch.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-bold">+ Add Item</button>
+                                <button onclick="window.downloadTemplate('${sch.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded text-sm font-bold">📥 Template</button>
+                                <button onclick="window.triggerImport('${sch.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded text-sm font-bold">📤 Import Excel</button>
+                                <button onclick="window.exportExcel('${sch.id}')" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded text-sm font-bold">📊 Export Data</button>
+                                <button onclick="window.openEntryModal('${sch.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold">+ Add Record</button>
                             </div>
                         </div>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto rounded border">
                         <table class="w-full text-left border-collapse">
-                            <thead class="bg-gray-100 text-gray-600 text-sm border-b">
-                                <tr>
-                                    <th class="p-3">${sch.cols[0]}</th>
-                                    <th class="p-3">${sch.cols[1]}</th>
-                                    <th class="p-3">${sch.cols[2]}</th>
-                                    ${sch.params === 3 ? `<th class="p-3">${sch.cols[3]}</th>` : ''}
-                                    <th class="p-3 text-right">Actions</th>
-                                </tr>
+                            <thead class="bg-gray-100 text-gray-700 text-sm border-b">
+                                <tr>${thHtml}<th class="p-3">Status</th><th class="p-3 text-right">Actions</th></tr>
                             </thead>
                             <tbody id="tbody_${sch.id}"></tbody>
                         </table>
@@ -230,12 +230,8 @@
             loadDataForAllTables();
         }
 
-        window.switchTab = (id) => {
-            currentTabId = id;
-            renderArchitecture();
-        };
+        window.switchTab = (id) => { currentTabId = id; renderArchitecture(); };
 
-        // --- FETCH DATA ---
         async function loadDataForAllTables() {
             for (let sch of appSchemas) {
                 const tbody = document.getElementById(`tbody_${sch.id}`);
@@ -244,15 +240,22 @@
                 const snap = await getDocs(collection(db, sch.id));
                 snap.forEach(docSnap => {
                     const d = docSnap.data();
+                    const activeBadge = (d.isActive !== false) ? 
+                        `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold">Active</span>` : 
+                        `<span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold">Inactive</span>`;
+                    
+                    let trCols = `<td class="p-3 font-medium">${d.name || ''}</td>`;
+                    if(sch.params >= 2) trCols += `<td class="p-3">${d.param1 || 0}</td>`;
+                    if(sch.params >= 3) trCols += `<td class="p-3">${d.param2 || 0}</td>`;
+                    if(sch.params >= 4) trCols += `<td class="p-3">${d.param3 || 0}</td>`;
+                    
                     html += `
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-3">${d.name || ''}</td>
-                            <td class="p-3">${d.param1 || 0}</td>
-                            <td class="p-3">${d.param2 || 0}</td>
-                            ${sch.params === 3 ? `<td class="p-3">${d.param3 || 0}</td>` : ''}
+                        <tr class="border-b hover:bg-gray-50 text-sm">
+                            ${trCols}
+                            <td class="p-3">${activeBadge}</td>
                             <td class="p-3 text-right">
-                                <button class="text-blue-600 mr-2 font-bold" onclick="window.openEntryModal('${sch.id}', '${docSnap.id}')">Edit</button>
-                                <button class="text-red-600 font-bold" onclick="window.deleteItem('${sch.id}','${docSnap.id}')">Del</button>
+                                <button class="text-blue-600 hover:underline font-bold mr-2" onclick="window.openEntryModal('${sch.id}', '${docSnap.id}')">Edit</button>
+                                <button class="text-red-600 hover:underline font-bold" onclick="window.deleteItem('${sch.id}','${docSnap.id}')">Del</button>
                             </td>
                         </tr>`;
                 });
@@ -260,23 +263,23 @@
             }
         }
 
-        // --- DATA ENTRY MODAL (MANUAL) ---
         window.openEntryModal = async (schemaId, docId = "") => {
             const sch = appSchemas.find(s => s.id === schemaId);
-            document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `Add ${sch.title}`;
+            document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `Add to ${sch.title}`;
             document.getElementById('activeCollection').value = sch.id;
             document.getElementById('activeDocId').value = docId;
             
-            document.getElementById('lbl1').innerText = sch.cols[0]; document.getElementById('inp1').value = "";
-            document.getElementById('lbl2').innerText = sch.cols[1]; document.getElementById('inp2').value = "";
-            document.getElementById('lbl3').innerText = sch.cols[2]; document.getElementById('inp3').value = "";
-            
-            if (sch.params === 3) {
-                document.getElementById('grp4').classList.remove('hidden');
-                document.getElementById('lbl4').innerText = sch.cols[3]; document.getElementById('inp4').value = "";
-            } else {
-                document.getElementById('grp4').classList.add('hidden');
-            }
+            // Reset fields & groupings
+            [2,3,4].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden'));
+            document.getElementById('inp1').value = ""; document.getElementById('inp2').value = "";
+            document.getElementById('inp3').value = ""; document.getElementById('inp4').value = "";
+            document.getElementById('isActive').checked = true;
+
+            // Display needed inputs based on schema params (1 to 4)
+            document.getElementById('lbl1').innerText = sch.cols[0];
+            if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; }
+            if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; }
+            if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
 
             document.getElementById('dataModal').classList.remove('hidden');
         };
@@ -288,55 +291,57 @@
             const id = document.getElementById('activeDocId').value;
             const sch = appSchemas.find(s => s.id === col);
             
-            const dataObj = {
+            const dataObj = { 
                 name: document.getElementById('inp1').value,
-                param1: Number(document.getElementById('inp2').value),
-                param2: Number(document.getElementById('inp3').value)
+                isActive: document.getElementById('isActive').checked 
             };
-            if (sch.params === 3) dataObj.param3 = Number(document.getElementById('inp4').value);
+            if (sch.params >= 2) dataObj.param1 = Number(document.getElementById('inp2').value);
+            if (sch.params >= 3) dataObj.param2 = Number(document.getElementById('inp3').value);
+            if (sch.params >= 4) dataObj.param3 = Number(document.getElementById('inp4').value);
 
             try {
                 if (id) await updateDoc(doc(db, col, id), dataObj);
                 else await addDoc(collection(db, col), dataObj);
                 document.getElementById('dataModal').classList.add('hidden');
                 loadDataForAllTables();
-            } catch (err) { alert("Error saving"); }
+            } catch (err) { alert("Error saving data."); }
         });
 
         window.deleteItem = async (col, id) => {
-            if(confirm("Delete this record permanently?")) {
+            if(confirm("Delete permanently? (Recommended: Just mark as 'Inactive' instead if quotes are using this)")) {
                 await deleteDoc(doc(db, col, id));
                 loadDataForAllTables();
             }
         };
 
-        // --- NEW MASTER SCHEMA BUILDER ---
-        document.getElementById('schemaBuilderBtn').addEventListener('click', () => {
-            document.getElementById('schemaModal').classList.remove('hidden');
-        });
-        document.getElementById('schType').addEventListener('change', (e) => {
-            if(e.target.value === "3") document.getElementById('schCol4Grp').classList.remove('hidden');
-            else document.getElementById('schCol4Grp').classList.add('hidden');
-        });
+        // --- Custom Schema Builder logic & Excel Engine kept exactly the same... ---
+        document.getElementById('schemaBuilderBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.remove('hidden'));
         document.getElementById('cancelSchemaBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.add('hidden'));
+        document.getElementById('schType').addEventListener('change', (e) => {
+            const val = Number(e.target.value);
+            document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2);
+            document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3);
+            document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4);
+        });
 
         document.getElementById('saveSchemaBtn').addEventListener('click', async () => {
             const title = document.getElementById('schTitle').value;
+            if(!title) return alert("Title required");
             const id = title.toLowerCase().replace(/[^a-z0-9]/g, '_');
             const behavior = document.getElementById('schBehavior').value;
             const params = Number(document.getElementById('schType').value);
-            const cols = [document.getElementById('schCol1').value, document.getElementById('schCol2').value, document.getElementById('schCol3').value];
-            if(params === 3) cols.push(document.getElementById('schCol4').value);
+            
+            let cols = [document.getElementById('schCol1').value];
+            if(params >= 2) cols.push(document.getElementById('schCol2').value);
+            if(params >= 3) cols.push(document.getElementById('schCol3').value);
+            if(params >= 4) cols.push(document.getElementById('schCol4').value);
 
-            if(!title) return alert("Title required");
-            const newSchema = { id, title, params, cols, behavior };
-
-            await setDoc(doc(db, "system_schemas", id), newSchema);
+            await setDoc(doc(db, "system_schemas", id), { id, title, params, cols, behavior });
             document.getElementById('schemaModal').classList.add('hidden');
             await initializeSchemas(); 
         });
 
-        // --- EXCEL ENGINE (IMPORT/EXPORT/TEMPLATE) ---
+        // Template logic
         window.downloadTemplate = (schemaId) => {
             const sch = appSchemas.find(s => s.id === schemaId);
             const ws = XLSX.utils.aoa_to_sheet([sch.cols]); 
@@ -345,6 +350,34 @@
             XLSX.writeFile(wb, `${sch.title}_Template.xlsx`);
         };
 
+        // Import logic (Always sets isActive to true on mass upload)
+        window.triggerImport = (schemaId) => { pendingImportCollection = schemaId; document.getElementById('excelUpload').click(); };
+        document.getElementById('excelUpload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const sch = appSchemas.find(s => s.id === pendingImportCollection);
+                let count = 0;
+                for(let row of jsonData) {
+                    const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true };
+                    if(sch.params >= 2) dataObj.param1 = Number(row[sch.cols[1]] || 0);
+                    if(sch.params >= 3) dataObj.param2 = Number(row[sch.cols[2]] || 0);
+                    if(sch.params >= 4) dataObj.param3 = Number(row[sch.cols[3]] || 0);
+                    await addDoc(collection(db, pendingImportCollection), dataObj);
+                    count++;
+                }
+                document.getElementById('excelUpload').value = ""; 
+                alert(`Successfully imported ${count} items!`);
+                loadDataForAllTables();
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Export logic
         window.exportExcel = async (schemaId) => {
             const sch = appSchemas.find(s => s.id === schemaId);
             const snap = await getDocs(collection(db, schemaId));
@@ -353,9 +386,10 @@
                 let d = docSnap.data();
                 let row = {};
                 row[sch.cols[0]] = d.name;
-                row[sch.cols[1]] = d.param1;
-                row[sch.cols[2]] = d.param2;
-                if(sch.params === 3) row[sch.cols[3]] = d.param3;
+                if(sch.params >= 2) row[sch.cols[1]] = d.param1;
+                if(sch.params >= 3) row[sch.cols[2]] = d.param2;
+                if(sch.params >= 4) row[sch.cols[3]] = d.param3;
+                row["Is Active"] = (d.isActive !== false) ? "Yes" : "No";
                 dataArr.push(row);
             });
             const ws = XLSX.utils.json_to_sheet(dataArr);
@@ -363,43 +397,6 @@
             XLSX.utils.book_append_sheet(wb, ws, sch.title);
             XLSX.writeFile(wb, `${sch.title}_Export.xlsx`);
         };
-
-        window.triggerImport = (schemaId) => {
-            pendingImportCollection = schemaId;
-            document.getElementById('excelUpload').click();
-        };
-
-        document.getElementById('excelUpload').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                const data = new Uint8Array(event.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                
-                const sch = appSchemas.find(s => s.id === pendingImportCollection);
-                let count = 0;
-                
-                for(let row of jsonData) {
-                    const dataObj = {
-                        name: String(row[sch.cols[0]] || "Unnamed"),
-                        param1: Number(row[sch.cols[1]] || 0),
-                        param2: Number(row[sch.cols[2]] || 0)
-                    };
-                    if(sch.params === 3) dataObj.param3 = Number(row[sch.cols[3]] || 0);
-                    
-                    await addDoc(collection(db, pendingImportCollection), dataObj);
-                    count++;
-                }
-                document.getElementById('excelUpload').value = ""; 
-                alert(`Successfully imported ${count} items into ${sch.title}!`);
-                loadDataForAllTables();
-            };
-            reader.readAsArrayBuffer(file);
-        });
-
     </script>
 </body>
 </html>
