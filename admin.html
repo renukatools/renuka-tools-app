@@ -20,7 +20,8 @@
             <button onclick="window.showProfile()" id="btnProfile" class="w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-gray-400">🏢 Company Profile</button>
             
             <div class="px-4 mt-6 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Module Access</p></div>
-            <a href="index.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-blue-400">🛒 Sales Engine</a>
+            <a href="index.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-yellow-400">🏠 Master Portal</a>
+            <a href="sales.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-blue-400">🛒 Sales Engine</a>
             <a href="design.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-purple-400">📐 Design Library</a>
             <a href="purchase.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-emerald-400">📦 Purchase Portal</a>
         </div>
@@ -75,12 +76,10 @@
         };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         
-        // MASTER ADMIN SECURITY GATE - Only these emails can access admin.html
         const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
 
         let appSchemas = []; let mst = {}; let currentTabId = "roles"; let pendingImportCollection = ""; let base64Logo = "";
         
-        // Users schema expanded to params: 5 for separate Override & Breakup access. Added Inserts master.
         const defaultSchemas = [
             { id: "roles", category: "crm", title: "System Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
             { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override", "Show Cost Breakup"], params: 5, behavior: "crm" },
@@ -110,7 +109,6 @@
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
         async function initializeSchemas() {
-            // Force document upgrades to ensure older schemas reflect new column counts
             await setDoc(doc(db, "system_schemas", "users"), { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override (Yes/No)", "Show Cost Breakup (Yes/No)"], params: 5, behavior: "crm" }, { merge: true });
             await setDoc(doc(db, "system_schemas", "roles"), { id: "roles", category: "crm", title: "System Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" }, { merge: true });
             await setDoc(doc(db, "system_schemas", "inserts"), { id: "inserts", category: "mfg", title: "Cutting Inserts Master", cols: ["Designation (e.g. CNMG)", "Shape Letter (C,W,S,T,D,V)", "Cost (₹)"], params: 3, behavior: "variable" }, { merge: true });
