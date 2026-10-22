@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Renuka Tools | Purchase Master</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>.custom-scrollbar::-webkit-scrollbar{width:6px;height:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}.active-nav{background-color:#047857;border-left:4px solid #34d399;color:white}</style>
 </head>
 <body class="bg-gray-100 h-screen flex overflow-hidden font-sans">
     
-    <div id="loginSection" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center"><div class="max-w-md w-full bg-white p-8 border rounded shadow-2xl"><h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Procurement Auth</h2><input type="email" id="email" placeholder="Email Address" class="w-full border p-3 mb-4 rounded outline-none focus:ring-2 focus:ring-emerald-500"><input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded outline-none focus:ring-2 focus:ring-emerald-500"><button id="loginBtn" class="w-full bg-emerald-700 text-white p-3 rounded font-bold hover:bg-emerald-800 shadow transition">Access Procurement DB</button></div></div>
+    <div id="loginScreen" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center"><div class="max-w-md w-full bg-white p-8 border rounded shadow-2xl"><h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Procurement Auth</h2><input type="email" id="email" placeholder="Email Address" class="w-full border p-3 mb-4 rounded outline-none focus:ring-2 focus:ring-emerald-500"><input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded outline-none focus:ring-2 focus:ring-emerald-500"><button id="loginBtn" class="w-full bg-emerald-700 text-white p-3 rounded font-bold hover:bg-emerald-800 shadow transition">Access Procurement DB</button></div></div>
 
     <!-- LEFT SIDEBAR -->
     <div id="sidebar" class="w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl z-20">
@@ -40,6 +39,16 @@
         const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
         const PROCUREMENT_SCHEMAS = ['raw_materials', 'blanks', 'operations', 'features', 'assembly', 'spares', 'freight'];
 
+        const defaultProcSchemas = [
+            { id: "raw_materials", category: "mfg", title: "Raw Materials", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3 },
+            { id: "blanks", category: "mfg", title: "Taper Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 4 },
+            { id: "operations", category: "mfg", title: "Machine Operations", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 3 },
+            { id: "features", category: "mfg", title: "Features & Pocketing", cols: ["Feature Name", "Rate per Qty (₹)"], params: 2 },
+            { id: "assembly", category: "mfg", title: "Assembly & Surface", cols: ["Process Name", "Flat Cost (₹)"], params: 2 },
+            { id: "spares", category: "com", title: "Spares & Standard Items", cols: ["Item Name", "List Price (₹)", "Max Disc (%)"], params: 3 },
+            { id: "freight", category: "com", title: "Freight & Transport", cols: ["Method", "Rate (₹/kg)", "Flat Cost (₹)"], params: 3 }
+        ];
+
         let appSchemas = []; let mst = {}; let currentTabId = "raw_materials"; let pendingImportCollection = "";
 
         onAuthStateChanged(auth, async (user) => { 
@@ -59,9 +68,20 @@
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
         async function initializeSchemas() {
-            const snap = await getDocs(collection(db, "system_schemas")); appSchemas = [];
-            snap.forEach(doc => { if(PROCUREMENT_SCHEMAS.includes(doc.data().id)) appSchemas.push(doc.data()); });
-            renderSidebar(); renderActiveTable();
+            try {
+                const snap = await getDocs(collection(db, "system_schemas")); 
+                appSchemas = [];
+                snap.forEach(doc => { if(PROCUREMENT_SCHEMAS.includes(doc.data().id)) appSchemas.push(doc.data()); });
+                
+                // Failsafe if admin db is empty
+                if(appSchemas.length === 0) appSchemas = defaultProcSchemas;
+                
+                renderSidebar(); renderActiveTable();
+            } catch(e) {
+                console.error("Schema Init Error:", e);
+                appSchemas = defaultProcSchemas;
+                renderSidebar(); renderActiveTable();
+            }
         }
 
         function renderSidebar() {
@@ -82,7 +102,7 @@
             let thHtml = sch.cols.map(c => `<th class="px-4 py-3 border-b">${c}</th>`).join('');
             document.getElementById('tableContainer').innerHTML = `<div class="overflow-x-auto"><table class="w-full text-left border-collapse whitespace-nowrap"><thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider"><tr>${thHtml}<th class="px-4 py-3 border-b w-24">Status</th><th class="px-4 py-3 border-b text-right w-24">Actions</th></tr></thead><tbody id="tbody_${sch.id}" class="text-sm divide-y divide-gray-100"></tbody></table></div>`;
             let html = "";
-            if(mst[sch.id].length === 0) { html = `<tr><td colspan="6" class="text-center py-10 text-gray-400">No records found. Click "+ Add Record" to begin.</td></tr>`; } 
+            if(mst[sch.id].length === 0) { html = `<tr><td colspan="6" class="text-center py-10 text-gray-400">No records found. Click "+ Add Cost Record" to begin.</td></tr>`; } 
             else { mst[sch.id].forEach(d => {
                 const activeBadge = (d.isActive !== false) ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded-full font-bold border border-emerald-200">Active</span>` : `<span class="bg-red-100 text-red-700 text-[10px] px-2 py-1 rounded-full font-bold border border-red-200">Inactive</span>`;
                 let trCols = `<td class="px-4 py-3 font-semibold text-gray-800">${d.name || ''}</td>`;
@@ -112,7 +132,6 @@
         });
         window.deleteItem = async (col, id) => { if(confirm("Permanently delete?")) { await deleteDoc(doc(db, col, id)); renderActiveTable(); } };
 
-        // Excel Logic
         window.downloadTemplate = (schemaId) => { const sch = appSchemas.find(s => s.id === schemaId); const ws = XLSX.utils.aoa_to_sheet([sch.cols]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `${sch.title}_Template.xlsx`); }; window.triggerImport = (schemaId) => { pendingImportCollection = schemaId; document.getElementById('excelUpload').click(); };
         document.getElementById('excelUpload').addEventListener('change', (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (event) => { const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'}); const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); const sch = appSchemas.find(s => s.id === pendingImportCollection); let count = 0; for(let row of jsonData) { const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true }; if(sch.params >= 2) dataObj.param1 = Number(row[sch.cols[1]] || 0); if(sch.params >= 3) dataObj.param2 = Number(row[sch.cols[2]] || 0); if(sch.params >= 4) dataObj.param3 = Number(row[sch.cols[3]] || 0); await addDoc(collection(db, pendingImportCollection), dataObj); count++; } document.getElementById('excelUpload').value = ""; alert(`Imported ${count} items!`); renderActiveTable(); }; reader.readAsArrayBuffer(file); });
     </script>
