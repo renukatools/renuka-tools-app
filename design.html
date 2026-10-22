@@ -2,65 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Renuka Tools | Advanced Design Library</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>.custom-scrollbar::-webkit-scrollbar{width:6px;height:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#6b7280;border-radius:4px}</style>
 </head>
 <body class="bg-gray-100 h-screen flex overflow-hidden font-sans">
-    
     <div id="loginScreen" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center"><div class="max-w-md w-full bg-white p-8 border rounded shadow-2xl"><h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Design Team Auth</h2><input type="email" id="email" placeholder="Email Address" class="w-full border p-3 mb-4 rounded outline-none focus:ring-2 focus:ring-purple-500"><input type="password" id="password" placeholder="Password" class="w-full border p-3 mb-6 rounded outline-none focus:ring-2 focus:ring-purple-500"><button id="loginBtn" class="w-full bg-purple-700 text-white p-3 rounded font-bold hover:bg-purple-800 shadow transition">Access Design Library</button></div></div>
 
-    <!-- LEFT SIDEBAR -->
     <div id="sidebar" class="w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl z-20">
         <div class="p-5 bg-gray-950 border-b border-gray-800"><h1 class="text-xl font-bold text-white tracking-wider">ENGINEERING</h1><p class="text-xs text-purple-400 mt-1">Advanced Tooling Library</p></div>
         <div class="flex-1 overflow-y-auto custom-scrollbar py-4 px-2">
-            <button class="w-full bg-purple-800 text-white p-2 rounded text-sm font-bold shadow text-left px-4">📐 N-Stage Tool Builder</button>
+            <button class="w-full bg-purple-800 text-white p-2 rounded text-sm font-bold shadow text-left px-4">📐 N-Stage Parametric Builder</button>
             <div class="mt-6 px-4 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Saved Master Profiles</p></div>
             <div id="savedList" class="space-y-1 mt-2 text-sm text-gray-400 px-2"></div>
         </div>
         <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2"><div class="text-xs text-gray-500 mb-2 truncate" id="userBadge"></div><button onclick="window.location.href='index.html'" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded text-sm font-bold shadow transition">Go to Sales</button><button id="logoutBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-2 rounded text-sm font-bold shadow transition">Log Out</button></div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="flex-1 flex flex-col h-full bg-gray-50">
         <header class="bg-white shadow-sm border-b px-6 py-4 flex justify-between items-center z-10">
-            <h2 class="text-2xl font-bold text-gray-800">Parametric AI Tool Modeler</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Parametric CAD Modeler</h2>
             <div class="flex space-x-3 items-center">
                 <input type="file" id="pdfUpload" accept=".pdf, image/*" class="hidden">
-                <button onclick="document.getElementById('pdfUpload').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold shadow flex items-center space-x-2"><span>📄</span><span>Upload 2D PDF (AI Parse)</span></button>
+                <button onclick="document.getElementById('pdfUpload').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-bold shadow flex items-center space-x-2"><span>📄</span><span>Upload 2D Drawing (AI Extraction)</span></button>
             </div>
         </header>
 
         <main class="flex-1 overflow-y-auto p-6 custom-scrollbar">
-            <!-- AI Loader Overlay -->
-            <div id="aiLoader" class="hidden bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded mb-6 font-mono text-sm shadow animate-pulse">
-                ⚙️ AI Vision Engine analyzing 2D drawing... extracting multi-stage tapers and insert geometry...
-            </div>
+            <div id="aiLoader" class="hidden bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded mb-6 font-mono text-sm shadow animate-pulse">⚙️ AI Vision Engine analyzing 2D drawing... extracting multi-stage tapers, squares, and insert geometry...</div>
 
             <div class="grid grid-cols-12 gap-6">
-                <!-- Data Entry -->
                 <div class="col-span-12 lg:col-span-5 space-y-4">
-                    <div class="bg-white p-5 rounded-lg shadow border border-t-4 border-t-purple-600 h-[650px] flex flex-col">
+                    <div class="bg-white p-5 rounded-lg shadow border border-t-4 border-t-purple-600 h-[700px] flex flex-col">
                         <label class="block text-xs font-bold mb-1 text-gray-700">Library Profile Designation (e.g. ISO-BT40-SCLCR)</label>
                         <input type="text" id="pName" class="w-full border p-2 text-sm rounded font-bold text-purple-900 focus:ring-2 focus:ring-purple-500 outline-none mb-4">
                         
-                        <!-- Tool Geometry -->
                         <div class="flex justify-between items-center border-b pb-2 mb-3">
                             <h4 class="font-bold text-sm text-gray-800">Dynamic Tool Stages</h4>
                             <button onclick="addStage()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-bold px-2 py-1 rounded">+ Add Stage</button>
                         </div>
                         
-                        <div id="stagesContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 pr-2 mb-4">
-                            <!-- Stages injected here -->
-                        </div>
+                        <div id="stagesContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 pr-2 mb-4"></div>
 
-                        <!-- Insert Configuration -->
                         <div class="border-t pt-3 mb-4">
-                            <h4 class="font-bold text-sm text-gray-800 mb-2">Cutting Insert Configuration</h4>
-                            <div class="grid grid-cols-3 gap-2 text-xs">
-                                <div><label class="font-bold text-gray-600">Insert Shape:</label><select id="insShape" class="w-full border p-1 rounded preview-trigger outline-none"><option value="None">None</option><option value="C">C (Diamond 80°)</option><option value="W">W (Trigon 80°)</option><option value="T">T (Triangle 60°)</option><option value="V">V (Diamond 35°)</option><option value="D">D (Diamond 55°)</option></select></div>
-                                <div><label class="font-bold text-gray-600">Clearance:</label><select id="insClear" class="w-full border p-1 rounded preview-trigger outline-none"><option value="N">N (0°)</option><option value="C">C (7°)</option><option value="P">P (11°)</option></select></div>
-                                <div><label class="font-bold text-gray-600">Approach (KAP):</label><select id="insApproach" class="w-full border p-1 rounded preview-trigger outline-none"><option value="95">95°</option><option value="93">93°</option><option value="90">90°</option><option value="45">45°</option></select></div>
+                            <h4 class="font-bold text-sm text-gray-800 mb-2">Cutting Insert Link</h4>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div><label class="font-bold text-gray-600">Master Insert:</label><select id="insType" class="w-full border p-1 rounded outline-none preview-trigger"></select></div>
+                                <div><label class="font-bold text-gray-600">Approach Angle (KAP):</label><select id="insApproach" class="w-full border p-1 rounded preview-trigger outline-none"><option value="95">95°</option><option value="93">93°</option><option value="90">90°</option><option value="45">45°</option><option value="0">0° (Neutral)</option></select></div>
                             </div>
                         </div>
 
@@ -68,10 +55,9 @@
                     </div>
                 </div>
 
-                <!-- 3D Preview -->
                 <div class="col-span-12 lg:col-span-7">
-                    <div class="bg-gray-900 rounded-lg shadow-2xl border border-gray-700 h-[650px] relative overflow-hidden flex flex-col">
-                        <div class="p-3 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10"><h3 class="text-white font-bold text-sm">3D Interactive Wireframe</h3><span class="text-[10px] text-gray-400 bg-gray-900 px-2 py-1 rounded border border-gray-600">Left-Click: Rotate | Scroll: Zoom</span></div>
+                    <div class="bg-gray-900 rounded-lg shadow-2xl border border-gray-700 h-[700px] relative overflow-hidden flex flex-col">
+                        <div class="p-3 bg-gray-800 border-b border-gray-700 flex justify-between items-center z-10"><h3 class="text-white font-bold text-sm">3D Advanced CAD Sandbox</h3><span class="text-[10px] text-gray-400 bg-gray-900 px-2 py-1 rounded border border-gray-600">Left-Click: Rotate | Scroll: Zoom</span></div>
                         <div id="canvasContainer" class="flex-1 relative w-full h-full cursor-move"></div>
                     </div>
                 </div>
@@ -88,11 +74,9 @@
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
 
-        let stages = [
-            { id: 1, name: "Shank", d1: 40, d2: 40, l: 80 },
-            { id: 2, name: "Collar", d1: 63, d2: 63, l: 20 },
-            { id: 3, name: "Head", d1: 50, d2: 50, l: 45 }
-        ];
+        let mst = {};
+        // N-Stage state: Shape can be 'round' or 'square'. Feature can be 'none' or 'flat'
+        let stages = [{ id: 1, name: "Shank", shape: "round", d1: 40, d2: 40, l: 80, feature: "none" }, { id: 2, name: "Head", shape: "round", d1: 50, d2: 50, l: 45, feature: "flat" }];
 
         onAuthStateChanged(auth, async (user) => { 
             if (user) { 
@@ -102,23 +86,23 @@
                 if (!isAuthorized) { alert("Access Denied. Design Team role required."); signOut(auth); return; }
                 
                 document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('userBadge').innerText = user.email;
-                initThreeJS(); renderStagesUI(); fetchLibrary(); 
+                await fetchInserts(); initThreeJS(); renderStagesUI(); fetchLibrary(); 
             } else { document.getElementById('loginScreen').classList.remove('hidden'); } 
         });
 
         document.getElementById('loginBtn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=>alert("Invalid Login")));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // N-STAGE BUILDER LOGIC
-        window.addStage = () => {
-            const lastD = stages.length > 0 ? stages[stages.length-1].d2 : 40;
-            stages.push({ id: Date.now(), name: `Stage ${stages.length + 1}`, d1: lastD, d2: lastD, l: 30 });
-            renderStagesUI(); triggerRender();
-        };
+        async function fetchInserts() {
+            const snap = await getDocs(collection(db, "inserts")); mst['inserts'] = [];
+            snap.forEach(d => { if(d.data().isActive !== false) mst['inserts'].push({id: d.id, ...d.data()}); });
+            let html = `<option value="None">-- No Insert --</option>` + mst.inserts.map((i,idx) => `<option value="${idx}">${i.name} (Shape: ${i.param1})</option>`).join('');
+            document.getElementById('insType').innerHTML = html;
+        }
 
+        window.addStage = () => { const lastD = stages.length > 0 ? stages[stages.length-1].d2 : 40; stages.push({ id: Date.now(), name: `Stage ${stages.length + 1}`, shape: 'round', d1: lastD, d2: lastD, l: 30, feature: 'none' }); renderStagesUI(); triggerRender(); };
         window.removeStage = (idx) => { stages.splice(idx, 1); renderStagesUI(); triggerRender(); };
-
-        window.updateStage = (idx, field, value) => { stages[idx][field] = Number(value); triggerRender(); };
+        window.updateStage = (idx, field, value) => { stages[idx][field] = (field==='name'||field==='shape'||field==='feature') ? value : Number(value); triggerRender(); };
 
         function renderStagesUI() {
             const container = document.getElementById('stagesContainer'); container.innerHTML = '';
@@ -126,10 +110,14 @@
                 container.insertAdjacentHTML('beforeend', `
                     <div class="bg-gray-50 border border-gray-200 p-2 rounded relative shadow-sm">
                         <button onclick="removeStage(${idx})" class="absolute top-1 right-2 text-red-500 font-bold text-xs hover:underline">X</button>
-                        <input type="text" value="${st.name}" onchange="stages[${idx}].name=this.value" class="font-bold text-xs text-purple-800 bg-transparent outline-none mb-1 w-3/4">
+                        <input type="text" value="${st.name}" onchange="updateStage(${idx}, 'name', this.value)" class="font-bold text-xs text-purple-800 bg-transparent outline-none mb-1 w-2/3">
+                        <div class="grid grid-cols-5 gap-2 text-xs mb-1">
+                            <div class="col-span-2"><label class="text-gray-500">Shape</label><select onchange="updateStage(${idx}, 'shape', this.value)" class="w-full border p-1 rounded"><option value="round" ${st.shape==='round'?'selected':''}>Round Cyl</option><option value="square" ${st.shape==='square'?'selected':''}>Square Block</option></select></div>
+                            <div class="col-span-3"><label class="text-gray-500">Feature</label><select onchange="updateStage(${idx}, 'feature', this.value)" class="w-full border p-1 rounded"><option value="none" ${st.feature==='none'?'selected':''}>None</option><option value="flat" ${st.feature==='flat'?'selected':''}>Weldon Flat (Round Only)</option></select></div>
+                        </div>
                         <div class="grid grid-cols-3 gap-2 text-xs">
-                            <div><label class="text-gray-500">Start Dia (mm)</label><input type="number" value="${st.d1}" oninput="updateStage(${idx}, 'd1', this.value)" class="w-full border p-1 rounded outline-none focus:border-purple-500"></div>
-                            <div><label class="text-gray-500">End Dia (mm)</label><input type="number" value="${st.d2}" oninput="updateStage(${idx}, 'd2', this.value)" class="w-full border p-1 rounded outline-none focus:border-purple-500"></div>
+                            <div><label class="text-gray-500">D1 / W (mm)</label><input type="number" value="${st.d1}" oninput="updateStage(${idx}, 'd1', this.value)" class="w-full border p-1 rounded outline-none focus:border-purple-500"></div>
+                            <div><label class="text-gray-500">D2 / H (mm)</label><input type="number" value="${st.d2}" oninput="updateStage(${idx}, 'd2', this.value)" class="w-full border p-1 rounded outline-none focus:border-purple-500"></div>
                             <div><label class="text-gray-500">Length (mm)</label><input type="number" value="${st.l}" oninput="updateStage(${idx}, 'l', this.value)" class="w-full border p-1 rounded outline-none focus:border-purple-500"></div>
                         </div>
                     </div>
@@ -139,46 +127,34 @@
 
         document.querySelectorAll('.preview-trigger').forEach(el => { el.addEventListener('change', triggerRender); });
 
-        // AI 2D-TO-3D MOCK PARSER
         document.getElementById('pdfUpload').addEventListener('change', (e) => {
-            if(!e.target.files[0]) return;
-            const loader = document.getElementById('aiLoader'); loader.classList.remove('hidden');
+            if(!e.target.files[0]) return; const loader = document.getElementById('aiLoader'); loader.classList.remove('hidden');
             setTimeout(() => {
-                // Simulating Vision API extraction of an ISO BT40 Taper with a complex boring head
                 stages = [
-                    { id: 1, name: "BT40 Taper (ISO 7388-2)", d1: 44.45, d2: 25.0, l: 65.4 },
-                    { id: 2, name: "V-Flange", d1: 63.0, d2: 63.0, l: 16.6 },
-                    { id: 3, name: "Neck Clearance", d1: 45.0, d2: 45.0, l: 15.0 },
-                    { id: 4, name: "Extension Body", d1: 45.0, d2: 32.0, l: 60.0 },
-                    { id: 5, name: "Boring Head", d1: 32.0, d2: 32.0, l: 30.0 }
+                    { id: 1, name: "BT40 Taper (ISO 7388-2)", shape: "round", d1: 44.45, d2: 25.0, l: 65.4, feature: "none" },
+                    { id: 2, name: "V-Flange", shape: "round", d1: 63.0, d2: 63.0, l: 16.6, feature: "none" },
+                    { id: 3, name: "Square Base", shape: "square", d1: 40.0, d2: 40.0, l: 30.0, feature: "none" },
+                    { id: 4, name: "Boring Extension", shape: "round", d1: 32.0, d2: 32.0, l: 80.0, feature: "flat" }
                 ];
-                document.getElementById('pName').value = "Auto-Parsed BT40 Boring Bar Assembly";
-                document.getElementById('insShape').value = "C";
-                document.getElementById('insApproach').value = "95";
-                
-                loader.classList.add('hidden'); renderStagesUI(); triggerRender();
-                document.getElementById('pdfUpload').value = "";
-                alert("✨ AI Extraction Complete! Parameters mapped to 3D geometry.");
+                document.getElementById('pName').value = "Auto-Parsed BT40 Complex Assembly"; document.getElementById('insApproach').value = "95";
+                loader.classList.add('hidden'); renderStagesUI(); triggerRender(); document.getElementById('pdfUpload').value = ""; alert("✨ AI Extraction Complete!");
             }, 2500);
         });
 
-        // DB LOGIC
         async function fetchLibrary() {
             const list = document.getElementById('savedList'); list.innerHTML = "";
             const snap = await getDocs(collection(db, "design_library"));
-            snap.forEach(docSnap => {
-                let d = docSnap.data();
-                list.insertAdjacentHTML('beforeend', `<div class="p-2 bg-gray-800 rounded flex justify-between items-center mb-1"><span class="truncate font-bold text-gray-300 w-3/4">${d.name}</span><button onclick="window.delDesign('${docSnap.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold">X</button></div>`);
-            });
+            snap.forEach(docSnap => { let d = docSnap.data(); list.insertAdjacentHTML('beforeend', `<div class="p-2 bg-gray-800 rounded flex justify-between items-center mb-1"><span class="truncate font-bold text-gray-300 w-3/4">${d.name}</span><button onclick="window.delDesign('${docSnap.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold">X</button></div>`); });
         }
         window.delDesign = async (id) => { if(confirm("Delete this standard profile?")) { await deleteDoc(doc(db, "design_library", id)); fetchLibrary(); } };
         document.getElementById('saveLibraryBtn').addEventListener('click', async () => {
             const name = document.getElementById('pName').value; if(!name) return alert("Please enter a profile name.");
-            const config = { stages: stages, insShape: document.getElementById('insShape').value, insApproach: document.getElementById('insApproach').value };
-            try { await addDoc(collection(db, "design_library"), { name: name, param1: JSON.stringify(config), isActive: true }); alert("Saved to Library! Sales team can now select this."); document.getElementById('pName').value = ""; fetchLibrary(); } catch(e) { alert("Error saving."); }
+            const insSel = document.getElementById('insType').value; const insData = insSel === 'None' ? null : mst.inserts[insSel];
+            const config = { stages: stages, insData: insData, insApproach: document.getElementById('insApproach').value };
+            try { await addDoc(collection(db, "design_library"), { name: name, param1: JSON.stringify(config), isActive: true }); alert("Saved to Library!"); document.getElementById('pName').value = ""; fetchLibrary(); } catch(e) { alert("Error saving."); }
         });
 
-        // 3D ENGINE
+        // ADVANCED 3D ENGINE
         let scene, camera, renderer, toolGroup;
         function initThreeJS() {
             const container = document.getElementById('canvasContainer'); scene = new THREE.Scene(); scene.background = new THREE.Color(0x0f172a);
@@ -188,60 +164,56 @@
             scene.add(new THREE.AmbientLight(0xffffff, 0.7)); const dirLight = new THREE.DirectionalLight(0xffffff, 0.6); dirLight.position.set(50, 100, 150); scene.add(dirLight);
             toolGroup = new THREE.Group(); scene.add(toolGroup);
             
-            // Basic Orbit Controls logic mapped manually for standalone HTML
             let isDragging = false; let previousMousePosition = { x: 0, y: 0 };
-            renderer.domElement.addEventListener('mousedown', (e) => { isDragging = true; });
-            renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
-            renderer.domElement.addEventListener('mousemove', (e) => {
-                if (isDragging) { const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y }; toolGroup.rotation.y += deltaMove.x * 0.01; toolGroup.rotation.x += deltaMove.y * 0.01; }
-                previousMousePosition = { x: e.offsetX, y: e.offsetY };
-            });
+            renderer.domElement.addEventListener('mousedown', () => { isDragging = true; }); renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
+            renderer.domElement.addEventListener('mousemove', (e) => { if (isDragging) { const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y }; toolGroup.rotation.y += deltaMove.x * 0.01; toolGroup.rotation.x += deltaMove.y * 0.01; } previousMousePosition = { x: e.offsetX, y: e.offsetY }; });
             renderer.domElement.addEventListener('wheel', (e) => { camera.position.z += e.deltaY * 0.1; });
             animate();
         }
 
-        function triggerRender() {
+        window.triggerRender = () => {
             while(toolGroup.children.length > 0) { toolGroup.remove(toolGroup.children[0]); }
-            
             const matDark = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.6, roughness: 0.4 });
             const matLight = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.2 });
+            const matFlat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.2, roughness: 0.8 }); // Darker for Weldon Flat
             const addEdges = (mesh) => { const edges = new THREE.EdgesGeometry(mesh.geometry); const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 })); mesh.add(line); };
 
-            let totalL = stages.reduce((sum, st) => sum + st.l, 0);
-            let currentY = totalL / 2; // Start from top
+            let totalL = stages.reduce((sum, st) => sum + st.l, 0); let currentY = totalL / 2; 
             
             stages.forEach((st, idx) => {
-                // CylinderGeometry: radiusTop, radiusBottom, height
-                const geo = new THREE.CylinderGeometry(st.d1/2, st.d2/2, st.l, 32);
-                const mesh = new THREE.Mesh(geo, idx % 2 === 0 ? matDark : matLight);
-                addEdges(mesh);
-                mesh.position.y = currentY - (st.l / 2);
-                currentY -= st.l;
-                toolGroup.add(mesh);
+                let mesh;
+                if (st.shape === 'square') {
+                    mesh = new THREE.Mesh(new THREE.BoxGeometry(st.d1, st.l, st.d2), idx % 2 === 0 ? matDark : matLight);
+                } else {
+                    mesh = new THREE.Mesh(new THREE.CylinderGeometry(st.d1/2, st.d2/2, st.l, 32), idx % 2 === 0 ? matDark : matLight);
+                    // Add Weldon Flat visualization
+                    if (st.feature === 'flat') {
+                        const flatGeo = new THREE.BoxGeometry(st.d1*0.8, st.l*0.8, st.d1*0.2);
+                        const flatMesh = new THREE.Mesh(flatGeo, matFlat);
+                        flatMesh.position.set(0, 0, (st.d1/2)*0.9); // Embedded on edge
+                        mesh.add(flatMesh);
+                    }
+                }
+                addEdges(mesh); mesh.position.y = currentY - (st.l / 2); currentY -= st.l; toolGroup.add(mesh);
             });
 
-            // Insert Calculation (Attached to final stage bottom)
-            const insShape = document.getElementById('insShape').value;
-            const insApp = Number(document.getElementById('insApproach').value);
-            if(insShape !== 'None' && stages.length > 0) {
-                const finalStage = stages[stages.length-1];
+            // Advanced Insert Attachment
+            const insSel = document.getElementById('insType').value;
+            if(insSel !== 'None' && stages.length > 0) {
+                const insData = mst.inserts[insSel]; const finalStage = stages[stages.length-1];
+                const insApp = Number(document.getElementById('insApproach').value);
                 const insMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.3, roughness: 0.8 });
-                let insGeo = new THREE.CylinderGeometry(6, 6, 2, insShape==='T'?3:4); // V/D/C = Diamond, T/W = Triangle/Trigon
+                
+                let sLtr = insData.param1.toUpperCase();
+                let insGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(10, 10, 2) : new THREE.CylinderGeometry(6, 6, 2, sLtr==='S'?4:3); 
+                
                 const insert = new THREE.Mesh(insGeo, insMat); addEdges(insert);
-                
-                // Position at edge of final stage
                 insert.position.set((finalStage.d2/2)-2, currentY, 0);
-                
-                // Apply Approach Angle mathematically (Z rotation)
-                insert.rotation.x = Math.PI / 2; // Lay flat
-                insert.rotation.z = (insApp * Math.PI) / 180; // Approach angle
-                
+                insert.rotation.x = Math.PI / 2; insert.rotation.z = (insApp * Math.PI) / 180;
                 toolGroup.add(insert);
             }
 
-            // Lay tool horizontally for standard view
-            toolGroup.rotation.x = 0; toolGroup.rotation.z = -Math.PI / 2; toolGroup.rotation.y = 0;
-            camera.position.z = totalL * 1.5;
+            toolGroup.rotation.x = 0; toolGroup.rotation.z = -Math.PI / 2; toolGroup.rotation.y = 0; camera.position.z = totalL * 1.5;
         }
         function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
     </script>
