@@ -3,66 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renuka Tools | Enterprise Portal</title>
+    <title>Renuka Tools | Enterprise Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
-        .app-card { transition: all 0.3s ease; }
-        .app-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2); }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); 
+            background-attachment: fixed;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .app-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .app-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.3), 0 15px 15px -5px rgba(0, 0, 0, 0.2); 
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans text-gray-800">
+<body class="min-h-screen flex flex-col font-sans text-gray-800 antialiased selection:bg-blue-500 selection:text-white overflow-x-hidden">
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="flex-1 flex items-center justify-center">
-        <div class="max-w-md w-full bg-white p-10 rounded-xl shadow-2xl">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-black text-gray-900 tracking-tight">RENUKA TOOLS</h2>
-                <p class="text-sm text-gray-500 mt-2 font-semibold uppercase tracking-widest">Enterprise Unified Portal</p>
+    <div id="loginScreen" class="flex-1 flex items-center justify-center p-4 transition-opacity duration-500">
+        <div class="max-w-md w-full bg-white p-8 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+            
+            <div class="text-center mb-8 flex flex-col items-center">
+                <img id="loginLogo" src="" alt="Renuka Tools Logo" class="brand-logo hidden h-16 object-contain mb-4 transition-all duration-300">
+                <h2 id="loginText" class="brand-text text-3xl font-black text-gray-900 tracking-tight">RENUKA TOOLS</h2>
+                <p class="text-xs text-gray-500 mt-2 font-bold uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">Enterprise Portal</p>
             </div>
+            
             <div class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Work Email</label>
-                    <input type="email" id="email" placeholder="name@renukatools.in" class="w-full border-2 border-gray-200 p-3 rounded focus:border-blue-600 outline-none transition font-semibold">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Work Email</label>
+                    <input type="email" id="email" placeholder="name@renukatools.in" class="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 outline-none transition font-semibold text-gray-800 placeholder-gray-400 text-sm sm:text-base">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" class="w-full border-2 border-gray-200 p-3 rounded focus:border-blue-600 outline-none transition font-semibold">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" class="w-full border-2 border-gray-200 p-3 rounded-lg focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 outline-none transition font-semibold text-gray-800 placeholder-gray-400 text-sm sm:text-base">
                 </div>
-                <button id="loginBtn" class="w-full bg-blue-700 hover:bg-blue-800 text-white p-4 rounded-lg font-bold shadow-lg transition text-lg mt-2">Access Hub</button>
+                <button id="loginBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white p-4 rounded-lg font-bold shadow-lg shadow-blue-600/30 transition-all text-base mt-4 flex justify-center items-center">
+                    <span>Secure Login</span>
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- MAIN APP LAUNCHER DASHBOARD -->
-    <div id="portalScreen" class="hidden flex-1 flex flex-col">
-        <nav class="bg-white/10 backdrop-blur-md border-b border-white/20 p-5 flex justify-between items-center shadow-lg">
-            <h1 class="text-2xl font-black text-white tracking-widest">RENUKA TOOLS <span class="text-blue-400 font-light">| HUB</span></h1>
-            <div class="flex items-center space-x-6">
-                <div class="text-right">
-                    <p class="text-sm font-bold text-white" id="userDisplay">Loading...</p>
-                    <p class="text-[10px] font-bold text-blue-300 uppercase tracking-widest" id="roleDisplay">Verifying Clearance</p>
+    <div id="portalScreen" class="hidden flex-1 flex flex-col transition-opacity duration-500">
+        <nav class="glass-panel sticky top-0 z-50 p-4 sm:px-8 sm:py-5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img id="navLogo" src="" alt="Renuka Tools" class="brand-logo hidden h-8 sm:h-10 object-contain transition-all duration-300">
+                <h1 id="navText" class="brand-text text-xl sm:text-2xl font-black text-white tracking-widest">RENUKA<span class="text-blue-400 font-light">HUB</span></h1>
+            </div>
+            <div class="flex items-center space-x-4 sm:space-x-6">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-bold text-white tracking-wide" id="userDisplay">Loading...</p>
+                    <p class="text-[10px] font-bold text-blue-300 uppercase tracking-widest transition-all" id="roleDisplay">Verifying Clearance</p>
                 </div>
-                <button id="logoutBtn" class="bg-red-500/20 hover:bg-red-500/40 text-red-100 border border-red-500/50 px-5 py-2 rounded font-bold transition text-sm">Sign Out</button>
+                <button id="logoutBtn" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-lg font-bold transition text-xs sm:text-sm backdrop-blur">Sign Out</button>
             </div>
         </nav>
 
-        <main class="flex-1 flex items-center justify-center p-8">
+        <main class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
             <div class="max-w-6xl w-full">
-                <h2 class="text-3xl font-bold text-white mb-8 border-b border-white/20 pb-4">Select Workspace</h2>
+                <div class="sm:hidden mb-8 text-center glass-panel p-4 rounded-xl">
+                    <p class="text-xs text-blue-300 uppercase font-bold tracking-widest mb-1">Welcome Back</p>
+                    <p class="text-base font-bold text-white truncate" id="mobileUserDisplay">Loading...</p>
+                    <p class="text-[10px] font-bold text-emerald-300 uppercase tracking-widest mt-1" id="mobileRoleDisplay">Verifying</p>
+                </div>
+
+                <div class="flex justify-between items-end mb-8 border-b border-white/20 pb-4">
+                    <div>
+                        <h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight">Select Workspace</h2>
+                        <p class="text-blue-200 text-sm mt-1 flex items-center"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span> Real-Time Sync Active</p>
+                    </div>
+                </div>
                 
-                <div id="moduleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Cards injected here via JS based on permissions -->
+                <div id="moduleGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 transition-all duration-500">
+                    <!-- Loading Skeleton -->
+                    <div class="col-span-4 flex justify-center py-10"><div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div></div>
                 </div>
             </div>
         </main>
+
+        <footer class="text-center pb-6 text-white/40 text-[10px] uppercase tracking-widest font-bold">
+            Renuka Tools © 2026 | Enterprise Edition
+        </footer>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
+        // VIP PRODUCTION KEYS
         const firebaseConfig = { 
             apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", 
             authDomain: "renuka-tools-quote.firebaseapp.com", 
@@ -77,14 +119,43 @@
         const db = getFirestore(app);
 
         const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
+        let unsubUsers = null;
+        let unsubProfile = null;
 
-        onAuthStateChanged(auth, async (user) => {
+        // 1. REAL-TIME CORPORATE IDENTITY LISTENER
+        function setupCorporateIdentityListener() {
+            if(unsubProfile) unsubProfile();
+            unsubProfile = onSnapshot(doc(db, "settings", "company_profile"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.logo) {
+                        document.querySelectorAll('.brand-logo').forEach(img => { img.src = data.logo; img.classList.remove('hidden'); });
+                        document.querySelectorAll('.brand-text').forEach(el => el.classList.add('hidden'));
+                    } else {
+                        document.querySelectorAll('.brand-logo').forEach(img => img.classList.add('hidden'));
+                        document.querySelectorAll('.brand-text').forEach(el => el.classList.remove('hidden'));
+                        if(data.name) { document.getElementById('loginText').innerText = data.name.toUpperCase(); }
+                    }
+                }
+            }, (error) => console.log("Profile sync waiting."));
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            setupCorporateIdentityListener(); 
+            
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('portalScreen').classList.remove('hidden');
                 document.getElementById('userDisplay').innerText = user.email;
-                await resolvePermissions(user.email);
+                document.getElementById('mobileUserDisplay').innerText = user.email;
+                
+                // 2. REAL-TIME PERMISSIONS LISTENER
+                if(unsubUsers) unsubUsers();
+                unsubUsers = onSnapshot(collection(db, "users"), (snap) => {
+                    resolvePermissions(user.email, snap);
+                });
             } else {
+                if(unsubUsers) { unsubUsers(); unsubUsers = null; }
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('portalScreen').classList.add('hidden');
             }
@@ -93,12 +164,19 @@
         document.getElementById('loginBtn').addEventListener('click', () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
-            signInWithEmailAndPassword(auth, e, p).catch(() => alert("Invalid Credentials"));
+            if(!e || !p) return alert("Enter credentials");
+            const btn = document.getElementById('loginBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>`;
+            signInWithEmailAndPassword(auth, e, p).catch(() => {
+                alert("Invalid Credentials or Access Denied.");
+                btn.innerHTML = originalContent;
+            });
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        async function resolvePermissions(email) {
+        function resolvePermissions(email, usersSnapshot) {
             let isAdmin = ADMIN_EMAILS.includes(email);
             let roles = [];
             let isSales = false; let isDesign = false; let isPurchase = false;
@@ -107,82 +185,84 @@
                 roles = ["Master Admin"];
                 isSales = true; isDesign = true; isPurchase = true;
             } else {
-                try {
-                    const uSnap = await getDocs(collection(db, "users"));
-                    uSnap.forEach(doc => {
-                        let d = doc.data();
-                        if (d.param1 === email && d.param2) {
-                            roles = d.param2.split(',').map(r => r.trim());
-                        }
-                    });
-
-                    if (roles.includes("Design Team")) { isDesign = true; }
-                    if (roles.includes("Purchase Team")) { isPurchase = true; }
-                    // If they have any role that isn't specifically isolated to back-office, they get Sales CRM
-                    if (roles.length > 0 && (!roles.includes("Design Team") || roles.length > 1) && (!roles.includes("Purchase Team") || roles.length > 1)) {
-                        isSales = true;
+                usersSnapshot.forEach(doc => {
+                    let d = doc.data();
+                    if (d.param1 === email && d.param2 && d.isActive !== false) {
+                        roles = d.param2.split(',').map(r => r.trim());
                     }
-                } catch(e) {
-                    console.error("Error fetching roles", e);
+                });
+
+                if (roles.includes("Design Team")) isDesign = true;
+                if (roles.includes("Purchase Team")) isPurchase = true;
+                if (roles.length > 0 && (!roles.includes("Design Team") || roles.length > 1) && (!roles.includes("Purchase Team") || roles.length > 1)) {
+                    isSales = true;
                 }
             }
 
-            document.getElementById('roleDisplay').innerText = roles.length > 0 ? roles.join(' | ') : "No Roles Assigned";
+            const roleTxt = roles.length > 0 ? roles.join(' | ') : "Unassigned / Pending Clearance";
+            document.getElementById('roleDisplay').innerText = roleTxt;
+            document.getElementById('mobileRoleDisplay').innerText = roleTxt;
             
             const grid = document.getElementById('moduleGrid');
-            grid.innerHTML = "";
+            let gridHTML = "";
 
             if (isSales) {
-                grid.innerHTML += `
-                    <a href="sales.html" class="app-card bg-white rounded-xl overflow-hidden shadow-lg border-b-4 border-blue-600 block cursor-pointer">
-                        <div class="bg-blue-50 p-6 flex justify-center items-center h-32"><span class="text-6xl">🛒</span></div>
-                        <div class="p-5">
-                            <h3 class="font-black text-gray-900 text-lg">Sales & CRM Engine</h3>
-                            <p class="text-xs text-gray-500 mt-2 font-semibold">Guided quotes, AI margins, & executive PDF generation.</p>
+                gridHTML += `
+                    <a href="sales.html" class="app-card bg-white rounded-2xl overflow-hidden border-b-8 border-blue-500 block cursor-pointer group">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 flex justify-center items-center h-32 sm:h-40 group-hover:from-blue-100 group-hover:to-blue-200 transition">
+                            <span class="text-6xl drop-shadow-md group-hover:scale-110 transition-transform duration-300">🛒</span>
                         </div>
-                    </a>
-                `;
+                        <div class="p-6">
+                            <h3 class="font-black text-gray-900 text-lg sm:text-xl">Sales & CRM Engine</h3>
+                            <p class="text-xs text-gray-500 mt-2 font-semibold leading-relaxed">Guided quoting, AI margin optimization, and PDF generation.</p>
+                        </div>
+                    </a>`;
             }
 
             if (isDesign) {
-                grid.innerHTML += `
-                    <a href="design.html" class="app-card bg-white rounded-xl overflow-hidden shadow-lg border-b-4 border-purple-600 block cursor-pointer">
-                        <div class="bg-purple-50 p-6 flex justify-center items-center h-32"><span class="text-6xl">📐</span></div>
-                        <div class="p-5">
-                            <h3 class="font-black text-gray-900 text-lg">Design Library</h3>
-                            <p class="text-xs text-gray-500 mt-2 font-semibold">N-Stage parametric CAD builder & master profile sync.</p>
+                gridHTML += `
+                    <a href="design.html" class="app-card bg-white rounded-2xl overflow-hidden border-b-8 border-purple-500 block cursor-pointer group">
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 flex justify-center items-center h-32 sm:h-40 group-hover:from-purple-100 group-hover:to-purple-200 transition">
+                            <span class="text-6xl drop-shadow-md group-hover:scale-110 transition-transform duration-300">📐</span>
                         </div>
-                    </a>
-                `;
+                        <div class="p-6">
+                            <h3 class="font-black text-gray-900 text-lg sm:text-xl">Design Library</h3>
+                            <p class="text-xs text-gray-500 mt-2 font-semibold leading-relaxed">AI Vision 2D-to-3D parser & N-Stage parametric modeling.</p>
+                        </div>
+                    </a>`;
             }
 
             if (isPurchase) {
-                grid.innerHTML += `
-                    <a href="purchase.html" class="app-card bg-white rounded-xl overflow-hidden shadow-lg border-b-4 border-emerald-600 block cursor-pointer">
-                        <div class="bg-emerald-50 p-6 flex justify-center items-center h-32"><span class="text-6xl">📦</span></div>
-                        <div class="p-5">
-                            <h3 class="font-black text-gray-900 text-lg">Purchase Master</h3>
-                            <p class="text-xs text-gray-500 mt-2 font-semibold">Manage standard raw materials, inserts, and hardware costs.</p>
+                gridHTML += `
+                    <a href="purchase.html" class="app-card bg-white rounded-2xl overflow-hidden border-b-8 border-emerald-500 block cursor-pointer group">
+                        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 flex justify-center items-center h-32 sm:h-40 group-hover:from-emerald-100 group-hover:to-emerald-200 transition">
+                            <span class="text-6xl drop-shadow-md group-hover:scale-110 transition-transform duration-300">📦</span>
                         </div>
-                    </a>
-                `;
+                        <div class="p-6">
+                            <h3 class="font-black text-gray-900 text-lg sm:text-xl">Purchase Master</h3>
+                            <p class="text-xs text-gray-500 mt-2 font-semibold leading-relaxed">Secure portal for raw materials, inserts, and operational costs.</p>
+                        </div>
+                    </a>`;
             }
 
             if (isAdmin) {
-                grid.innerHTML += `
-                    <a href="admin.html" class="app-card bg-white rounded-xl overflow-hidden shadow-lg border-b-4 border-red-600 block cursor-pointer">
-                        <div class="bg-red-50 p-6 flex justify-center items-center h-32"><span class="text-6xl">⚙️</span></div>
-                        <div class="p-5">
-                            <h3 class="font-black text-gray-900 text-lg">Master Admin</h3>
-                            <p class="text-xs text-gray-500 mt-2 font-semibold">Global schemas, user overrides, and company branding.</p>
+                gridHTML += `
+                    <a href="admin.html" class="app-card bg-white rounded-2xl overflow-hidden border-b-8 border-red-500 block cursor-pointer group">
+                        <div class="bg-gradient-to-br from-red-50 to-red-100 p-6 flex justify-center items-center h-32 sm:h-40 group-hover:from-red-100 group-hover:to-red-200 transition">
+                            <span class="text-6xl drop-shadow-md group-hover:scale-110 transition-transform duration-300">⚙️</span>
                         </div>
-                    </a>
-                `;
+                        <div class="p-6">
+                            <h3 class="font-black text-gray-900 text-lg sm:text-xl">Master Admin</h3>
+                            <p class="text-xs text-gray-500 mt-2 font-semibold leading-relaxed">Global schemas, CRM overrides, and corporate profiling.</p>
+                        </div>
+                    </a>`;
             }
 
-            if(grid.innerHTML === "") {
-                grid.innerHTML = `<div class="col-span-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert"><strong class="font-bold">Access Denied! </strong><span class="block sm:inline">You do not have permission to view any modules. Contact Anand.</span></div>`;
+            if(gridHTML === "") {
+                gridHTML = `<div class="col-span-1 sm:col-span-2 lg:col-span-4 glass-panel border border-red-400 text-red-200 p-6 rounded-xl flex items-center justify-center space-x-4"><span class="text-3xl">⚠️</span><div><strong class="font-bold text-lg block text-white">Clearance Denied</strong><span class="text-sm mt-1 block">You do not have assigned roles. Contact the system administrator.</span></div></div>`;
             }
+            
+            grid.innerHTML = gridHTML;
         }
     </script>
 </body>
