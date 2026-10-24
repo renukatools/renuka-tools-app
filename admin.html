@@ -89,14 +89,14 @@
                 <div class="mt-8 pt-4 border-t text-right"><button id="saveProfileBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold shadow-lg transition">💾 Save Organization Profile</button></div>
             </div>
             
-            <!-- SCHEMA MANAGER (KILL SWITCH) -->
+            <!-- SCHEMA MANAGER (KILL SWITCH & SCHEMA EDITOR) -->
             <div id="schemaManagerContainer" class="hidden bg-white rounded-xl shadow-sm border p-4 sm:p-8 max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-6 border-b pb-2">
-                    <h3 class="text-xl font-bold text-gray-800">Database Schema Manager</h3>
-                    <p class="text-xs text-red-600 font-bold bg-red-50 px-3 py-1 rounded-full border border-red-200">⚠️ Danger Zone</p>
+                    <h3 class="text-xl font-bold text-gray-800">Database Schema Manager & Renaming</h3>
+                    <p class="text-xs text-red-600 font-bold bg-red-50 px-3 py-1 rounded-full border border-red-200">⚠️ God Mode</p>
                 </div>
-                <p class="text-sm text-gray-500 mb-6 font-semibold">Toggle databases to "Inactive" to instantly hide them across all modules globally. Data is preserved safely.</p>
-                <div class="overflow-x-auto"><table class="w-full text-left text-sm border-collapse"><thead class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider"><tr><th class="p-3 border-b rounded-tl-lg">Module Category</th><th class="p-3 border-b">Database Title</th><th class="p-3 border-b">Behavior</th><th class="p-3 border-b text-center rounded-tr-lg">Global Status</th></tr></thead><tbody id="schemaManagerBody" class="divide-y divide-gray-100"></tbody></table></div>
+                <p class="text-sm text-gray-500 mb-6 font-semibold">Modify database titles, column header names, behaviors, or toggle global active states.</p>
+                <div class="overflow-x-auto"><table class="w-full text-left text-sm border-collapse"><thead class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider"><tr><th class="p-3 border-b rounded-tl-lg">Module</th><th class="p-3 border-b">Database Title & Columns</th><th class="p-3 border-b">Behavior</th><th class="p-3 border-b text-center">Global Status</th><th class="p-3 border-b text-right rounded-tr-lg">Action</th></tr></thead><tbody id="schemaManagerBody" class="divide-y divide-gray-100"></tbody></table></div>
             </div>
         </main>
     </div>
@@ -128,10 +128,11 @@
         </div>
     </div>
 
-    <!-- SCHEMA BUILDER MODAL -->
+    <!-- SCHEMA BUILDER & EDIT MODAL -->
     <div id="schemaModal" class="fixed inset-0 bg-slate-900/60 hidden flex items-center justify-center z-50 backdrop-blur-sm p-4 transition-opacity">
         <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg">
-            <h3 class="text-xl font-black mb-4 text-purple-900 border-b pb-2">Deploy Custom Database</h3>
+            <h3 id="schemaModalTitle" class="text-xl font-black mb-4 text-purple-900 border-b pb-2">Deploy Custom Database</h3>
+            <input type="hidden" id="editingSchemaId">
             <div class="space-y-4">
                 <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Module Category</label><select id="schCat" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-semibold transition"><option value="com">Commercial & Trading</option><option value="mfg">Manufacturing Engine</option><option value="crm">CRM & Operations</option></select></div>
                 <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Master Title</label><input type="text" id="schTitle" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-bold transition" placeholder="e.g. Agent Commission"></div>
@@ -139,15 +140,15 @@
                 <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Data Columns Needed</label><select id="schType" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-semibold transition"><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option><option value="4">4 Columns</option></select></div>
                 
                 <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border-2 border-slate-100">
-                    <div><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 1 (Text)</label><input type="text" id="schCol1" value="Name" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-800 outline-none transition focus:border-purple-400"></div>
-                    <div id="schCol2Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 2 (Value)</label><input type="text" id="schCol2" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
-                    <div id="schCol3Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 3 (Value)</label><input type="text" id="schCol3" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
-                    <div id="schCol4Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 4 (Value)</label><input type="text" id="schCol4" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
+                    <div><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 1 Header</label><input type="text" id="schCol1" value="Name" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-800 outline-none transition focus:border-purple-400"></div>
+                    <div id="schCol2Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 2 Header</label><input type="text" id="schCol2" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
+                    <div id="schCol3Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 3 Header</label><input type="text" id="schCol3" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
+                    <div id="schCol4Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 4 Header</label><input type="text" id="schCol4" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
                 </div>
             </div>
             <div class="flex justify-end space-x-3 border-t mt-6 pt-4">
                 <button id="cancelSchemaBtn" class="px-5 py-2.5 bg-slate-200 rounded-lg font-bold text-slate-800 hover:bg-slate-300 transition">Cancel</button>
-                <button id="saveSchemaBtn" class="px-5 py-2.5 bg-purple-600 text-white font-bold rounded-lg shadow-lg shadow-purple-500/30 hover:bg-purple-700 transition">Deploy Database</button>
+                <button id="saveSchemaBtn" class="px-5 py-2.5 bg-purple-600 text-white font-bold rounded-lg shadow-lg shadow-purple-500/30 hover:bg-purple-700 transition">Save Changes</button>
             </div>
         </div>
     </div>
@@ -157,17 +158,13 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, setDoc, writeBatch, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // VIP KEYS
         const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", authDomain: "renuka-tools-quote.firebaseapp.com", databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "renuka-tools-quote", storageBucket: "renuka-tools-quote.firebasestorage.app", messagingSenderId: "300959855269", appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         
         const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
 
         let appSchemas = []; let mst = {}; let currentTabId = "roles"; let pendingImportCollection = ""; let base64Logo = "";
-        
-        // Real-Time Listeners
-        let unsubSchemas = null; let unsubTable = null; let unsubProfile = null;
-        let roleCache = [];
+        let unsubSchemas = null; let unsubTable = null; let unsubProfile = null; let roleCache = [];
 
         const defaultSchemas = [
             { id: "roles", category: "crm", title: "System Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
@@ -196,8 +193,7 @@
         onAuthStateChanged(auth, async (user) => { 
             if (user) { 
                 if (!ADMIN_EMAILS.includes(user.email)) { alert("Unauthorized Access. Admin Privileges Required."); signOut(auth); return; }
-                document.getElementById('loginSection').classList.add('hidden'); 
-                bootSequence(); 
+                document.getElementById('loginSection').classList.add('hidden'); bootSequence(); 
             } else { 
                 document.getElementById('loginSection').classList.remove('hidden'); 
                 if(unsubSchemas) unsubSchemas(); if(unsubTable) unsubTable(); if(unsubProfile) unsubProfile();
@@ -212,14 +208,9 @@
         });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // MASTER INITIALIZATION MATRIX (One-Time Run)
         async function runInitializationMatrix() {
-            const loader = document.getElementById('initLoader'); 
-            
-            // Fast check without locking UI if already populated
             const rmSnap = await getDocs(collection(db, "raw_materials"));
             if (rmSnap.empty) {
-                loader.classList.remove('hidden');
                 const b = writeBatch(db);
                 const rms = [ {n:"EN8 Steel", d:7.85, c:85}, {n:"EN19 Steel", d:7.85, c:105}, {n:"EN24 Steel", d:7.85, c:125}, {n:"20MnCr5 Steel", d:7.85, c:115}, {n:"H13 Tool Steel", d:7.80, c:240}, {n:"P20 Die Steel", d:7.85, c:160}, {n:"Aluminium 6061-T6", d:2.70, c:350}, {n:"Aluminium 7075", d:2.81, c:480}, {n:"Solid Carbide (Standard)", d:14.50, c:4500}, {n:"Electrolytic Copper", d:8.96, c:950} ];
                 rms.forEach(r => { b.set(doc(collection(db, "raw_materials")), { name: r.n, param1: r.d, param2: r.c, isActive: true }); });
@@ -234,12 +225,10 @@
                 blanks.forEach(r => { b.set(doc(collection(db, "blanks")), { name: r.n, param1: r.d, param2: r.l, param3: r.c, isActive: true }); });
                 
                 await b.commit();
-                loader.classList.add('hidden');
             }
         }
 
         async function bootSequence() {
-            // Force schema document upgrades if missing
             const checkSch = await getDocs(collection(db, "system_schemas"));
             if(checkSch.empty || checkSch.size < 14) {
                 const b = writeBatch(db);
@@ -251,7 +240,6 @@
         }
 
         function setupRealTimeListeners() {
-            // Profile Listener
             if(unsubProfile) unsubProfile();
             unsubProfile = onSnapshot(doc(db, "settings", "company_profile"), (snap) => {
                 if(snap.exists()) {
@@ -261,12 +249,8 @@
                 }
             });
 
-            // Role Cache Listener (Used for Dropdowns)
-            onSnapshot(collection(db, "roles"), (snap) => {
-                roleCache = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            });
+            onSnapshot(collection(db, "roles"), (snap) => { roleCache = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); });
 
-            // Schema Listener
             if(unsubSchemas) unsubSchemas();
             unsubSchemas = onSnapshot(collection(db, "system_schemas"), (snap) => {
                 appSchemas = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -281,7 +265,6 @@
             appSchemas.forEach(sch => {
                 const targetDiv = sch.category === 'crm' ? 'nav-crm' : (sch.category === 'mfg' ? 'nav-mfg' : 'nav-com');
                 const btn = document.createElement('button'); 
-                // Always render in admin, but dim if inactive
                 const dimClass = sch.isActive === false ? 'opacity-50 line-through' : '';
                 btn.className = `w-full text-left px-4 py-2 sm:px-6 sm:py-2 text-xs sm:text-sm font-bold transition-all hover:bg-slate-800 rounded-lg mb-1 ${sch.id === currentTabId ? 'active-nav' : 'text-slate-400'} ${dimClass}`; 
                 btn.innerText = sch.title;
@@ -308,12 +291,14 @@
             appSchemas.forEach(sch => {
                 const badge = sch.isActive !== false ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">Active</span>` : `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-bold">Inactive</span>`;
                 const catStr = sch.category === 'crm' ? 'CRM' : (sch.category === 'mfg' ? 'Manufacturing' : 'Commercial');
+                const colsList = (sch.cols || []).join(' | ');
                 body.insertAdjacentHTML('beforeend', `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                         <td class="p-3 font-semibold text-slate-500">${catStr}</td>
-                        <td class="p-3 font-black text-slate-800">${sch.title} <span class="text-[10px] font-bold text-slate-400 block">${sch.id}</span></td>
+                        <td class="p-3"><p class="font-black text-slate-800">${sch.title}</p><p class="text-[10px] text-slate-400 font-bold">${colsList}</p></td>
                         <td class="p-3 text-[10px] uppercase tracking-wider text-blue-600 font-bold">${sch.behavior}</td>
                         <td class="p-3 text-center cursor-pointer hover:opacity-80 transition" onclick="window.toggleSchemaStatus('${sch.id}', ${sch.isActive !== false})">${badge}</td>
+                        <td class="p-3 text-right"><button onclick="window.openEditSchemaModal('${sch.id}')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold text-xs px-3 py-1 rounded-lg transition">Edit Schema</button></td>
                     </tr>
                 `);
             });
@@ -340,7 +325,7 @@
                 <button onclick="window.exportExcel('${sch.id}')" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold shadow-lg shadow-teal-500/30 transition flex items-center"><span class="hidden sm:inline mr-1">📊 </span>Export</button>
                 <button onclick="window.openEntryModal('${sch.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 sm:px-5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold shadow-lg shadow-green-500/30 transition flex items-center">+ Add</button>`;
                 
-            let thHtml = sch.cols.map(c => `<th class="px-4 py-4 border-b font-black">${c}</th>`).join('');
+            let thHtml = (sch.cols || ["Name"]).map(c => `<th class="px-4 py-4 border-b font-black">${c}</th>`).join('');
             document.getElementById('tableContainer').innerHTML = `<div class="overflow-x-auto"><table class="w-full text-left whitespace-nowrap"><thead class="bg-slate-100 text-slate-500 text-[10px] sm:text-xs uppercase tracking-wider"><tr>${thHtml}<th class="px-4 py-4 border-b w-24 font-black">Status</th><th class="px-4 py-4 border-b text-right w-24 font-black">Actions</th></tr></thead><tbody id="tbody_${sch.id}" class="text-xs sm:text-sm divide-y divide-slate-100"><tr><td colspan="6" class="text-center py-10 text-slate-400 font-bold"><div class="animate-pulse">Loading live data...</div></td></tr></tbody></table></div>`;
 
             if(unsubTable) unsubTable();
@@ -410,29 +395,91 @@
             try { 
                 if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); 
                 document.getElementById('dataModal').classList.add('hidden'); 
-                // Table auto-updates via onSnapshot!
             } catch (err) { alert("Error saving data."); }
         });
 
         window.deleteItem = async (col, id) => { if(confirm("Permanently delete? Note: This may affect historic quote calculations. Consider making it 'Inactive' instead.")) { await deleteDoc(doc(db, col, id)); } };
         
-        document.getElementById('schemaBuilderBtn').addEventListener('click', () => { document.getElementById('schemaModal').classList.remove('hidden'); if(window.innerWidth < 1024) toggleSidebar(); }); 
+        // Schema Builder & Editor Logic
+        document.getElementById('schemaBuilderBtn').addEventListener('click', () => { 
+            document.getElementById('schemaModalTitle').innerText = "Deploy Custom Database";
+            document.getElementById('editingSchemaId').value = "";
+            document.getElementById('schTitle').value = "";
+            document.getElementById('schCat').value = "mfg";
+            document.getElementById('schBehavior').value = "flat";
+            document.getElementById('schType').value = "1";
+            document.getElementById('schCol1').value = "Name";
+            ['schCol2Grp','schCol3Grp','schCol4Grp'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('schemaModal').classList.remove('hidden'); 
+            if(window.innerWidth < 1024) toggleSidebar(); 
+        }); 
+
+        window.openEditSchemaModal = (schId) => {
+            const sch = appSchemas.find(s => s.id === schId);
+            if(!sch) return;
+            document.getElementById('schemaModalTitle').innerText = `Edit Schema: ${sch.title}`;
+            document.getElementById('editingSchemaId').value = sch.id;
+            document.getElementById('schTitle').value = sch.title || "";
+            document.getElementById('schCat').value = sch.category || "mfg";
+            document.getElementById('schBehavior').value = sch.behavior || "flat";
+            document.getElementById('schType').value = String(sch.params || 1);
+            
+            const cols = sch.cols || ["Name"];
+            document.getElementById('schCol1').value = cols[0] || "Name";
+            document.getElementById('schCol2').value = cols[1] || "";
+            document.getElementById('schCol3').value = cols[2] || "";
+            document.getElementById('schCol4').value = cols[3] || "";
+
+            const val = sch.params || 1;
+            document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2); 
+            document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3); 
+            document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4);
+
+            document.getElementById('schemaModal').classList.remove('hidden');
+        };
+
         document.getElementById('cancelSchemaBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.add('hidden')); 
         document.getElementById('schType').addEventListener('change', (e) => { const val = Number(e.target.value); document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2); document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3); document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4); });
         
         document.getElementById('saveSchemaBtn').addEventListener('click', async () => { 
             const title = document.getElementById('schTitle').value; if(!title) return alert("Title required"); 
-            const id = title.toLowerCase().replace(/[^a-z0-9]/g, '_'); 
+            const existingId = document.getElementById('editingSchemaId').value;
+            const id = existingId ? existingId : title.toLowerCase().replace(/[^a-z0-9]/g, '_'); 
             const cat = document.getElementById('schCat').value;
-            const behavior = document.getElementById('schBehavior').value; const params = Number(document.getElementById('schType').value); 
-            let cols = [document.getElementById('schCol1').value]; if(params >= 2) cols.push(document.getElementById('schCol2').value); if(params >= 3) cols.push(document.getElementById('schCol3').value); if(params >= 4) cols.push(document.getElementById('schCol4').value); 
-            await setDoc(doc(db, "system_schemas", id), { id, title, params, cols, behavior, category: cat, isActive: true }); 
+            const behavior = document.getElementById('schBehavior').value; 
+            const params = Number(document.getElementById('schType').value); 
+            let cols = [document.getElementById('schCol1').value]; 
+            if(params >= 2) cols.push(document.getElementById('schCol2').value); 
+            if(params >= 3) cols.push(document.getElementById('schCol3').value); 
+            if(params >= 4) cols.push(document.getElementById('schCol4').value); 
+            
+            // Fetch existing schema to preserve active status if editing
+            let existingSch = appSchemas.find(s => s.id === id);
+            let isActiveState = existingSch ? (existingSch.isActive !== false) : true;
+
+            await setDoc(doc(db, "system_schemas", id), { id, title, params, cols, behavior, category: cat, isActive: isActiveState }, { merge: true }); 
             document.getElementById('schemaModal').classList.add('hidden'); 
-            // Sidebar and Schema Manager auto-update via onSnapshot!
+            alert(`Schema "${title}" successfully updated! All modules updated in real-time.`);
         });
-        
-        window.downloadTemplate = (schemaId) => { const sch = appSchemas.find(s => s.id === schemaId); const ws = XLSX.utils.aoa_to_sheet([sch.cols]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `${sch.title}_Template.xlsx`); }; window.triggerImport = (schemaId) => { pendingImportCollection = schemaId; document.getElementById('excelUpload').click(); };
-        document.getElementById('excelUpload').addEventListener('change', (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = async (event) => { const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'}); const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); const sch = appSchemas.find(s => s.id === pendingImportCollection); const isText = (sch.category === 'crm' || pendingImportCollection === 'inserts'); let count = 0; const b = writeBatch(db); for(let row of jsonData) { const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true }; if(sch.params >= 2) dataObj.param1 = isText ? String(row[sch.cols[1]] || "") : Number(row[sch.cols[1]] || 0); if(sch.params >= 3) dataObj.param2 = isText ? String(row[sch.cols[2]] || "") : Number(row[sch.cols[2]] || 0); if(sch.params >= 4) dataObj.param3 = isText ? String(row[sch.cols[3]] || "") : Number(row[sch.cols[3]] || 0); b.set(doc(collection(db, pendingImportCollection)), dataObj); count++; } await b.commit(); document.getElementById('excelUpload').value = ""; alert(`Imported ${count} items globally!`); }; reader.readAsArrayBuffer(file); });
+
+        window.downloadTemplate = (schemaId) => { const sch = appSchemas.find(s => s.id === schemaId); const ws = XLSX.utils.aoa_to_sheet([sch.cols]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `${sch.title}_Template.xlsx`); }; 
+        window.triggerImport = (schemaId) => { pendingImportCollection = schemaId; document.getElementById('excelUpload').click(); };
+        document.getElementById('excelUpload').addEventListener('change', (e) => { 
+            const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); 
+            reader.onload = async (event) => { 
+                const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'}); const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); const sch = appSchemas.find(s => s.id === pendingImportCollection); let count = 0; const b = writeBatch(db);
+                for(let row of jsonData) { 
+                    const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true }; 
+                    if(sch.params >= 2) dataObj.param1 = pendingImportCollection === 'inserts' ? String(row[sch.cols[1]] || "") : Number(row[sch.cols[1]] || 0); 
+                    if(sch.params >= 3) dataObj.param2 = isText ? String(row[sch.cols[2]] || "") : Number(row[sch.cols[2]] || 0); 
+                    if(sch.params >= 4) dataObj.param3 = isText ? String(row[sch.cols[3]] || "") : Number(row[sch.cols[3]] || 0); 
+                    b.set(doc(collection(db, pendingImportCollection)), dataObj); count++; 
+                } 
+                await b.commit();
+                document.getElementById('excelUpload').value = ""; alert(`Imported ${count} items globally!`); 
+            }; 
+            reader.readAsArrayBuffer(file); 
+        });
         window.exportExcel = async (schemaId) => { const sch = appSchemas.find(s => s.id === schemaId); let dataArr = mst[schemaId].map(d => { let row = {}; row[sch.cols[0]] = d.name; if(sch.params >= 2) row[sch.cols[1]] = d.param1; if(sch.params >= 3) row[sch.cols[2]] = d.param2; if(sch.params >= 4) row[sch.cols[3]] = d.param3; row["Is Active"] = (d.isActive !== false) ? "Yes" : "No"; return row; }); const ws = XLSX.utils.json_to_sheet(dataArr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sch.title); XLSX.writeFile(wb, `${sch.title}_Export.xlsx`); };
     </script>
 </body>

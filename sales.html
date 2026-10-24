@@ -558,8 +558,9 @@
                             let maxD = 0; let totL = 0; let totalFinishGrams = 0;
                             conf.stages.forEach(st => { 
                                 maxD = Math.max(maxD, st.d1, st.d2); totL += st.l; 
-                                // Finish Weight using specific stage material or global fallback
-                                let stMat = mst.raw_materials[st.materialIdx] || mat; let stDen = stMat ? stMat.param1 : den;
+                                // Fixed Bug: Finding material by Document ID instead of array index
+                                let stMat = mst.raw_materials.find(m => m.id === st.materialId) || mat; 
+                                let stDen = stMat ? stMat.param1 : den;
                                 let stVol = 0;
                                 if(st.shape === 'square') stVol = (st.d1/10)*(st.d2/10)*(st.l/10);
                                 else {
