@@ -5,29 +5,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three-csg-ts@3.1.11/lib/three-csg-ts.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar{height:6px;width:6px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
         .tab-active{border-bottom:3px solid #60a5fa;color:#60a5fa} 
-        .wizard-step { transition: all 0.3s ease; }
         body { background: #f8fafc; }
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="min-h-screen font-sans text-gray-800 antialiased overflow-x-hidden">
     
     <!-- NAVIGATION -->
-    <nav class="bg-gradient-to-r from-gray-900 to-blue-900 text-white p-4 shadow-lg flex flex-wrap justify-between items-center z-50 sticky top-0">
-        <div class="flex items-center space-x-4 sm:space-x-8 mb-2 sm:mb-0 w-full sm:w-auto justify-between">
-            <div class="flex items-center space-x-3"><img id="navLogo" class="h-8 hidden object-contain"><h1 id="navTitle" class="text-lg sm:text-xl font-black tracking-wider text-blue-200">ERP SYSTEM</h1></div>
-            <div id="navTabs" class="hidden space-x-4 sm:space-x-6 text-xs sm:text-sm font-bold tracking-wide">
+    <nav class="bg-gradient-to-r from-gray-900 to-blue-900 text-white p-4 shadow-lg flex justify-between items-center z-50 sticky top-0">
+        <div class="flex items-center space-x-8">
+            <div class="flex items-center space-x-3"><img id="navLogo" class="h-8 hidden object-contain"><h1 id="navTitle" class="text-xl font-black tracking-wider text-blue-200">ERP SYSTEM</h1></div>
+            <div id="navTabs" class="hidden space-x-6 text-sm font-bold tracking-wide">
                 <button onclick="switchTab('dashboard')" id="tab-dashboard" class="pb-1 hover:text-blue-300 transition tab-active">Dashboard</button>
                 <button onclick="switchTab('builder')" id="tab-builder" class="pb-1 hover:text-blue-300 transition">Quote Builder</button>
                 <a href="index.html" class="pb-1 text-gray-400 hover:text-white transition hidden sm:inline">⌂ Main Hub</a>
             </div>
         </div>
-        <div class="flex items-center space-x-4 w-full sm:w-auto justify-end"><div id="userBadge" class="flex items-center font-bold text-gray-300"></div><button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold hidden transition shadow">Sign Out</button></div>
+        <div class="flex items-center space-x-4"><div id="userBadge" class="flex items-center font-bold text-gray-300"></div><button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-bold hidden transition shadow">Sign Out</button></div>
     </nav>
 
     <!-- LOGIN -->
@@ -41,27 +38,32 @@
         </div>
     </div>
 
+    <!-- QUICK ADD CRM MODAL -->
+    <div id="quickCrmModal" class="fixed inset-0 bg-slate-900/60 hidden flex items-center justify-center z-50 backdrop-blur-sm p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-lg">
+            <h3 class="text-xl font-black text-blue-900 mb-4 border-b pb-2">Quick Add Customer</h3>
+            <div class="space-y-3">
+                <div><label class="text-[10px] font-bold text-gray-500 uppercase">Company Name</label><input type="text" id="qcName" class="w-full border-2 border-gray-200 p-2 rounded-lg font-bold outline-none focus:border-blue-500"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] font-bold text-gray-500 uppercase">Primary Contact Name</label><input type="text" id="qcContact" class="w-full border-2 border-gray-200 p-2 rounded-lg font-semibold outline-none focus:border-blue-500"></div>
+                    <div><label class="text-[10px] font-bold text-gray-500 uppercase">Mobile No.</label><input type="text" id="qcMob" class="w-full border-2 border-gray-200 p-2 rounded-lg font-semibold outline-none focus:border-blue-500"></div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 border-t mt-5 pt-4">
+                <button onclick="document.getElementById('quickCrmModal').classList.add('hidden')" class="px-4 py-2 bg-slate-200 rounded font-bold text-slate-800">Cancel</button>
+                <button id="saveQuickCrmBtn" class="px-4 py-2 bg-blue-600 text-white rounded font-bold shadow-lg">Save to Master</button>
+            </div>
+        </div>
+    </div>
+
     <div id="appScreen" class="hidden">
         <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="max-w-7xl mx-auto mt-6 p-4 space-y-6">
+            <!-- Analytics Summary -->
             <div class="grid grid-cols-12 gap-6">
-                <div class="col-span-12 lg:col-span-5 bg-gradient-to-r from-blue-800 to-indigo-900 rounded-xl p-5 text-white shadow-xl border border-blue-700">
-                    <h3 class="text-lg font-bold mb-3 flex items-center">🤖 System Action Alerts</h3>
-                    <ul id="aiAlerts" class="space-y-2 text-sm text-blue-100 font-medium"></ul>
-                </div>
-                <div class="col-span-12 lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border text-center"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Pipeline Value</p><p class="text-2xl font-black text-gray-800 mt-2" id="statPipeline">₹ 0.00</p></div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border text-center"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Active Quotes</p><p class="text-2xl font-black text-blue-600 mt-2" id="statActive">0</p></div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border text-center"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Won This Month</p><p class="text-2xl font-black text-green-600 mt-2" id="statWon">0</p></div>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-12 gap-6">
-                <div class="col-span-12 lg:col-span-7 bg-white p-5 rounded-xl shadow-sm border">
-                    <h3 class="font-black text-gray-800 mb-4 border-b pb-2">Sales Team Analytics</h3>
-                    <div class="overflow-x-auto"><table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-slate-50 text-slate-600 text-[10px] uppercase tracking-wider"><tr><th class="p-3">Salesperson</th><th class="p-3 text-right">Pipeline (₹)</th><th class="p-3 text-right">Won (₹)</th><th class="p-3 text-center">Win Rate</th></tr></thead><tbody id="performanceBody" class="divide-y divide-slate-100"></tbody></table></div>
-                </div>
-                <div class="col-span-12 lg:col-span-5 bg-white p-5 rounded-xl shadow-sm border flex justify-center items-center"><canvas id="statusChart" height="180"></canvas></div>
+                <div class="col-span-12 lg:col-span-4 bg-white p-5 rounded-xl shadow-sm border text-center"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Pipeline Value</p><p class="text-3xl font-black text-gray-800 mt-2" id="statPipeline">₹ 0</p></div>
+                <div class="col-span-12 lg:col-span-4 bg-white p-5 rounded-xl shadow-sm border text-center"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Active Quotes</p><p class="text-3xl font-black text-blue-600 mt-2" id="statActive">0</p></div>
+                <div class="col-span-12 lg:col-span-4 bg-white p-5 rounded-xl shadow-sm border text-center"><p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Won Deals</p><p class="text-3xl font-black text-green-600 mt-2" id="statWon">0</p></div>
             </div>
             
             <div class="bg-white p-5 rounded-xl shadow-sm border">
@@ -69,755 +71,466 @@
                     <h3 class="text-lg font-black text-gray-800">Active Pipeline</h3>
                     <input type="text" id="quoteSearch" placeholder="🔍 Search Quotes..." class="border-2 border-gray-200 p-2 rounded-lg text-sm w-full sm:w-72 outline-none focus:border-blue-500 transition font-semibold">
                 </div>
-                <div class="overflow-x-auto"><table class="w-full text-left border-collapse whitespace-nowrap text-sm"><thead class="bg-slate-50 text-slate-600 uppercase text-[10px] tracking-wider"><tr><th class="p-3 border-b">Quote ID</th><th class="p-3 border-b">Customer & Subject</th><th class="p-3 border-b">Value</th><th class="p-3 border-b">Owner</th><th class="p-3 border-b w-32">Status</th><th class="p-3 border-b">Alerts</th></tr></thead><tbody id="quoteTableBody" class="divide-y divide-gray-100"></tbody></table></div>
+                <div class="overflow-x-auto"><table class="w-full text-left border-collapse whitespace-nowrap text-sm"><thead class="bg-slate-50 text-slate-600 uppercase text-[10px] tracking-wider"><tr><th class="p-3 border-b">Quote ID</th><th class="p-3 border-b">Customer & Subject</th><th class="p-3 border-b">Value</th><th class="p-3 border-b w-32">Status</th><th class="p-3 border-b">Alerts</th></tr></thead><tbody id="quoteTableBody" class="divide-y divide-gray-100"></tbody></table></div>
             </div>
         </div>
 
         <!-- GUIDED QUOTE BUILDER -->
-        <div id="view-builder" class="max-w-7xl mx-auto mt-6 p-4 hidden grid grid-cols-12 gap-6">
+        <div id="view-builder" class="max-w-[1400px] mx-auto mt-6 p-4 hidden grid grid-cols-12 gap-6">
+            
             <div class="col-span-12 lg:col-span-8 space-y-6">
-                
-                <!-- STEP 1: CRM -->
-                <div id="step1" class="wizard-step bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-t-4 border-t-blue-600">
-                    <div class="flex justify-between items-center mb-6 border-b pb-2"><h3 class="text-lg font-black text-gray-800">STEP 1: CRM Setup</h3><input type="text" id="quoteId" readonly class="border-0 bg-transparent font-bold text-gray-400 text-right outline-none text-xs sm:text-sm"></div>
+                <!-- STEP 1: DEEP CRM SETUP -->
+                <div id="step1" class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border-2 border-blue-600 transition-all duration-300 relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-5 border-b border-slate-200 pb-3">
+                        <h3 class="text-lg font-black text-blue-900">STEP 1: Advanced CRM Setup</h3>
+                        <input type="text" id="quoteId" readonly class="border-0 bg-transparent font-black text-slate-400 text-right outline-none text-sm w-48">
+                    </div>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-2">
-                        <div class="sm:col-span-2 relative">
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-4">
+                        <div class="sm:col-span-5 relative">
                             <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Company Name *</label>
-                            <input type="text" id="qCompany" list="crmList" class="w-full border-2 border-yellow-200 p-2.5 text-sm rounded-lg bg-yellow-50 focus:border-yellow-500 outline-none font-bold text-gray-900 transition" autocomplete="off">
+                            <div class="flex space-x-2">
+                                <input type="text" id="qCompany" list="crmList" class="w-full border-2 border-yellow-300 p-2.5 text-sm rounded-lg bg-yellow-50 focus:border-blue-500 outline-none font-black text-gray-900 transition" autocomplete="off" placeholder="Type to search/filter...">
+                                <button type="button" onclick="document.getElementById('quickCrmModal').classList.remove('hidden')" class="bg-blue-100 text-blue-700 px-3 rounded-lg font-black hover:bg-blue-200" title="Add New">+</button>
+                            </div>
                             <datalist id="crmList"></datalist>
                         </div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Contact Person</label><input type="text" id="qContact" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg focus:border-blue-500 outline-none font-semibold"></div>
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Project Ref</label><input type="text" id="qProject" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg focus:border-blue-500 outline-none font-semibold"></div>
+                        <div class="sm:col-span-4">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Select Contact Person</label>
+                            <select id="qContact" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg focus:border-blue-500 outline-none font-bold text-slate-700"><option value="">-- Manual Entry --</option></select>
+                        </div>
+                        <div class="sm:col-span-3">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Project Ref</label>
+                            <input type="text" id="qProject" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg focus:border-blue-500 outline-none font-semibold">
+                        </div>
                     </div>
                     
-                    <!-- AI FUZZY MATCH ALERT BOX -->
-                    <div id="crmAiAlert" class="hidden mb-4 bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded-r-lg text-xs text-yellow-800 shadow-sm animate-pulse"></div>
+                    <div class="mb-5"><label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Compulsory Subject Line *</label><input type="text" id="qSubject" class="w-full border-2 border-red-200 p-2.5 text-sm rounded-lg focus:border-red-500 outline-none font-black text-gray-900 transition" placeholder="e.g. Quotation for Custom Boring Bars"></div>
                     
-                    <div class="mb-6"><label class="block text-[10px] font-bold text-red-500 uppercase tracking-wide mb-1">Compulsory Subject Line *</label><input type="text" id="qSubject" class="w-full border-2 border-red-200 p-2.5 text-sm rounded-lg focus:border-red-500 outline-none font-bold text-gray-900 transition" placeholder="e.g. Quotation for Custom Boring Bars"></div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Business Model</label><select id="qModel" class="w-full border-2 border-slate-200 p-2.5 text-sm rounded-lg font-bold text-blue-800 focus:border-blue-500 outline-none"><option value="tools">Cutting Tools (18%)</option><option value="jobwork_renuka">Job-Work (Renuka RM 18%)</option><option value="jobwork_cust">Job-Work (Cust RM 12%)</option></select></div>
-                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Tax Region</label><select id="qRegion" class="w-full border-2 border-slate-200 p-2.5 text-sm rounded-lg font-semibold focus:border-blue-500 outline-none"><option value="mh">Maharashtra (CGST+SGST)</option><option value="inter">Interstate (IGST)</option><option value="export">Export (0% Tax)</option></select></div>
-                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Payment Terms</label><select id="qPayTerms" class="w-full border-2 border-slate-200 p-2.5 text-sm rounded-lg font-semibold focus:border-blue-500 outline-none"></select></div>
-                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">INCO Terms</label><select id="qIncoTerms" class="w-full border-2 border-slate-200 p-2.5 text-sm rounded-lg font-semibold focus:border-blue-500 outline-none"></select></div>
+                    <!-- Global Quote-Level Masters -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Tax Region</label><select id="qRegion" class="w-full border-2 border-slate-200 p-2 rounded-lg font-bold focus:border-blue-500 outline-none text-xs calc-trigger"><option value="mh">Maharashtra (CGST+SGST)</option><option value="inter">Interstate (IGST)</option><option value="export">Export (0% Tax)</option></select></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Customer Tier</label><select id="qTier" class="w-full border-2 border-slate-200 p-2 rounded-lg font-bold focus:border-blue-500 outline-none text-xs calc-trigger"></select></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Payment Terms</label><select id="qPayTerms" class="w-full border-2 border-slate-200 p-2 rounded-lg font-semibold focus:border-blue-500 outline-none text-xs"></select></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">INCO Terms</label><select id="qIncoTerms" class="w-full border-2 border-slate-200 p-2 rounded-lg font-semibold focus:border-blue-500 outline-none text-xs"></select></div>
                     </div>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Customer Tier</label><select id="qTier" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg font-bold focus:border-blue-500 outline-none"></select></div>
-                        <div class="flex space-x-2"><div class="w-1/2"><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Freight Type</label><select id="qFreightMode" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg font-semibold focus:border-blue-500 outline-none"><option value="manual">Manual Lump Sum</option><option value="auto">Auto-Calc by Weight</option></select></div><div class="w-1/2"><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Value / Rate</label><input type="number" id="qFreightVal" value="0" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg font-bold focus:border-blue-500 outline-none"></div></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Freight Mode</label><select id="qFreightMode" class="w-full border-2 border-gray-200 p-2 rounded-lg font-bold focus:border-blue-500 outline-none text-xs calc-trigger"><option value="manual">Manual Lump Sum</option><option value="auto">Auto-Calc by Weight</option></select></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Freight Rate / Value (₹)</label><input type="number" min="0" id="qFreightVal" value="0" class="w-full border-2 border-gray-200 p-2 rounded-lg font-black focus:border-blue-500 outline-none text-xs calc-trigger"></div>
+                        <div class="flex flex-col justify-end"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Live Freight Total</p><p class="text-xl font-black text-indigo-700" id="liveFreightDisp">₹ 0</p></div>
                     </div>
-                    
-                    <button id="proceedBtn" class="w-full bg-slate-300 text-slate-500 font-black py-3 sm:py-4 rounded-xl shadow-sm cursor-not-allowed transition duration-300 text-sm sm:text-base uppercase tracking-wider">Fill Required Fields to Proceed</button>
                 </div>
 
-                <!-- STEP 2: ITEM BUILDER -->
-                <div id="step2" class="wizard-step hidden bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-t-4 border-t-emerald-500">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-2 gap-3">
-                        <h3 class="text-lg font-black text-gray-800">STEP 2: Item Generator</h3>
-                        <select id="iType" class="border-2 border-slate-200 p-2 text-sm rounded-lg bg-slate-50 font-black text-emerald-800 outline-none focus:border-emerald-500 transition w-full sm:w-auto"><option value="custom">⚙️ Custom Engineering Tool</option><option value="standard">📦 Standard Spares</option><option value="trading">🛒 Bought-Out Item</option></select>
+                <!-- STEP 2: INFINITE RECURSIVE ITEM BUILDER -->
+                <div id="step2" class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border-2 border-emerald-500 transition-all duration-300 relative">
+                    <div class="absolute top-0 right-0 w-48 h-48 bg-emerald-500 rounded-full mix-blend-screen filter blur-[80px] opacity-10 pointer-events-none"></div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 border-b border-slate-200 pb-3 gap-3">
+                        <h3 class="text-lg font-black text-emerald-900">STEP 2: Component-Level Engine</h3>
+                        <div class="flex space-x-2 w-full sm:w-auto">
+                            <input type="number" min="1" id="iQty" value="1" class="border-2 border-emerald-300 p-2 rounded-lg w-20 text-center font-black text-emerald-900 outline-none calc-trigger" title="Item Quantity">
+                            <select id="iType" class="border-2 border-slate-200 p-2 text-sm rounded-lg bg-slate-50 font-black text-emerald-800 outline-none focus:border-emerald-500 transition flex-1 sm:flex-none"><option value="custom">⚙️ Custom Engineered Tool</option><option value="trading">🛒 Standard / Trading Item</option></select>
+                        </div>
                     </div>
                     
-                    <div class="mb-6"><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Printable Description</label><input type="text" id="iDesc" placeholder="e.g. Ø63mm Anti-Vibration Boring Bar" class="w-full border-2 border-gray-200 p-3 text-sm sm:text-base rounded-lg font-black text-blue-900 outline-none focus:border-blue-500 transition"></div>
+                    <div class="mb-5"><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Final Printable Description</label><input type="text" id="iDesc" placeholder="e.g. Ø63mm Anti-Vibration Boring Bar (Qty: 1)" class="w-full border-2 border-gray-200 p-3 text-sm rounded-lg font-black text-blue-900 outline-none focus:border-blue-500 transition"></div>
 
-                    <div id="viewTrading" class="hidden mb-6 p-5 bg-slate-50 border-2 border-slate-100 rounded-xl"><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Procurement Cost (₹)</label><input type="number" id="tCost" class="border-2 border-gray-200 p-2 w-full sm:w-1/3 rounded-lg calc-trigger font-bold outline-none focus:border-blue-500"><p class="text-xs text-slate-500 mt-2 font-medium">Trading Margin auto-applied.</p></div>
-                    <div id="viewStandard" class="hidden mb-6 p-5 bg-slate-50 border-2 border-slate-100 rounded-xl"><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Select Product</label><select id="sProduct" class="border-2 border-gray-200 p-2 w-full rounded-lg calc-trigger font-bold outline-none focus:border-blue-500"></select></div>
+                    <!-- TRADING ITEM -->
+                    <div id="viewTrading" class="hidden mb-5 p-5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Item Category (Margin)</label><select id="tCategory" class="w-full border-2 border-white p-2.5 rounded-lg font-bold outline-none calc-trigger shadow-sm"></select></div>
+                            <div><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Base Procurement Cost (₹)</label><input type="number" min="0" id="tCost" value="0" class="w-full border-2 border-white p-2.5 rounded-lg font-black outline-none calc-trigger shadow-sm text-blue-900"></div>
+                        </div>
+                    </div>
 
-                    <!-- CUSTOM BUILDER -->
-                    <div id="viewCustom" class="space-y-6">
-                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Tool Category (Margin Class)</label><select id="cCategory" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg bg-slate-50 font-bold text-slate-800 calc-trigger outline-none focus:border-blue-500"></select></div>
+                    <!-- CUSTOM TOOL: RECURSIVE BOM ENGINE -->
+                    <div id="viewCustom" class="space-y-5">
+                        <div><label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Tool Category (Margin Class)</label><select id="cCategory" class="w-full border-2 border-gray-200 p-2.5 text-sm rounded-lg bg-slate-50 font-black text-slate-800 calc-trigger outline-none focus:border-blue-500"></select></div>
                         
-                        <!-- 3D Modeler Section -->
-                        <div id="rmSection" class="p-4 sm:p-5 bg-blue-50/50 border-2 border-blue-100 rounded-2xl">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b border-blue-200 pb-2 gap-3">
-                                <h4 class="font-black text-sm text-blue-900">1. Geometry & True-CSG Render</h4>
-                                <select id="cStockShape" class="border-2 border-blue-200 p-1.5 text-xs rounded-lg font-bold outline-none bg-white shadow-sm text-blue-800 w-full sm:w-auto"><option value="round">Standard Taper Tool</option><option value="square">Standard Block Tool</option><option value="library">Load Master Profile</option></select>
-                            </div>
+                        <!-- MAIN BODY COMPONENT -->
+                        <div class="p-4 sm:p-5 bg-blue-50/40 border border-blue-200 rounded-2xl" id="mainBodyWrapper">
+                            <h4 class="font-black text-sm text-blue-900 mb-3 flex justify-between border-b border-blue-200 pb-2"><span>1. Main Tool Body</span><span class="text-[10px] text-blue-500 uppercase tracking-widest font-bold">Base Structure</span></h4>
                             
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <!-- Parameters -->
-                                <div id="dimRound" class="grid grid-cols-2 gap-3 text-[10px] sm:text-xs">
-                                    <div class="col-span-2"><label class="font-bold text-slate-600 block mb-1">Master Insert:</label><select id="insTypeR" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-semibold"></select></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Shank Dia:</label><input type="number" id="sDia" value="32" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Shank Len:</label><input type="number" id="sLen" value="100" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Collar Dia:</label><input type="number" id="cDia" value="63" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Collar Len:</label><input type="number" id="cLen" value="15" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Head Dia:</label><input type="number" id="hDia" value="50" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Head Len:</label><input type="number" id="hLen" value="45" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                </div>
-                                <div id="dimRect" class="grid grid-cols-2 gap-3 text-xs hidden">
-                                    <div class="col-span-2"><label class="font-bold text-slate-600 block mb-1">Master Insert:</label><select id="insTypeS" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-semibold"></select></div>
-                                    <div class="col-span-2 border-b border-blue-200 pb-1 mt-2 font-black text-blue-900">Block Dimensions</div>
-                                    <div class="col-span-2"><label class="font-bold text-slate-600 block mb-1">Length (L):</label><input type="number" id="rcL" value="120" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Width (W):</label><input type="number" id="rcW" value="40" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                    <div><label class="font-bold text-slate-600 block mb-1">Height (H):</label><input type="number" id="rcH" value="40" class="w-full border-2 border-blue-100 p-2 rounded-lg render-trigger outline-none font-bold focus:border-blue-400"></div>
-                                </div>
-                                <div id="dimLibrary" class="hidden flex flex-col space-y-3">
-                                    <div><label class="font-bold text-slate-600 block mb-1 text-xs">Load Master Profile:</label><select id="bType" class="w-full border-2 border-blue-200 p-2.5 rounded-lg render-trigger outline-none font-bold text-blue-900 bg-white shadow-sm"></select></div>
-                                    <div class="bg-blue-100/50 p-3 rounded-lg border border-blue-200"><p class="text-[10px] text-blue-800 font-semibold mb-2">Library Override Options</p><div class="space-y-2 text-xs"><div><label class="font-bold text-slate-600">Override Insert:</label><select id="insTypeLib" class="w-full border border-white p-1.5 rounded outline-none font-semibold render-trigger"><option value="">Keep Original</option></select></div><div><label class="font-bold text-slate-600">Override Ext Length:</label><input type="number" id="libExtLen" placeholder="Leave empty for original" class="w-full border border-white p-1.5 rounded outline-none font-semibold render-trigger"></div></div></div>
+                            <!-- Main Material Selector (Bifurcated Logic) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-4 items-end">
+                                <div class="col-span-3"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Material Source</label><select class="w-full border border-blue-200 p-2 rounded font-bold text-xs bg-white calc-trigger" onchange="toggleMatMode(this, 'main')"><option value="raw">Raw Material</option><option value="blank">Master Blank</option></select></div>
+                                
+                                <!-- RAW MODE -->
+                                <div class="col-span-9 grid grid-cols-12 gap-2 mat-raw-mode" id="main_raw">
+                                    <div class="col-span-4"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Grade</label><select id="mRawGrade" class="w-full border border-blue-200 p-2 rounded font-bold text-xs bg-white calc-trigger dyn-mat-raw"></select></div>
+                                    <div class="col-span-2"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Shape</label><select id="mShape" class="w-full border border-blue-200 p-2 rounded font-bold text-xs bg-white calc-trigger" onchange="toggleDimShape(this, 'main')"><option value="round">Round</option><option value="square">Square</option></select></div>
+                                    <div class="col-span-6 grid grid-cols-3 gap-2 dim-round"><div><label class="text-[9px] font-bold text-slate-500 uppercase">Dia(mm)</label><input type="number" min="0" id="mD" value="0" class="w-full border border-blue-200 p-2 rounded font-bold text-xs calc-trigger"></div><div class="col-span-2"><label class="text-[9px] font-bold text-slate-500 uppercase">Length(mm)</label><input type="number" min="0" id="mL" value="0" class="w-full border border-blue-200 p-2 rounded font-bold text-xs calc-trigger"></div></div>
+                                    <div class="col-span-6 grid grid-cols-3 gap-2 dim-square hidden"><div><label class="text-[9px] font-bold text-slate-500 uppercase">L(mm)</label><input type="number" min="0" id="mSqL" value="0" class="w-full border border-blue-200 p-2 rounded font-bold text-xs calc-trigger"></div><div><label class="text-[9px] font-bold text-slate-500 uppercase">W(mm)</label><input type="number" min="0" id="mSqW" value="0" class="w-full border border-blue-200 p-2 rounded font-bold text-xs calc-trigger"></div><div><label class="text-[9px] font-bold text-slate-500 uppercase">H(mm)</label><input type="number" min="0" id="mSqH" value="0" class="w-full border border-blue-200 p-2 rounded font-bold text-xs calc-trigger"></div></div>
                                 </div>
                                 
-                                <!-- Canvas Box -->
-                                <div class="flex flex-col h-full">
-                                    <div class="flex-1 bg-slate-100 rounded-t-xl border-2 border-b-0 border-slate-200 relative overflow-hidden flex items-center justify-center min-h-[220px]" id="canvasContainer">
-                                        <div id="dimLabels" class="absolute top-2 left-2 pointer-events-none z-10 flex flex-col space-y-1"></div>
-                                    </div>
-                                    <div class="bg-slate-800 p-2 rounded-b-xl border-2 border-t-0 border-slate-800 flex flex-col justify-end" id="ai3dBox">
-                                        <div id="aiChatLog" class="text-[9px] h-14 overflow-y-auto custom-scrollbar text-slate-300 font-mono space-y-1 pr-1 border-b border-slate-600 pb-1 mb-1"><i>AI Prompt (e.g. "make stage 2 alu")</i></div>
-                                        <div class="flex space-x-1"><input type="text" id="ai3dPrompt" class="w-full bg-slate-700 border-none text-white rounded p-1.5 text-[10px] outline-none font-semibold"><button type="button" onclick="window.processAi3d()" class="bg-blue-600 text-white text-[10px] px-3 rounded font-bold shadow hover:bg-blue-500 transition">↵</button></div>
-                                    </div>
+                                <!-- BLANK MODE -->
+                                <div class="col-span-9 mat-blank-mode hidden" id="main_blank">
+                                    <label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Select Taper Blank (Flat Cost)</label>
+                                    <input type="text" id="mBlank" list="list_blanks" class="w-full border border-blue-200 p-2 rounded font-bold text-xs bg-white calc-trigger" placeholder="Type to search blanks...">
                                 </div>
                             </div>
-                            
-                            <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-blue-200 pt-4 items-center">
-                                <div><label class="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Global Base Material Grade</label><select id="cMatGrade" class="w-full border-2 border-white p-2 rounded-lg text-sm calc-trigger dynamic-mat-select bg-white shadow-sm font-bold outline-none focus:border-blue-400"></select></div>
-                                <div class="text-right sm:mt-5"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Finished Tool Weight</p><p class="text-lg font-black text-blue-900" id="toolWeightDisplay">0.00 kg</p></div>
+
+                            <!-- Main Body BOM (Operations, Spares) -->
+                            <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm">
+                                <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-1"><p class="text-[10px] font-bold text-slate-500 uppercase">Operations & Features BOM</p><button type="button" onclick="addBomRow('main_bom')" class="text-[9px] bg-blue-100 text-blue-700 font-black px-2 py-1 rounded hover:bg-blue-200">+ Add BOM Row</button></div>
+                                <div id="main_bom" class="space-y-2"></div>
                             </div>
                         </div>
 
-                        <!-- SUB ASSEMBLIES -->
-                        <div class="p-4 sm:p-5 bg-white border-2 border-slate-100 rounded-2xl shadow-sm">
-                            <h4 class="font-black text-sm text-slate-800 mb-4 border-b pb-2">2. Custom Sub-Assemblies (Clamps, Shims)</h4>
+                        <!-- NESTED SUB-ASSEMBLIES LOOP -->
+                        <div class="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl">
+                            <h4 class="font-black text-sm text-slate-800 mb-3 flex justify-between border-b border-slate-200 pb-2"><span>2. Sub-Assemblies & Cartridges</span></h4>
                             <div id="subAssemblyWrapper" class="space-y-4 mb-4"></div>
-                            <button type="button" onclick="window.addSubComponent()" class="w-full border-2 border-dashed border-slate-300 text-slate-600 hover:text-blue-700 hover:border-blue-400 hover:bg-blue-50 font-black py-3 rounded-xl text-sm transition">+ Add Sub-Component</button>
-                        </div>
-
-                        <!-- DYNAMIC BOM -->
-                        <div class="p-4 sm:p-5 bg-white border-2 border-slate-100 rounded-2xl shadow-sm">
-                            <h4 class="font-black text-sm text-slate-800 mb-1">3. Manufacturing BOM & Live Operations</h4>
-                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-4 border-b pb-2">Dynamically linked to Purchase DB</p>
-                            <div id="dynamicBomContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                            <button type="button" onclick="window.addSubComponent()" class="w-full border-2 border-dashed border-slate-300 text-slate-500 hover:text-blue-700 hover:border-blue-400 font-black py-3 rounded-xl text-xs transition uppercase tracking-wider">+ Add Sub-Component (Creates New BOM Loop)</button>
                         </div>
                     </div>
 
-                    <!-- PRICING ENGINE -->
-                    <div class="mt-8 p-5 sm:p-6 bg-slate-900 text-white rounded-2xl shadow-2xl border border-slate-700 relative overflow-hidden">
-                        <!-- Decorative glow -->
-                        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-screen filter blur-[100px] opacity-20"></div>
-                        
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-slate-700 pb-4 relative z-10 gap-4">
-                            <h4 class="font-black text-xl text-blue-300 tracking-tight">Final Price Engine</h4>
-                            <div class="flex space-x-6 w-full sm:w-auto justify-between sm:justify-end">
-                                <div class="text-right"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculated MRP</p><p class="font-black text-lg text-slate-200" id="engMrp">₹ 0.00</p></div>
-                                <div class="text-right"><p class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Override MRP</p><input type="number" id="overrideMrp" class="w-24 bg-slate-800 border-2 border-slate-600 text-white p-1.5 rounded-lg text-right calc-trigger text-sm font-bold focus:border-yellow-400 outline-none transition"></div>
+                    <!-- PRICING ENGINE (Live Math) -->
+                    <div class="mt-6 p-5 sm:p-6 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-700 relative overflow-hidden">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b border-slate-700 pb-4 gap-4">
+                            <h4 class="font-black text-xl text-blue-300 tracking-tight">Cost Engine & Margins</h4>
+                            <div class="flex space-x-4">
+                                <div class="text-right"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Calculated MRP</p><p class="font-black text-lg text-slate-200" id="engMrp">₹ 0</p></div>
+                                <div class="text-right"><p class="text-[9px] font-bold text-yellow-500 uppercase tracking-widest">Override MRP (₹)</p><input type="number" min="0" id="overrideMrp" class="w-24 bg-slate-800 border-2 border-slate-600 text-white p-1.5 rounded-lg text-right calc-trigger text-sm font-bold outline-none focus:border-yellow-400 transition"></div>
                             </div>
                         </div>
                         
-                        <div class="flex flex-col sm:flex-row justify-between items-center relative z-10 gap-6">
-                            <div class="flex w-full sm:w-auto justify-between sm:space-x-8">
-                                <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Max Discount</p><p class="font-black text-base text-yellow-500" id="maxDiscOut">0.0% (₹ 0)</p></div>
-                                <div><p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Disc (%)</p><input type="number" id="offeredDiscPct" value="0" class="w-20 bg-slate-800 border-2 border-emerald-500/50 text-emerald-100 p-1.5 rounded-lg text-center outline-none focus:border-emerald-400 font-bold transition"></div>
-                                <div><p class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Disc (₹)</p><input type="number" id="offeredDiscFlat" value="0" class="w-24 bg-slate-800 border-2 border-emerald-500/50 text-emerald-100 p-1.5 rounded-lg text-center outline-none focus:border-emerald-400 font-bold transition"></div>
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="flex w-full sm:w-auto justify-between sm:space-x-6">
+                                <div><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Max Discount</p><p class="font-black text-sm text-yellow-500" id="maxDiscOut">0% (₹ 0)</p></div>
+                                <div><p class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Disc (%)</p><input type="number" min="0" max="100" id="offeredDiscPct" value="0" class="w-16 bg-slate-800 border-2 border-emerald-500/50 text-emerald-100 p-1.5 rounded-lg text-center outline-none focus:border-emerald-400 font-bold transition text-sm"></div>
+                                <div><p class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Disc (₹)</p><input type="number" min="0" id="offeredDiscFlat" value="0" class="w-24 bg-slate-800 border-2 border-emerald-500/50 text-emerald-100 p-1.5 rounded-lg text-center outline-none focus:border-emerald-400 font-bold transition text-sm"></div>
                             </div>
-                            <div class="text-right w-full sm:w-auto border-t sm:border-0 border-slate-700 pt-4 sm:pt-0"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Net Selling Price</p><p class="font-black text-4xl text-emerald-400 drop-shadow-md tracking-tight" id="netPriceOut">₹ 0.00</p></div>
+                            <div class="text-right w-full sm:w-auto border-t sm:border-0 border-slate-700 pt-3 sm:pt-0"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Net Selling Price (× Qty)</p><p class="font-black text-3xl sm:text-4xl text-emerald-400 tracking-tight" id="netPriceOut">₹ 0</p></div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row justify-between mt-6 gap-4">
-                        <button id="adminAuditBtn" class="text-xs text-blue-600 hover:text-blue-800 font-black hidden transition w-full sm:w-auto text-left">👁️ Show Internal Cost Breakup</button>
-                        <button id="addToCartBtn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-xl font-black shadow-lg shadow-emerald-600/30 transition uppercase tracking-wider text-sm">🛒 Add to Unified Quote</button>
-                    </div>
-
-                    <div id="adminAuditPanel" class="hidden mt-4 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-xl text-xs text-slate-800 grid grid-cols-3 gap-3 shadow-inner">
-                        <p class="font-semibold text-slate-600">Raw Envelope: <span id="adVol" class="font-black text-blue-700">0</span> cm³</p>
-                        <p class="font-semibold text-slate-600">Raw Weight: <span id="adWt" class="font-black text-blue-700">0</span> kg</p>
-                        <p class="font-semibold text-slate-600">RM Cost: <span id="adRm" class="font-black text-red-600">₹ 0</span></p>
-                        <p class="col-span-3 font-semibold text-slate-600">Dynamic BOM Cost: <span id="adBom" class="font-black text-red-600">₹ 0</span></p>
-                        <p class="col-span-3 border-t border-yellow-300 pt-3 font-semibold text-slate-600">Base Mfg Cost: <span id="adBase" class="font-black text-slate-900 text-sm">₹ 0</span></p>
-                        <p class="col-span-3 text-right text-sm border-t border-yellow-300 pt-3 mt-1 font-bold text-slate-500 uppercase">Absolute Floor Limit: <span id="adFloor" class="font-black text-blue-900 text-base">₹ 0</span></p>
+                    <div class="flex flex-col justify-end mt-5 gap-3">
+                        <button id="adminAuditBtn" class="text-[10px] text-blue-600 hover:text-blue-800 font-black hidden text-right w-full uppercase tracking-wider">👁️ Show Internal Cost Breakup</button>
+                        
+                        <div id="adminAuditPanel" class="hidden p-4 bg-yellow-50 border-2 border-yellow-200 rounded-xl text-xs text-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 shadow-inner">
+                            <p class="font-bold text-slate-600">Total Raw Wt: <span id="adWt" class="font-black text-blue-700">0</span> kg</p>
+                            <p class="font-bold text-slate-600">Total RM Cost: <span id="adRm" class="font-black text-red-600">₹ 0</span></p>
+                            <p class="font-bold text-slate-600">Total BOM Cost: <span id="adBom" class="font-black text-red-600">₹ 0</span></p>
+                            <p class="font-bold text-slate-600">Base Mfg Cost: <span id="adBase" class="font-black text-slate-900">₹ 0</span></p>
+                            <p class="col-span-2 sm:col-span-4 text-right text-xs border-t border-yellow-300 pt-2 mt-1 font-bold text-slate-500 uppercase tracking-wider">Absolute Floor Limit (For Total Qty): <span id="adFloor" class="font-black text-blue-900 text-sm">₹ 0</span></p>
+                        </div>
+                        
+                        <button id="addToCartBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-black shadow-lg transition uppercase tracking-widest text-sm flex justify-center items-center"><span class="text-xl mr-2">🛒</span> Add to Unified Quote</button>
                     </div>
                 </div>
             </div>
 
-            <!-- CART / SUMMARY -->
+            <!-- UNIFIED CART & SUMMARY -->
             <div class="col-span-12 lg:col-span-4">
-                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-slate-200 lg:sticky lg:top-20">
+                <div class="bg-white p-5 rounded-2xl shadow-xl border border-slate-200 lg:sticky lg:top-20">
                     <h3 class="text-lg font-black mb-4 border-b border-slate-200 pb-2 text-slate-800 flex justify-between items-center"><span>Unified Cart</span><span class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded" id="cCount">0 Items</span></h3>
                     
-                    <div id="cartItems" class="space-y-3 mb-6 min-h-[150px] max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
+                    <div id="cartItems" class="space-y-3 mb-5 min-h-[150px] max-h-[350px] overflow-y-auto custom-scrollbar pr-2">
                         <div class="flex flex-col items-center justify-center h-full text-slate-400 mt-10" id="emptyCartMsg">
-                            <span class="text-4xl mb-2 opacity-50">🛒</span><p class="text-xs font-bold uppercase tracking-widest">Cart is empty</p>
+                            <span class="text-4xl mb-2 opacity-50">🛒</span><p class="text-[10px] font-bold uppercase tracking-widest">Cart is empty</p>
                         </div>
                     </div>
                     
-                    <button id="aiCartOptBtn" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-2 border-indigo-200 p-2 rounded-lg font-black shadow-sm mb-6 transition text-xs flex justify-center items-center"><span class="mr-2">✨</span> AI Optimize Loss Recovery</button>
+                    <button id="aiCartOptBtn" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-2 border-indigo-200 p-2 rounded-lg font-black shadow-sm mb-5 transition text-[10px] uppercase tracking-wider flex justify-center items-center"><span class="mr-2 text-sm">✨</span> AI Optimize Loss Recovery</button>
                     
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
-                        <div class="space-y-2 text-sm font-semibold text-slate-600">
-                            <div class="flex justify-between"><span>Subtotal (Basic):</span><span id="cSub" class="font-black text-slate-800">₹ 0.00</span></div>
-                            <div class="flex justify-between"><span>Total Weight:</span><span id="cWt" class="font-black text-slate-800">0.00 kg</span></div>
-                            <div class="flex justify-between"><span>Freight:</span><span id="cFreight" class="font-black text-slate-800">₹ 0.00</span></div>
-                            <div class="flex justify-between border-t border-slate-200 pt-2 mt-2 text-blue-700" id="taxLine"><span>Taxes:</span><span id="cTax" class="font-black">₹ 0.00</span></div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-5">
+                        <div class="space-y-2 text-xs font-bold text-slate-600">
+                            <div class="flex justify-between"><span>Subtotal (Basic):</span><span id="cSub" class="font-black text-slate-800">₹ 0</span></div>
+                            <div class="flex justify-between"><span>Total Finish Weight:</span><span id="cWt" class="font-black text-slate-800">0.00 kg</span></div>
+                            <div class="flex justify-between text-blue-700 border-t border-slate-200 pt-2 mt-2" id="cFreightLine"><span>Freight:</span><span id="cFreightOut" class="font-black">₹ 0</span></div>
+                            <div class="flex justify-between text-blue-700" id="taxLine"><span>Taxes:</span><span id="cTax" class="font-black">₹ 0</span></div>
                         </div>
-                        <div class="flex justify-between items-end mt-4 pt-4 border-t-2 border-slate-200">
+                        <div class="flex justify-between items-end mt-4 pt-3 border-t-2 border-slate-200">
                             <span class="font-black text-slate-800 text-sm uppercase tracking-wider">Grand Total</span>
-                            <span id="cGrand" class="font-black text-emerald-600 text-2xl tracking-tight">₹ 0.00</span>
+                            <span id="cGrand" class="font-black text-emerald-600 text-2xl tracking-tight">₹ 0</span>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-3 mb-6">
-                        <div><label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Sales Stage</label><select id="dealStatus" class="w-full bg-white border-2 border-slate-200 rounded-lg p-2 text-xs font-bold outline-none focus:border-blue-500"><option value="Draft">Draft</option><option value="Sent" selected>Sent</option><option value="Won">Won</option><option value="Lost">Lost</option></select></div>
-                        <div><label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Probability</label><select id="dealProb" class="w-full bg-white border-2 border-slate-200 rounded-lg p-2 text-xs font-bold outline-none focus:border-blue-500"><option value="Hot">🔥 Hot (80%+)</option><option value="Warm" selected>☀️ Warm (50%)</option><option value="Cold">❄️ Cold (20%)</option></select></div>
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <div><label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Sales Stage</label><select id="dealStatus" class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-bold outline-none"><option value="Draft">Draft</option><option value="Sent" selected>Sent</option><option value="Won">Won</option><option value="Lost">Lost</option></select></div>
+                        <div><label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Probability</label><select id="dealProb" class="w-full bg-white border border-slate-300 rounded p-2 text-xs font-bold outline-none"><option value="Hot">🔥 Hot (80%+)</option><option value="Warm" selected>☀️ Warm (50%)</option><option value="Cold">❄️ Cold (20%)</option></select></div>
                     </div>
                     
-                    <div class="space-y-3">
-                        <button id="saveQuoteDbBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-4 rounded-xl font-black shadow-lg shadow-blue-600/30 transition flex justify-center items-center"><span class="mr-2">💾</span> Save Pipeline Snapshot</button>
-                        <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 text-white p-3 sm:p-4 rounded-xl font-black shadow-lg shadow-red-600/30 transition flex justify-center items-center"><span class="mr-2">📄</span> Export Executive PDF</button>
+                    <div class="space-y-2">
+                        <button id="saveQuoteDbBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-black shadow-lg transition text-xs uppercase tracking-wider flex justify-center items-center"><span class="mr-2">💾</span> Save Pipeline Snapshot</button>
+                        <button id="pdfBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-black shadow-lg transition text-xs uppercase tracking-wider flex justify-center items-center"><span class="mr-2">📄</span> Export Executive PDF</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <canvas id="engDrawingCanvas" class="hidden"></canvas>
+    <!-- DATALISTS FOR SEARCHABLE DROPDOWNS -->
+    <datalist id="list_blanks"></datalist>
+    <datalist id="list_spares"></datalist>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", authDomain: "renuka-tools-quote.firebaseapp.com", databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "renuka-tools-quote", storageBucket: "renuka-tools-quote.firebasestorage.app", messagingSenderId: "300959855269", appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
-
         const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
-        const CORE_CONFIG_IDS = ["customer_tiers", "tool_categories", "raw_materials", "payment_terms", "inco_terms", "freight"];
-        const BOM_MODULES = ["operations", "features", "assembly"];
 
         let companyProfile = { name: "RENUKA TOOLS", address: "", gst: "", iec: "", pan: "", phone: "", email: "", bank: "", logo: "" };
-        let currentUser = null; let activeRole = null; let myHierarchyRoles = []; 
-        let hasOverrideAuthority = false; let hasBreakupAuthority = false;
+        let currentUser = null; let activeRole = null; let myHierarchyRoles = []; let hasOverrideAuthority = false; let hasBreakupAuthority = false;
         
-        let appSchemas = []; let mst = { customers: [], raw_materials: [], inserts: [], design_library: [] }; 
-        let quotesData = []; let cart = []; let curDraft = null;
-        let activeDiscountMode = 'pct'; let quoteSubtotal = 0; let quoteGrandTotal = 0;
+        let appSchemas = []; let mst = { customers: [] }; 
+        let quotesData = []; let cart = []; let curDraft = null; let activeDiscountMode = 'pct'; let subCompCount = 0; let bomRowCount = 0;
 
         document.getElementById('quoteId').value = `RT-${new Date().toISOString().slice(0,10).replace(/-/g,"")}-${Math.floor(100+Math.random()*900)}`;
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user; 
-                document.getElementById('loginScreen').classList.add('hidden'); 
-                document.getElementById('appScreen').classList.remove('hidden'); 
-                document.getElementById('navTabs').classList.remove('hidden'); 
-                document.getElementById('logoutBtn').classList.remove('hidden');
-                
-                setupRealTimeSync(user.email);
-                initThreeJS(); 
-                setupGuidedWizard();
-            } else { 
-                document.getElementById('loginScreen').classList.remove('hidden'); 
-                document.getElementById('appScreen').classList.add('hidden'); 
-            }
+            if (user) { currentUser = user; document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('appScreen').classList.remove('hidden'); document.getElementById('navTabs').classList.remove('hidden'); document.getElementById('logoutBtn').classList.remove('hidden'); setupRealTimeSync(user.email); setupGuidedWizard(); } 
+            else { document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('appScreen').classList.add('hidden'); }
         });
 
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const btn = document.getElementById('loginBtn'); btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>`;
-            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=> { alert("Invalid Login"); btn.innerHTML = "Access System"; });
-        });
+        document.getElementById('loginBtn').addEventListener('click', () => { signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=>alert("Invalid Login")); });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+        window.switchTab = (tab) => { ['dashboard','builder'].forEach(t => { document.getElementById(`view-${t}`).classList.add('hidden'); document.getElementById(`tab-${t}`).classList.remove('tab-active'); }); document.getElementById(`view-${tab}`).classList.remove('hidden'); document.getElementById(`tab-${tab}`).classList.add('tab-active'); };
 
-        window.switchTab = (tab) => { 
-            ['dashboard','builder'].forEach(t => { document.getElementById(`view-${t}`).classList.add('hidden'); document.getElementById(`tab-${t}`).classList.remove('tab-active'); }); 
-            document.getElementById(`view-${tab}`).classList.remove('hidden'); document.getElementById(`tab-${tab}`).classList.add('tab-active'); 
-        };
-
-        // REAL-TIME ONSNAPSHOT SYNC ENGINE
+        // REAL-TIME SYNC
         function setupRealTimeSync(email) {
-            // Profile Sync
-            onSnapshot(doc(db, "settings", "company_profile"), (snap) => {
-                if(snap.exists()) { companyProfile = { ...companyProfile, ...snap.data() }; if(companyProfile.name) document.getElementById('navTitle').innerText = companyProfile.name.toUpperCase(); if(companyProfile.logo) { document.getElementById('navLogo').src = companyProfile.logo; document.getElementById('navLogo').classList.remove('hidden'); } }
-            });
-
-            // User Permissions Sync
+            onSnapshot(doc(db, "settings", "company_profile"), (snap) => { if(snap.exists()) { companyProfile = {...companyProfile, ...snap.data()}; if(companyProfile.name) document.getElementById('navTitle').innerText = companyProfile.name; if(companyProfile.logo) { document.getElementById('navLogo').src = companyProfile.logo; document.getElementById('navLogo').classList.remove('hidden'); } } });
             onSnapshot(collection(db, "users"), (snap) => {
                 let roles = []; hasOverrideAuthority = ADMIN_EMAILS.includes(email); hasBreakupAuthority = ADMIN_EMAILS.includes(email);
-                snap.forEach(doc => { const d = doc.data(); if (d.param1 === email && d.isActive !== false) { if (d.param2) roles = d.param2.split(',').map(r=>r.trim()); if (d.param3 === 'Yes') hasOverrideAuthority = true; if (d.param4 === 'Yes') hasBreakupAuthority = true; }});
-                
-                if (hasBreakupAuthority) document.getElementById('adminAuditBtn').classList.remove('hidden'); else document.getElementById('adminAuditBtn').classList.add('hidden');
-                
+                snap.forEach(d => { const data = d.data(); if(data.param1 === email && data.isActive !== false) { if(data.param2) roles = data.param2.split(',').map(r=>r.trim()); if(data.param3 === 'Yes') hasOverrideAuthority = true; if(data.param4 === 'Yes') hasBreakupAuthority = true; }});
+                document.getElementById('adminAuditBtn').classList.toggle('hidden', !hasBreakupAuthority);
                 const b = document.getElementById('userBadge');
-                if (ADMIN_EMAILS.includes(email) || roles.length === 0) { myHierarchyRoles = ["ALL"]; activeRole = "Admin"; b.innerHTML = `<span class="bg-blue-800 text-blue-100 px-3 py-1 text-[10px] rounded-full uppercase tracking-wider shadow">Admin</span>`; } 
-                else {
-                    activeRole = roles[0]; myHierarchyRoles = [...roles];
-                    if (roles.length > 1) { 
-                        b.innerHTML = `<select id="roleSwitcher" class="bg-slate-800 text-white border-2 border-slate-600 rounded-lg text-xs p-1 font-bold outline-none">${roles.map(r => `<option value="${r}">${r}</option>`).join('')}</select>`; 
-                        document.getElementById('roleSwitcher').addEventListener('change', (e) => { activeRole = e.target.value; filterDashboardData(); }); 
-                    } else { b.innerHTML = `<span class="bg-slate-800 border-2 border-slate-600 px-3 py-1 text-[10px] uppercase tracking-wider rounded-full text-white shadow">${activeRole}</span>`; }
-                }
+                if(ADMIN_EMAILS.includes(email) || roles.length===0) { myHierarchyRoles=["ALL"]; activeRole="Admin"; b.innerHTML = `<span class="bg-blue-800 text-blue-100 px-3 py-1 text-[10px] rounded-full uppercase tracking-wider">Admin</span>`; } 
+                else { activeRole=roles[0]; myHierarchyRoles=[...roles]; b.innerHTML = `<span class="bg-slate-800 border border-slate-600 px-3 py-1 text-[10px] rounded-full text-white uppercase">${activeRole}</span>`; }
             });
-
-            // Master Schemas & Dynamic BOM Loading
             onSnapshot(collection(db, "system_schemas"), (snap) => {
-                appSchemas = []; snap.forEach(doc => { if(doc.data().isActive !== false) appSchemas.push({id: doc.id, ...doc.data()}); });
-                appSchemas.forEach(sch => {
-                    onSnapshot(collection(db, sch.id), (cSnap) => {
-                        mst[sch.id] = cSnap.docs.map(d => ({id: d.id, ...d.data()})).filter(x => x.isActive !== false);
-                        if(sch.id === 'customers') setupCrmAiLogic(); // Trigger AI setup
-                        if(sch.id === 'inserts') updateInsertDropdowns();
-                        buildDynamicUI(); 
-                        calcEngine();
-                    });
-                });
+                appSchemas = snap.docs.map(doc => ({id: doc.id, ...doc.data()})).filter(s => s.isActive !== false);
+                appSchemas.forEach(sch => { onSnapshot(collection(db, sch.id), (cSnap) => { mst[sch.id] = cSnap.docs.map(d => ({id: d.id, ...d.data()})).filter(x => x.isActive !== false); buildDynamicUI(); calcEngine(); }); });
             });
-
-            // Design Library Loading
-            onSnapshot(collection(db, "design_library"), (snap) => {
-                mst.design_library = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(x => x.isActive !== false);
-                document.getElementById('bType').innerHTML = `<option value="">-- Choose Library Profile --</option>` + mst.design_library.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
-                document.getElementById('insTypeLib').innerHTML = `<option value="">Keep Original</option>` + mst.inserts.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
-            });
-
-            // Quotes Pipeline
-            onSnapshot(collection(db, "quotes"), (snap) => {
-                quotesData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                filterDashboardData();
-            });
+            onSnapshot(collection(db, "quotes"), (snap) => { quotesData = snap.docs.map(d => ({id: d.id, ...d.data()})); filterDashboardData(); });
         }
 
-        // ==========================================
-        // 1. AI CRM FUZZY-MATCH DEDUPLICATION
-        // ==========================================
+        // DEEP CRM AUTO-FILL
         function setupCrmAiLogic() {
             const list = document.getElementById('crmList'); list.innerHTML = ""; mst.customers.forEach(c => { let opt = document.createElement('option'); opt.value = c.name; list.appendChild(opt); });
-            const inp = document.getElementById('qCompany');
-            const alertBox = document.getElementById('crmAiAlert');
-            
-            inp.addEventListener('input', (e) => {
-                const rawVal = e.target.value;
-                const match = mst.customers.find(c => c.name.toLowerCase() === rawVal.toLowerCase());
-                
-                if (match) { 
-                    document.getElementById('qContact').value = match.param1 || ""; 
-                    document.getElementById('crmSaveBox').classList.add('hidden'); 
-                    alertBox.classList.add('hidden');
-                } else if (rawVal.length > 2) { 
-                    document.getElementById('crmSaveBox').classList.remove('hidden'); 
-                    
-                    // The AI Fuzzy Logic
-                    const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/(ltd|pvt|inc|co|llp|limited)/g, '');
-                    const normInput = normalize(rawVal);
-                    if(normInput.length > 2) {
-                        const suspects = mst.customers.filter(c => normalize(c.name).includes(normInput) || normInput.includes(normalize(c.name)));
-                        if(suspects.length > 0) {
-                            let sHtml = suspects.map(s => `• <b>${s.name}</b> (Owner: ${s.param2 || 'Admin'})`).join('<br>');
-                            alertBox.innerHTML = `⚠️ <b>AI DEDUPLICATION ALERT</b><br>Similar companies already exist in the database. Are you sure this is new?<br><div class="mt-1 pl-2 text-[10px] border-l-2 border-yellow-600">${sHtml}</div>`;
-                            alertBox.classList.remove('hidden');
-                        } else { alertBox.classList.add('hidden'); }
-                    } else { alertBox.classList.add('hidden'); }
-                } else { 
-                    document.getElementById('crmSaveBox').classList.add('hidden'); 
-                    alertBox.classList.add('hidden'); 
+            document.getElementById('qCompany').addEventListener('input', (e) => {
+                const match = mst.customers.find(c => c.name.toLowerCase() === e.target.value.toLowerCase());
+                const cSelect = document.getElementById('qContact'); cSelect.innerHTML = `<option value="">-- Manual Entry --</option>`;
+                if (match) {
+                    try {
+                        let contacts = JSON.parse(match.contacts || "[]");
+                        contacts.forEach(c => {
+                            let opt = document.createElement('option'); opt.value = c.name; opt.text = `${c.name} (${c.desig||'Staff'})`;
+                            if(c.isPrimary) opt.selected = true; cSelect.appendChild(opt);
+                        });
+                    } catch(err){}
+                    if(match.defaultPay && document.getElementById('qPayTerms').querySelector(`option[value="${match.defaultPay}"]`)) document.getElementById('qPayTerms').value = match.defaultPay;
+                    if(match.defaultInco && document.getElementById('qIncoTerms').querySelector(`option[value="${match.defaultInco}"]`)) document.getElementById('qIncoTerms').value = match.defaultInco;
                 }
                 window.checkStep1();
             });
         }
+        document.getElementById('saveQuickCrmBtn').addEventListener('click', async () => {
+            const name = document.getElementById('qcName').value; if(!name) return alert("Name required");
+            let contacts = []; if(document.getElementById('qcContact').value) contacts.push({name: document.getElementById('qcContact').value, mob: document.getElementById('qcMob').value, isPrimary: true});
+            await addDoc(collection(db, "customers"), { name: name, contacts: JSON.stringify(contacts), isActive: true });
+            document.getElementById('qCompany').value = name; document.getElementById('quickCrmModal').classList.add('hidden'); setupCrmAiLogic();
+        });
 
-        // ==========================================
-        // WIZARD LOOPHOLE FIX & UI GENERATION
-        // ==========================================
         function setupGuidedWizard() {
-            const check = () => {
-                const comp = document.getElementById('qCompany').value.trim();
-                const subj = document.getElementById('qSubject').value.trim();
-                const btn = document.getElementById('proceedBtn');
-                
-                if(comp.length > 2 && subj.length > 2) {
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
-                    btn.classList.add('hover:bg-blue-700', 'bg-blue-600', 'text-white', 'shadow-lg');
-                    btn.innerText = "Proceed to Item Builder ↓"; btn.disabled = false;
-                } else {
-                    btn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-300', 'text-slate-500');
-                    btn.classList.remove('hover:bg-blue-700', 'bg-blue-600', 'text-white', 'shadow-lg');
-                    btn.innerText = "Fill Required Fields to Proceed"; btn.disabled = true;
-                    // Wizard Bypass Fix: Auto-lock Step 2 if fields are cleared
-                    document.getElementById('step2').classList.add('hidden');
-                    document.getElementById('proceedBtn').classList.remove('hidden');
-                    document.getElementById('step1').classList.replace('border-gray-300', 'border-blue-600');
-                }
+            window.checkStep1 = () => {
+                const comp = document.getElementById('qCompany').value.trim(); const subj = document.getElementById('qSubject').value.trim(); const btn = document.getElementById('proceedBtn');
+                if(comp.length > 2 && subj.length > 2) { btn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-300', 'text-slate-500'); btn.classList.add('hover:bg-blue-700', 'bg-blue-600', 'text-white'); btn.innerText = "Proceed to Item Builder ↓"; btn.disabled = false; } 
+                else { btn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-300', 'text-slate-500'); btn.classList.remove('hover:bg-blue-700', 'bg-blue-600', 'text-white'); btn.innerText = "Fill Required Fields to Proceed"; btn.disabled = true; document.getElementById('step2').classList.add('hidden'); document.getElementById('proceedBtn').classList.remove('hidden'); document.getElementById('step1').classList.replace('border-slate-300', 'border-blue-600'); }
             };
-            window.checkStep1 = check;
-            ['qCompany', 'qSubject'].forEach(id => {
-                document.getElementById(id).addEventListener('input', check);
-                document.getElementById(id).addEventListener('blur', check);
-            });
-            
-            document.getElementById('proceedBtn').addEventListener('click', () => {
-                if(!document.getElementById('proceedBtn').disabled) {
-                    document.getElementById('step2').classList.remove('hidden');
-                    document.getElementById('proceedBtn').classList.add('hidden');
-                    document.getElementById('step1').classList.replace('border-blue-600', 'border-gray-300');
-                    setTimeout(() => window.triggerRender(), 200); 
-                }
-            });
+            ['qCompany', 'qSubject'].forEach(id => { document.getElementById(id).addEventListener('input', window.checkStep1); });
+            document.getElementById('proceedBtn').addEventListener('click', () => { if(!document.getElementById('proceedBtn').disabled) { document.getElementById('step2').classList.remove('hidden'); document.getElementById('proceedBtn').classList.add('hidden'); document.getElementById('step1').classList.replace('border-blue-600', 'border-slate-300'); } });
         }
 
-        function updateInsertDropdowns() {
-            const html = `<option value="None">-- No Insert --</option>` + (mst.inserts || []).map(i => `<option value="${i.id}">${i.name} (${i.param1})</option>`).join('');
-            document.getElementById('insTypeR').innerHTML = html;
-            document.getElementById('insTypeS').innerHTML = html;
-        }
-
+        // BUILD DYNAMIC COMPONENT UI
         function buildDynamicUI() {
+            if(mst.customers) setupCrmAiLogic();
             const pop = (id, arr, textFn) => { const el = document.querySelector(id); if(el){ el.innerHTML = ""; (arr || []).forEach(item => { let opt = document.createElement('option'); opt.value = item.id; opt.text = textFn(item); el.appendChild(opt); }); } };
-            pop('#qTier', mst.customer_tiers, i => `${i.name} (Floor: ${i.param1}%)`); pop('#qPayTerms', mst.payment_terms, i => i.name); pop('#qIncoTerms', mst.inco_terms, i => i.name); pop('#cCategory', mst.tool_categories, i => `${i.name}`); pop('.dynamic-mat-select', mst.raw_materials, i => `${i.name} (₹${i.param2}/kg)`); if(mst.spares) pop('#sProduct', mst.spares, i => `${i.name} (₹${i.param1})`);
+            const popList = (id, arr) => { const el = document.getElementById(id); if(el){ el.innerHTML = ""; (arr || []).forEach(i => { let opt = document.createElement('option'); opt.value = i.id; opt.text = i.name; el.appendChild(opt); }); } };
             
-            // Dynamic BOM builder
-            const bomContainer = document.getElementById('dynamicBomContainer'); 
-            // Preserve existing rows if possible to avoid UI flicker during typing, otherwise full rebuild
-            if(bomContainer.children.length === 0) {
-                appSchemas.forEach(sch => {
-                    const isBomModule = BOM_MODULES.includes(sch.id);
-                    if (CORE_CONFIG_IDS.includes(sch.id) || sch.category === 'crm' || sch.id === 'inserts' || sch.id === 'spares' || sch.id === 'freight') return; 
-                    if (!isBomModule && (!mst[sch.id] || mst[sch.id].length === 0)) return;
-                    
-                    const uom = (sch.behavior === 'flat') ? 'NA' : 'Qty / Hrs';
-                    bomContainer.insertAdjacentHTML('beforeend', `<div class="border-2 border-slate-100 rounded-xl p-3 bg-slate-50 transition hover:border-slate-300" data-behavior="${sch.behavior}"><div class="flex justify-between items-center mb-2 border-b border-slate-200 pb-1"><h4 class="font-bold text-xs text-slate-700 uppercase tracking-wide">${sch.title}</h4><button type="button" onclick="window.addDynamicBomRow('${sch.id}', '${uom}')" class="text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-800 px-2 py-1 rounded font-black transition">+ Add</button></div><div id="bom_div_${sch.id}" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar"></div></div>`);
-                }); 
-            }
-            bindTriggers(); 
+            pop('#qTier', mst.customer_tiers, i => i.name); pop('#qPayTerms', mst.payment_terms, i => i.name); pop('#qIncoTerms', mst.inco_terms, i => i.name); pop('#cCategory', mst.tool_categories, i => i.name); pop('#tCategory', mst.tool_categories, i => i.name); pop('.dyn-mat-raw', mst.raw_materials, i => i.name);
+            popList('list_blanks', mst.blanks); popList('list_spares', mst.spares);
+            bindTriggers();
         }
 
-        window.addDynamicBomRow = (schemaId, uom) => {
-            if(!mst[schemaId] || mst[schemaId].length === 0) return alert(`The ${schemaId} database is empty.`);
-            const rowId = `bomrow_${Math.random().toString(36).substr(2, 9)}`;
-            let selHtml = mst[schemaId].map(item => `<option value="${item.id}">${item.name}</option>`).join('');
-            document.getElementById(`bom_div_${schemaId}`).insertAdjacentHTML('beforeend', `<div class="flex space-x-2 items-center text-xs bom-row" id="${rowId}" data-schema="${schemaId}"><select class="border-2 border-white p-1.5 w-full rounded-lg bom-select calc-trigger bg-white shadow-sm font-semibold outline-none focus:border-blue-400">${selHtml}</select>${uom!=='NA'?`<input type="number" value="1" class="border-2 border-white shadow-sm p-1.5 w-16 rounded-lg text-sm text-center calc-trigger bom-qty font-bold outline-none focus:border-blue-400">`:''}<button type="button" onclick="document.getElementById('${rowId}').remove(); window.calcEngine();" class="text-red-500 font-black px-2 hover:bg-red-100 rounded transition">✕</button></div>`);
-            bindTriggers(); calcEngine();
+        // MATERIAL MODE TOGGLE
+        window.toggleMatMode = (selectEl, scopePrefix) => {
+            const rawDiv = document.getElementById(`${scopePrefix}_raw`); const blankDiv = document.getElementById(`${scopePrefix}_blank`);
+            if(selectEl.value === 'raw') { rawDiv.classList.remove('hidden'); blankDiv.classList.add('hidden'); } else { rawDiv.classList.add('hidden'); blankDiv.classList.remove('hidden'); } calcEngine();
+        };
+        window.toggleDimShape = (selectEl, scopePrefix) => {
+            const block = selectEl.closest('.mat-raw-mode'); block.querySelector('.dim-round').classList.add('hidden'); block.querySelector('.dim-square').classList.add('hidden'); block.querySelector(`.dim-${selectEl.value}`).classList.remove('hidden'); calcEngine();
         };
 
-        let subCompCount = 0;
+        // INFINITE NESTED COMPONENT BOM LOOPS
+        window.getBomComponentOptions = () => {
+            let opts = `<option value="">-- Select Operation/Item --</option>`;
+            appSchemas.filter(s => s.category === 'component_level' && s.id !== 'raw_materials' && s.id !== 'blanks' && s.id !== 'tool_categories').forEach(sch => {
+                if(mst[sch.id] && mst[sch.id].length > 0) { opts += `<optgroup label="${sch.title}">` + mst[sch.id].map(i => `<option value="${sch.id}|${i.id}">${i.name}</option>`).join('') + `</optgroup>`; }
+            }); return opts;
+        };
+
+        window.addBomRow = (containerId) => {
+            bomRowCount++; const rowId = `bom_${bomRowCount}`;
+            document.getElementById(containerId).insertAdjacentHTML('beforeend', `<div class="flex space-x-2 items-center text-xs bom-row p-1" id="${rowId}"><select class="border border-blue-200 p-1.5 w-full rounded bg-white calc-trigger bom-select font-semibold outline-none">${window.getBomComponentOptions()}</select><input type="number" min="0" value="1" class="border border-blue-200 p-1.5 w-16 rounded text-center calc-trigger bom-qty font-bold outline-none"><button type="button" onclick="document.getElementById('${rowId}').remove(); window.calcEngine();" class="text-red-400 font-black px-2 hover:text-red-600">✕</button></div>`);
+            bindTriggers();
+        };
+
         window.addSubComponent = () => {
-            if(!mst.raw_materials || mst.raw_materials.length === 0) return alert("Raw Materials missing.");
-            subCompCount++; const id = `subcomp_${subCompCount}`;
-            let matHtml = mst.raw_materials.map(i => `<option value="${i.id}">${i.name} (₹${i.param2}/kg)</option>`).join(''); 
-            document.getElementById('subAssemblyWrapper').insertAdjacentHTML('beforeend', `<div class="sub-comp-block p-4 bg-slate-50 border-2 border-slate-200 rounded-xl relative mt-2 transition hover:border-slate-300" id="${id}"><button type="button" onclick="document.getElementById('${id}').remove(); window.calcEngine();" class="absolute top-2 right-2 text-xs text-red-500 font-black hover:bg-red-100 px-2 py-1 rounded transition">✕</button><div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-3 w-full sm:w-3/4"><input type="text" placeholder="Component Name (e.g. Clamp)" class="border-2 border-white shadow-sm p-2 text-xs rounded-lg w-full sm:w-1/2 font-bold outline-none focus:border-blue-400"><select class="sub-shape border-2 border-white shadow-sm p-2 text-xs rounded-lg w-full sm:w-1/2 calc-trigger outline-none font-semibold focus:border-blue-400" onchange="window.toggleSubShape('${id}', this.value)"><option value="rect">Rectangular Block</option><option value="round">Round Stock</option></select></div><div class="sub-dim-rect grid grid-cols-3 gap-3 text-[10px] uppercase font-bold text-slate-500 mb-3"><div><label>Length(mm)</label><input type="number" value="0" class="sub-rl border-2 border-white shadow-sm p-2 w-full rounded-lg calc-trigger outline-none font-bold text-slate-800 focus:border-blue-400 mt-1"></div><div><label>Width(mm)</label><input type="number" value="0" class="sub-rw border-2 border-white shadow-sm p-2 w-full rounded-lg calc-trigger outline-none font-bold text-slate-800 focus:border-blue-400 mt-1"></div><div><label>Height(mm)</label><input type="number" value="0" class="sub-rh border-2 border-white shadow-sm p-2 w-full rounded-lg calc-trigger outline-none font-bold text-slate-800 focus:border-blue-400 mt-1"></div></div><div class="sub-dim-round grid grid-cols-2 gap-3 text-[10px] uppercase font-bold text-slate-500 mb-3 hidden"><div><label>Dia(mm)</label><input type="number" value="0" class="sub-rd border-2 border-white shadow-sm p-2 w-full rounded-lg calc-trigger outline-none font-bold text-slate-800 focus:border-blue-400 mt-1"></div><div><label>Len(mm)</label><input type="number" value="0" class="sub-rlen border-2 border-white shadow-sm p-2 w-full rounded-lg calc-trigger outline-none font-bold text-slate-800 focus:border-blue-400 mt-1"></div></div><div class="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-3"><label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Material Grade:</label><select class="sub-mat border-2 border-white shadow-sm p-2 rounded-lg text-xs calc-trigger w-full sm:w-1/2 bg-white outline-none font-semibold focus:border-blue-400">${matHtml}</select></div></div>`);
-            bindTriggers(); calcEngine();
+            subCompCount++; const id = `sub_${subCompCount}`;
+            document.getElementById('subAssemblyWrapper').insertAdjacentHTML('beforeend', `
+                <div class="sub-comp-block p-4 bg-white border border-slate-200 rounded-xl relative mt-2 shadow-sm transition hover:border-slate-300" id="${id}">
+                    <button type="button" onclick="document.getElementById('${id}').remove(); window.calcEngine();" class="absolute top-2 right-2 text-xs text-red-400 font-black hover:text-red-600 bg-red-50 px-2 py-1 rounded">✕</button>
+                    <input type="text" placeholder="Component Name (e.g. Top Clamp)" class="font-black text-sm text-slate-800 bg-transparent outline-none border-b-2 border-dashed border-slate-300 focus:border-blue-500 mb-3 w-3/4 pb-1">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-4 items-end">
+                        <div class="col-span-3"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Material Source</label><select class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs bg-slate-50 calc-trigger" onchange="toggleMatMode(this, '${id}')"><option value="raw">Raw Material</option><option value="blank">Master Blank</option></select></div>
+                        <div class="col-span-9 grid grid-cols-12 gap-2 mat-raw-mode" id="${id}_raw">
+                            <div class="col-span-4"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Grade</label><select class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs bg-slate-50 calc-trigger dyn-mat-raw sub-mat"></select></div>
+                            <div class="col-span-2"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Shape</label><select class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs bg-slate-50 calc-trigger sub-shape" onchange="toggleDimShape(this, '${id}')"><option value="square">Square</option><option value="round">Round</option></select></div>
+                            <div class="col-span-6 grid grid-cols-3 gap-2 dim-square"><div><label class="text-[9px] font-bold text-slate-500 uppercase">L</label><input type="number" min="0" value="0" class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs calc-trigger sub-l"></div><div><label class="text-[9px] font-bold text-slate-500 uppercase">W</label><input type="number" min="0" value="0" class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs calc-trigger sub-w"></div><div><label class="text-[9px] font-bold text-slate-500 uppercase">H</label><input type="number" min="0" value="0" class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs calc-trigger sub-h"></div></div>
+                            <div class="col-span-6 grid grid-cols-3 gap-2 dim-round hidden"><div><label class="text-[9px] font-bold text-slate-500 uppercase">Dia</label><input type="number" min="0" value="0" class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs calc-trigger sub-d"></div><div class="col-span-2"><label class="text-[9px] font-bold text-slate-500 uppercase">Length</label><input type="number" min="0" value="0" class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs calc-trigger sub-dl"></div></div>
+                        </div>
+                        <div class="col-span-9 mat-blank-mode hidden" id="${id}_blank"><label class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Select Taper Blank (Flat Cost)</label><input type="text" list="list_blanks" class="w-full border border-slate-200 p-1.5 rounded font-bold text-xs bg-slate-50 calc-trigger sub-blank" placeholder="Type to search blanks..."></div>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-lg border border-slate-100"><div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1"><p class="text-[9px] font-bold text-slate-400 uppercase">Sub-Assembly BOM</p><button type="button" onclick="addBomRow('${id}_bom')" class="text-[9px] bg-white border border-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded shadow-sm hover:bg-slate-100">+ Add BOM Row</button></div><div id="${id}_bom" class="space-y-1"></div></div>
+                </div>
+            `);
+            const pop = (sel, arr) => { const el = document.getElementById(id).querySelector(sel); if(el){ el.innerHTML = ""; (arr||[]).forEach(i => { let opt = document.createElement('option'); opt.value = i.id; opt.text = i.name; el.appendChild(opt); }); } };
+            pop('.dyn-mat-raw', mst.raw_materials); bindTriggers(); calcEngine();
         };
-        window.toggleSubShape = (id, shapeVal) => { const block = document.getElementById(id); ['rect', 'round'].forEach(s => { let el = block.querySelector(`.sub-dim-${s}`); if(el) el.classList.add('hidden'); }); block.querySelector(`.sub-dim-${shapeVal}`).classList.remove('hidden'); calcEngine(); };
 
-        // ==========================================
-        // TRUE SYNCHRONIZED MATH ENGINE
-        // ==========================================
-        function bindTriggers() {
-            document.querySelectorAll('.calc-trigger').forEach(el => {
-                if(el.id === 'offeredDiscPct' || el.id === 'offeredDiscFlat') return;
-                el.removeEventListener('input', calcEngine); el.addEventListener('input', calcEngine); el.removeEventListener('change', calcEngine); el.addEventListener('change', calcEngine);
-            });
-        }
+        // RECURSIVE COST ENGINE
+        function bindTriggers() { document.querySelectorAll('.calc-trigger').forEach(el => { if(el.id === 'offeredDiscPct' || el.id === 'offeredDiscFlat') return; el.removeEventListener('input', calcEngine); el.addEventListener('input', calcEngine); el.removeEventListener('change', calcEngine); el.addEventListener('change', calcEngine); }); }
         
         window.calcEngine = () => {
-            if(!mst.customer_tiers || mst.customer_tiers.length === 0) return;
-            const iType = document.getElementById('iType').value; 
-            const tierMatch = mst.customer_tiers.find(t => t.id === document.getElementById('qTier').value);
-            const tier = tierMatch || {param1:0, param2:0}; 
-            const isJobCustRM = (document.getElementById('qModel').value === 'jobwork_cust');
-            let baseCost = 0, quotePrice = 0, floorPrice = 0;
-            
-            // Critical: Separate Raw Cost Weight vs Finish Display Weight
-            let rawCostWt = 0; let finishDisplayWt = 0;
+            if(!mst.customer_tiers || mst.customer_tiers.length===0) return;
+            const iType = document.getElementById('iType').value; const tier = mst.customer_tiers.find(t => t.id === document.getElementById('qTier').value) || {param1:0, param2:0}; const isJobCustRM = (document.getElementById('qModel').value === 'jobwork_cust'); const finalItemQty = Math.max(1, Number(document.getElementById('iQty').value) || 1);
+            let totalUnitCost = 0, floorPriceUnit = 0, mrpUnit = 0, rawCostWtUnit = 0, finishDisplayWtUnit = 0, totalRmCost = 0, totalBomCost = 0, totalPctMultiplier = 0;
+
+            const calcBomBlock = (containerId) => {
+                let blockCost = 0; document.getElementById(containerId).querySelectorAll('.bom-row').forEach(row => {
+                    let selVal = row.querySelector('.bom-select').value; if(!selVal) return; let [schId, itemId] = selVal.split('|'); let itemData = mst[schId].find(x => x.id === itemId); let qty = Math.max(0, Number(row.querySelector('.bom-qty').value) || 0); let schMeta = appSchemas.find(s => s.id === schId);
+                    if(itemData) { if(schMeta && schMeta.behavior === 'percentage') { totalPctMultiplier += (itemData.param1 / 100) * qty; } else { blockCost += (itemData.param1 * qty) + (itemData.param2 || 0); } }
+                }); return blockCost;
+            };
+
+            const calcMaterialBlock = (isRaw, gradeId, blankId, shape, dims) => {
+                let rC = 0, fW = 0;
+                if(isRaw) {
+                    const mat = mst.raw_materials.find(m => m.id === gradeId); const den = mat ? mat.param1 : 7.85; const cst = mat ? mat.param2 : 150;
+                    if(shape === 'round') {
+                        if(!isJobCustRM) { let rV = Math.PI * Math.pow((dims.d+10)/20, 2) * ((dims.l+10)/10); let w = (rV*den)/1000; rC = w*cst; rawCostWtUnit += w; }
+                        fW = (Math.PI * Math.pow(dims.d/20, 2) * (dims.l/10) * den) / 1000;
+                    } else {
+                        if(!isJobCustRM) { let rV = ((dims.l+10)/10)*((dims.w+10)/10)*((dims.h+10)/10); let w = (rV*den)/1000; rC = w*cst; rawCostWtUnit += w; }
+                        fW = ((dims.l/10)*(dims.w/10)*(dims.h/10) * den) / 1000;
+                    }
+                } else {
+                    const blank = mst.blanks.find(b => b.name === blankId); if(blank) { rC = blank.param3; fW = 2.5; } // Approximate blank finish weight
+                }
+                finishDisplayWtUnit += fW; return rC;
+            };
 
             if (iType === 'trading') {
-                baseCost = Number(document.getElementById('tCost').value); floorPrice = baseCost * (1 + (tier.param1 / 100)); quotePrice = baseCost * (1 + (tier.param2 / 100));
-            } else if (iType === 'standard') {
-                const std = mst.spares.find(s => s.id === document.getElementById('sProduct').value); quotePrice = std ? std.param1 : 0; floorPrice = quotePrice * (1 - ((std?std.param2:0) / 100)); baseCost = floorPrice; 
+                totalUnitCost = Math.max(0, Number(document.getElementById('tCost').value) || 0);
+                floorPriceUnit = totalUnitCost * (1 + (tier.param1 / 100)); mrpUnit = totalUnitCost * (1 + (tier.param2 / 100));
             } else if (iType === 'custom') {
-                const cat = mst.tool_categories.find(c => c.id === document.getElementById('cCategory').value); 
-                let totalRmCost = 0;
-                const shape = document.getElementById('cStockShape').value;
-                const mat = mst.raw_materials.find(m => m.id === document.getElementById('cMatGrade').value);
-                const den = mat ? mat.param1 : 7.85; const cst = mat ? mat.param2 : 150;
-
-                if (shape === 'round') {
-                    const sD=Number(document.getElementById('sDia').value), sL=Number(document.getElementById('sLen').value), cD=Number(document.getElementById('cDia').value), cL=Number(document.getElementById('cLen').value), hD=Number(document.getElementById('hDia').value), hL=Number(document.getElementById('hLen').value);
-                    
-                    // 1. Raw Material Costing (+10mm Envelope logic)
-                    if (!isJobCustRM) { 
-                        const maxDia = Math.max(sD, cD, hD) + 10; const totalL = sL+cL+hL+10;
-                        const rawVol = Math.PI * Math.pow(maxDia/20, 2) * (totalL/10); // cm3
-                        rawCostWt = (rawVol * den) / 1000; totalRmCost += (rawCostWt * cst); 
-                        document.getElementById('adVol').innerText = rawVol.toFixed(2); 
-                    }
-                    // 2. Finish Engineering Weight (Exact Geometry)
-                    const trueVol = Math.PI * (Math.pow(sD/20,2)*(sL/10) + Math.pow(cD/20,2)*(cL/10) + Math.pow(hD/20,2)*(hL/10));
-                    finishDisplayWt += (trueVol * den) / 1000;
-
-                } else if (shape === 'square') {
-                    const l=Number(document.getElementById('rcL').value), w=Number(document.getElementById('rcW').value), h=Number(document.getElementById('rcH').value);
-                    if (!isJobCustRM) {
-                        const rawVol = ((l+10)/10) * ((w+10)/10) * ((h+10)/10); 
-                        rawCostWt = (rawVol * den) / 1000; totalRmCost += (rawCostWt * cst);
-                    }
-                    finishDisplayWt += (((l/10)*(w/10)*(h/10)) * den) / 1000;
-
-                } else if (shape === 'library') {
-                    let d = mst.design_library.find(lib => lib.id === document.getElementById('bType').value);
-                    if (d) { 
-                        try {
-                            let conf = JSON.parse(d.param1); 
-                            // Raw Envelope Check
-                            let maxD = 0; let totL = 0; let totalFinishGrams = 0;
-                            conf.stages.forEach(st => { 
-                                maxD = Math.max(maxD, st.d1, st.d2); totL += st.l; 
-                                // Fixed Bug: Finding material by Document ID instead of array index
-                                let stMat = mst.raw_materials.find(m => m.id === st.materialId) || mat; 
-                                let stDen = stMat ? stMat.param1 : den;
-                                let stVol = 0;
-                                if(st.shape === 'square') stVol = (st.d1/10)*(st.d2/10)*(st.l/10);
-                                else {
-                                    // Exact Frustum Math
-                                    stVol = Math.PI * (st.l/10 / 3) * (Math.pow(st.d1/20,2) + (st.d1/20 * st.d2/20) + Math.pow(st.d2/20,2));
-                                    if(st.feature === 'flat') stVol -= ((st.l*0.8/10) * (st.d1*0.2/10) * (st.d1*0.8/10));
-                                }
-                                totalFinishGrams += stVol * stDen;
-                            });
-
-                            if (!isJobCustRM) {
-                                let rawVol = Math.PI * Math.pow((maxD+10)/20, 2) * ((totL+10)/10); // simplified bounding cyl
-                                rawCostWt = (rawVol * den) / 1000; totalRmCost += (rawCostWt * cst);
-                            }
-                            finishDisplayWt += totalFinishGrams / 1000;
-                        } catch(e) {}
-                    }
-                }
-
-                // Sub-Assemblies
-                document.querySelectorAll('.sub-comp-block').forEach(blk => {
-                    const sMatId = blk.querySelector('.sub-mat').value;
-                    const sMat = mst.raw_materials.find(m => m.id === sMatId); const sDen = sMat ? sMat.param1 : 7.85; const sCst = sMat ? sMat.param2 : 150;
-                    const sShape = blk.querySelector('.sub-shape').value;
-                    let sRawVol = 0; let sTrueVol = 0;
-                    if(sShape === 'rect') {
-                        const l=Number(blk.querySelector('.sub-rl').value), w=Number(blk.querySelector('.sub-rw').value), h=Number(blk.querySelector('.sub-rh').value);
-                        sRawVol = ((l+10)/10)*((w+10)/10)*((h+10)/10); sTrueVol = (l/10)*(w/10)*(h/10);
-                    } else {
-                        const d=Number(blk.querySelector('.sub-rd').value), l=Number(blk.querySelector('.sub-rlen').value);
-                        sRawVol = Math.PI*Math.pow((d+10)/20,2)*((l+10)/10); sTrueVol = Math.PI*Math.pow(d/20,2)*(l/10);
-                    }
-                    if(!isJobCustRM) { const swR = (sRawVol * sDen) / 1000; rawCostWt += swR; totalRmCost += (swR * sCst); }
-                    finishDisplayWt += (sTrueVol * sDen) / 1000;
-                });
-
-                document.getElementById('adWt').innerText = rawCostWt.toFixed(2);
-                document.getElementById('adRm').innerText = `₹ ${totalRmCost.toFixed(2)}`;
-
-                let totalBomCost = 0; let totalPctMultiplier = 0;
-                document.querySelectorAll('.bom-row').forEach(row => {
-                    let schId = row.dataset.schema; let itemData = mst[schId].find(x => x.id === row.querySelector('.bom-select').value); let qty = row.querySelector('.bom-qty') ? Number(row.querySelector('.bom-qty').value) : 1; let schMeta = appSchemas.find(s => s.id === schId);
-                    if(itemData) { if (schMeta && schMeta.behavior === 'percentage') { totalPctMultiplier += (itemData.param1 / 100) * qty; } else { totalBomCost += (itemData.param1 * qty) + (itemData.param2 || 0); } }
-                });
-                document.getElementById('adBom').innerText = `₹ ${totalBomCost.toFixed(2)}`;
+                const cat = mst.tool_categories.find(c => c.id === document.getElementById('cCategory').value);
                 
-                baseCost = totalRmCost + totalBomCost;
-                let rawFloor = baseCost * (1 + ((tier.param1 + (cat ? cat.param1 : 0)) / 100)); let rawQuote = baseCost * (1 + ((cat ? cat.param2 : 100) / 100));
-                if (totalPctMultiplier > 0) { quotePrice = rawQuote / (1 - totalPctMultiplier); floorPrice = rawFloor + (quotePrice - rawQuote); } else { floorPrice = rawFloor; quotePrice = rawQuote; }
+                // MAIN BODY
+                const mainIsRaw = !document.getElementById('main_raw').classList.contains('hidden');
+                totalRmCost += calcMaterialBlock(mainIsRaw, document.getElementById('mRawGrade').value, document.getElementById('mBlank').value, document.getElementById('mShape').value, {d:Number(document.getElementById('mD').value), l:Number(document.getElementById('mL').value), w:Number(document.getElementById('mSqW').value), h:Number(document.getElementById('mSqH').value)});
+                totalBomCost += calcBomBlock('main_bom');
+
+                // SUB-ASSEMBLIES
+                document.querySelectorAll('.sub-comp-block').forEach(blk => {
+                    const sIsRaw = !blk.querySelector('.mat-raw-mode').classList.contains('hidden');
+                    totalRmCost += calcMaterialBlock(sIsRaw, blk.querySelector('.sub-mat').value, blk.querySelector('.sub-blank').value, blk.querySelector('.sub-shape').value, {d:Number(blk.querySelector('.sub-d').value), l:Number(blk.querySelector('.sub-dl').value), w:Number(blk.querySelector('.sub-w').value), h:Number(blk.querySelector('.sub-h').value)});
+                    totalBomCost += calcBomBlock(`${blk.id}_bom`);
+                });
+
+                totalUnitCost = totalRmCost + totalBomCost;
+                let rawFloor = totalUnitCost * (1 + ((tier.param1 + (cat ? cat.param1 : 0)) / 100)); let rawQuote = totalUnitCost * (1 + ((cat ? cat.param2 : 100) / 100));
+                if (totalPctMultiplier > 0) { mrpUnit = rawQuote / (1 - totalPctMultiplier); floorPriceUnit = rawFloor + (mrpUnit - rawQuote); } else { floorPriceUnit = rawFloor; mrpUnit = rawQuote; }
             }
 
-            document.getElementById('adBase').innerText = `₹ ${baseCost.toFixed(2)}`; document.getElementById('adFloor').innerText = `₹ ${floorPrice.toFixed(2)}`; document.getElementById('engMrp').innerText = `₹ ${quotePrice.toFixed(2)}`;
-            const overInp = document.getElementById('overrideMrp'); let fMrp = quotePrice;
-            if (overInp.value && Number(overInp.value) >= quotePrice) { fMrp = Number(overInp.value); overInp.classList.remove('border-red-500'); } else if (overInp.value && Number(overInp.value) < quotePrice) { overInp.classList.add('border-red-500'); fMrp = quotePrice; }
+            // TOTALS (Multiply by Qty)
+            const totalFloor = floorPriceUnit * finalItemQty; const totalMrp = mrpUnit * finalItemQty;
+            
+            document.getElementById('adWt').innerText = (rawCostWtUnit * finalItemQty).toFixed(2); document.getElementById('adRm').innerText = `₹ ${(totalRmCost * finalItemQty).toFixed(2)}`; document.getElementById('adBom').innerText = `₹ ${(totalBomCost * finalItemQty).toFixed(2)}`; document.getElementById('adBase').innerText = `₹ ${(totalUnitCost * finalItemQty).toFixed(2)}`; document.getElementById('adFloor').innerText = `₹ ${totalFloor.toFixed(2)}`; document.getElementById('engMrp').innerText = `₹ ${totalMrp.toFixed(2)}`;
+            
+            const overInp = document.getElementById('overrideMrp'); let finalActiveMrp = totalMrp;
+            if (overInp.value) { finalActiveMrp = Math.max(0, Number(overInp.value)); overInp.classList.toggle('border-red-500', finalActiveMrp < totalMrp); }
 
-            const maxDiscFlat = fMrp - floorPrice; const maxDiscPct = (maxDiscFlat / fMrp) * 100;
+            const maxDiscFlat = Math.max(0, finalActiveMrp - totalFloor); const maxDiscPct = finalActiveMrp > 0 ? (maxDiscFlat / finalActiveMrp) * 100 : 0;
             document.getElementById('maxDiscOut').innerText = `${maxDiscPct.toFixed(1)}% (₹ ${maxDiscFlat.toFixed(0)})`;
 
             let offPctInp = document.getElementById('offeredDiscPct'); let offFlatInp = document.getElementById('offeredDiscFlat'); let offDiscPct = 0; let offDiscFlat = 0;
-            if (activeDiscountMode === 'pct') { offDiscPct = Number(offPctInp.value); offDiscFlat = fMrp * (offDiscPct / 100); offFlatInp.value = offDiscFlat.toFixed(0); } else { offDiscFlat = Number(offFlatInp.value); offDiscPct = (offDiscFlat / fMrp) * 100; offPctInp.value = offDiscPct.toFixed(2); }
+            if (activeDiscountMode === 'pct') { offDiscPct = Math.max(0, Math.min(100, Number(offPctInp.value))); offDiscFlat = finalActiveMrp * (offDiscPct / 100); offFlatInp.value = offDiscFlat.toFixed(0); } 
+            else { offDiscFlat = Math.max(0, Number(offFlatInp.value)); offDiscPct = finalActiveMrp > 0 ? (offDiscFlat / finalActiveMrp) * 100 : 0; offPctInp.value = offDiscPct.toFixed(2); }
 
             const btn = document.getElementById('addToCartBtn');
             if (offDiscFlat > maxDiscFlat) {
                 offPctInp.classList.replace('border-emerald-500', 'border-red-500'); offFlatInp.classList.replace('border-emerald-500', 'border-red-500');
-                if (hasOverrideAuthority) { btn.disabled = false; btn.innerText = "⚠️ Add (Override Loss)"; btn.classList.replace('bg-emerald-600', 'bg-orange-600'); btn.classList.replace('hover:bg-emerald-500', 'hover:bg-orange-500'); } 
-                else { btn.disabled = true; btn.innerText = "🛒 Add to Unified Quote"; btn.classList.remove('bg-orange-600'); btn.classList.add('bg-slate-400'); }
-            } else { offPctInp.classList.replace('border-red-500', 'border-emerald-500'); offFlatInp.classList.replace('border-red-500', 'border-emerald-500'); btn.disabled = false; btn.innerText = "🛒 Add to Unified Quote"; btn.classList.remove('bg-slate-400', 'bg-orange-600'); btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500'); }
+                if (hasOverrideAuthority) { btn.disabled = false; btn.innerHTML = "<span class='text-xl mr-2'>⚠️</span> Add (Override Loss)"; btn.classList.replace('bg-emerald-600', 'bg-orange-600'); btn.classList.replace('hover:bg-emerald-500', 'hover:bg-orange-500'); } 
+                else { btn.disabled = true; btn.innerHTML = "<span class='text-xl mr-2'>🚫</span> Margin Too Low"; btn.classList.remove('bg-orange-600'); btn.classList.add('bg-slate-400'); }
+            } else { offPctInp.classList.replace('border-red-500', 'border-emerald-500'); offFlatInp.classList.replace('border-red-500', 'border-emerald-500'); btn.disabled = false; btn.innerHTML = "<span class='text-xl mr-2'>🛒</span> Add to Unified Quote"; btn.classList.remove('bg-slate-400', 'bg-orange-600'); btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500'); }
             
-            const netP = fMrp - offDiscFlat; document.getElementById('netPriceOut').innerText = `₹ ${netP.toFixed(2)}`;
-            curDraft = { desc: document.getElementById('iDesc').value || "Unnamed Item", weight: finishDisplayWt, rawCostWeight: rawCostWt, mrp: fMrp, discPercent: offDiscPct, discFlat: offDiscFlat, netPrice: netP, floor: floorPrice };
+            const netP = Math.max(0, finalActiveMrp - offDiscFlat); document.getElementById('netPriceOut').innerText = `₹ ${netP.toFixed(0)}`;
+            curDraft = { desc: document.getElementById('iDesc').value || "Unnamed Item", qty: finalItemQty, weightTotal: finishDisplayWtUnit * finalItemQty, mrpTotal: finalActiveMrp, discFlat: offDiscFlat, netTotal: netP, floorTotal: totalFloor };
+            
+            // Live Freight Update based on current draft + cart
+            let totalQuoteWt = cart.reduce((a,c)=>a+c.weightTotal, 0) + (finishDisplayWtUnit * finalItemQty);
+            let fRate = Math.max(0, Number(document.getElementById('qFreightVal').value) || 0);
+            let lFreight = document.getElementById('qFreightMode').value === 'auto' ? Math.ceil(totalQuoteWt) * fRate : fRate;
+            document.getElementById('liveFreightDisp').innerText = `₹ ${lFreight}`;
         };
 
-        // ==========================================
-        // 3D CSG POCKETING ENGINE
-        // ==========================================
-        let scene, camera, renderer, toolGroup;
-        function initThreeJS() {
-            const container = document.getElementById('canvasContainer'); scene = new THREE.Scene(); scene.background = new THREE.Color(0xf8fafc);
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000); camera.position.set(0, 0, 300);
-            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(container.clientWidth, container.clientHeight); 
-            container.insertBefore(renderer.domElement, container.firstChild);
-            
-            scene.add(new THREE.AmbientLight(0xffffff, 0.7)); const dirLight = new THREE.DirectionalLight(0xffffff, 0.6); dirLight.position.set(50, 100, 150); scene.add(dirLight);
-            
-            toolGroup = new THREE.Group(); scene.add(toolGroup); 
-            
-            let isDragging = false; let previousMousePosition = { x: 0, y: 0 };
-            renderer.domElement.addEventListener('mousedown', () => { isDragging = true; }); renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
-            renderer.domElement.addEventListener('mousemove', (e) => { if (isDragging) { const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y }; toolGroup.rotation.y += deltaMove.x * 0.01; toolGroup.rotation.x += deltaMove.y * 0.01; } previousMousePosition = { x: e.offsetX, y: e.offsetY }; });
-            renderer.domElement.addEventListener('wheel', (e) => { camera.position.z += e.deltaY * 0.1; });
-            animate(); window.triggerRender();
-        }
-
-        window.triggerRender = () => {
-            if(!toolGroup || typeof CSG === 'undefined') return; 
-            while(toolGroup.children.length > 0) { toolGroup.remove(toolGroup.children[0]); }
-            const shape = document.getElementById('cStockShape').value;
-            const matDark = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.6, roughness: 0.4 });
-            const matLight = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.2 });
-            const addEdges = (mesh) => { const edges = new THREE.EdgesGeometry(mesh.geometry); const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2, transparent: true, opacity: 0.3 })); mesh.add(line); };
-
-            let finalX = 0; let totalL = 0;
-
-            if(shape === 'round') {
-                const sD=Number(document.getElementById('sDia').value), sL=Number(document.getElementById('sLen').value), cD=Number(document.getElementById('cDia').value), cL=Number(document.getElementById('cLen').value), hD=Number(document.getElementById('hDia').value), hL=Number(document.getElementById('hLen').value);
-                const insSel = document.getElementById('insTypeR').value;
-                const shank = new THREE.Mesh(new THREE.CylinderGeometry(sD/2, sD/2, sL, 32), matDark); addEdges(shank);
-                const collar = new THREE.Mesh(new THREE.CylinderGeometry(cD/2, cD/2, cL, 32), matLight); addEdges(collar);
-                
-                // Head with CSG Pocketing
-                let headMesh = new THREE.Mesh(new THREE.CylinderGeometry(hD/2, hD/2, hL, 32), matDark);
-                headMesh.position.set(0,0,0); headMesh.updateMatrix();
-                
-                totalL = sL + cL + hL; let cY = -totalL / 2;
-                shank.position.y = cY + (sL / 2); cY += sL; collar.position.y = cY + (cL / 2); cY += cL; 
-                headMesh.position.y = cY + (hL / 2); headMesh.updateMatrix();
-
-                // CSG Subtraction Logic
-                if(insSel !== 'None' && mst.inserts.find(i=>i.id===insSel)) {
-                    let hCsg = CSG.fromMesh(headMesh);
-                    
-                    const insData = mst.inserts.find(i=>i.id===insSel);
-                    let sLtr = insData.param1 ? insData.param1.toUpperCase() : 'C';
-                    
-                    // Create Pocket Cutter (Slightly larger than insert)
-                    let cutterGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(10.2, 10.2, 3) : new THREE.CylinderGeometry(6.2, 6.2, 3, sLtr==='S'?4:3); 
-                    let cutterMesh = new THREE.Mesh(cutterGeo);
-                    cutterMesh.position.set((hD/2)-2, headMesh.position.y + (hL/2) - 2, 0); // Position at edge
-                    cutterMesh.rotation.x = Math.PI / 2; cutterMesh.rotation.z = 95 * Math.PI / 180;
-                    cutterMesh.updateMatrix();
-                    
-                    let cutterCsg = CSG.fromMesh(cutterMesh);
-                    let finalHeadCsg = hCsg.subtract(cutterCsg);
-                    headMesh = CSG.toMesh(finalHeadCsg, headMesh.matrix, matDark);
-                    
-                    // Add actual yellow insert
-                    const insMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.3, roughness: 0.8 });
-                    let insGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(10, 10, 2) : new THREE.CylinderGeometry(6, 6, 2, sLtr==='S'?4:3); 
-                    const insert = new THREE.Mesh(insGeo, insMat); addEdges(insert);
-                    insert.position.copy(cutterMesh.position); insert.rotation.copy(cutterMesh.rotation);
-                    toolGroup.add(insert);
-                }
-                
-                addEdges(headMesh);
-                toolGroup.add(shank); toolGroup.add(collar); toolGroup.add(headMesh);
-                document.getElementById('dimLabels').innerHTML = `<div class="bg-white/80 p-1 text-[10px] font-bold border rounded shadow">Shank: Ø${sD} × ${sL}</div><div class="bg-white/80 p-1 text-[10px] font-bold border rounded shadow">Collar: Ø${cD} × ${cL}</div><div class="bg-white/80 p-1 text-[10px] font-bold border rounded shadow">Head: Ø${hD} × ${hL}</div>`;
-            } else if (shape === 'library') {
-                let d = mst.design_library.find(x=>x.id === document.getElementById('bType').value);
-                if(d) {
-                    try {
-                        let conf = JSON.parse(d.param1); totalL = conf.stages.reduce((sum, st) => sum + st.l, 0); let currentY = totalL / 2;
-                        
-                        // Override Logic
-                        const overLen = document.getElementById('libExtLen').value;
-                        const overIns = document.getElementById('insTypeLib').value;
-                        if(overLen) { conf.stages[conf.stages.length-1].l = Number(overLen); totalL = conf.stages.reduce((sum, st) => sum + st.l, 0); currentY = totalL / 2; }
-                        if(overIns) { conf.insData = mst.inserts.find(x=>x.id===overIns) || conf.insData; }
-
-                        conf.stages.forEach((st, idx) => {
-                            let mesh;
-                            if (st.shape === 'square') { mesh = new THREE.Mesh(new THREE.BoxGeometry(st.d1, st.l, st.d2), idx % 2 === 0 ? matDark : matLight); } 
-                            else { mesh = new THREE.Mesh(new THREE.CylinderGeometry(st.d1/2, st.d2/2, st.l, 32), idx % 2 === 0 ? matDark : matLight); }
-                            
-                            mesh.position.set(0, currentY - (st.l / 2), 0); mesh.updateMatrix();
-
-                            // CSG Pocketing on final stage
-                            if(idx === conf.stages.length - 1 && conf.insData) {
-                                let stCsg = CSG.fromMesh(mesh);
-                                let sLtr = conf.insData.param1.toUpperCase();
-                                let cGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(10.2, 10.2, 3) : new THREE.CylinderGeometry(6.2, 6.2, 3, sLtr==='S'?4:3); 
-                                let cMesh = new THREE.Mesh(cGeo);
-                                cMesh.position.set((st.d2/2)-2, currentY, 0); cMesh.rotation.x = Math.PI/2; cMesh.rotation.z = (conf.insApproach||95) * Math.PI/180; cMesh.updateMatrix();
-                                let finalCsg = stCsg.subtract(CSG.fromMesh(cMesh));
-                                mesh = CSG.toMesh(finalCsg, mesh.matrix, idx % 2 === 0 ? matDark : matLight);
-                                
-                                const iGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(10, 10, 2) : new THREE.CylinderGeometry(6, 6, 2, sLtr==='S'?4:3); 
-                                const insert = new THREE.Mesh(iGeo, new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.3, roughness: 0.8 })); addEdges(insert);
-                                insert.position.copy(cMesh.position); insert.rotation.copy(cMesh.rotation); toolGroup.add(insert);
-                            }
-                            addEdges(mesh); currentY -= st.l; toolGroup.add(mesh);
-                        });
-                        document.getElementById('dimLabels').innerHTML = `<div class="bg-blue-100/80 p-1 text-[10px] font-bold border border-blue-300 rounded shadow">Master Library Linked</div>`;
-                    } catch(e) {}
-                }
-            }
-            toolGroup.rotation.x = 0; toolGroup.rotation.z = -Math.PI / 2; toolGroup.rotation.y = 0; camera.position.z = totalL * 1.5 || 200;
-        };
-
-        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
-        
-        document.getElementById('iType').addEventListener('change', (e) => { ['viewCustom', 'viewStandard', 'viewTrading'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById(e.target.value === 'custom' ? 'viewCustom' : (e.target.value === 'standard' ? 'viewStandard' : 'viewTrading')).classList.remove('hidden'); calcEngine(); window.triggerRender(); });
-        document.getElementById('cStockShape').addEventListener('change', (e) => { ['dimRound', 'dimRect', 'dimLibrary'].forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('canvasContainer').classList.remove('hidden'); document.getElementById('ai3dBox').classList.remove('hidden'); if(e.target.value === 'round') { document.getElementById('dimRound').classList.remove('hidden'); } if(e.target.value === 'square') { document.getElementById('dimRect').classList.remove('hidden'); document.getElementById('canvasContainer').classList.add('hidden'); document.getElementById('ai3dBox').classList.add('hidden'); } if(e.target.value === 'library') { document.getElementById('dimLibrary').classList.remove('hidden'); } calcEngine(); window.triggerRender(); });
-        document.querySelectorAll('.render-trigger').forEach(el => { el.addEventListener('input', window.triggerRender); el.addEventListener('change', window.triggerRender); });
+        document.getElementById('offeredDiscPct').addEventListener('focus', () => { activeDiscountMode = 'pct'; }); document.getElementById('offeredDiscFlat').addEventListener('focus', () => { activeDiscountMode = 'flat'; });
         document.getElementById('adminAuditBtn').addEventListener('click', () => { document.getElementById('adminAuditPanel').classList.toggle('hidden'); });
 
-        // AI Chat Engine (Upgraded)
-        window.processAi3d = () => {
-            const p = document.getElementById('ai3dPrompt').value.toLowerCase(); 
-            const chatLog = document.getElementById('aiChatLog'); chatLog.innerHTML += `<div class="text-blue-300">👤 ${p}</div>`;
-            const shape = document.getElementById('cStockShape').value;
-            let updated = false;
-
-            if(shape === 'round') {
-                const ext = (kws, id) => { kws.forEach(kw => { let m = p.match(new RegExp(kw + "\\s*[:=]?\\s*(\\d+)")); if(m) { document.getElementById(id).value = m[1]; updated = true; } }); };
-                ext(['shank dia', 'sd'], 'sDia'); ext(['shank len', 'sl'], 'sLen'); ext(['collar dia', 'cd'], 'cDia'); ext(['collar len', 'cl'], 'cLen'); ext(['head dia', 'hd'], 'hDia'); ext(['head len', 'hl'], 'hLen');
-                for(let i=0; i<mst.inserts.length; i++) { if(p.includes(mst.inserts[i].name.toLowerCase())) { document.getElementById('insTypeR').value = mst.inserts[i].id; updated = true; break; } }
-            } else if (shape === 'library') {
-                let m = p.match(/(length|ext|extend)\s*[:=]?\\s*(\\d+)/); if(m) { document.getElementById('libExtLen').value = m[2]; updated = true; }
-                for(let i=0; i<mst.inserts.length; i++) { if(p.includes(mst.inserts[i].name.toLowerCase())) { document.getElementById('insTypeLib').value = mst.inserts[i].id; updated = true; break; } }
-            }
-
-            if(updated) { chatLog.innerHTML += `<div class="text-green-400 font-bold">🤖 Parameters applied.</div>`; window.triggerRender(); window.calcEngine(); } 
-            else { chatLog.innerHTML += `<div class="text-orange-400 font-bold">🤖 Unrecognized prompt. Try "Make length 150".</div>`; }
-            chatLog.scrollTop = chatLog.scrollHeight; document.getElementById('ai3dPrompt').value = ""; 
-        };
-
-        // ==========================================
-        // CART BUG FIX & PDF EXPORT
-        // ==========================================
+        // CART & UI FIXES
         document.querySelectorAll('#qFreightMode, #qFreightVal, #qRegion, #qModel').forEach(el => el.addEventListener('change', updateCartUI)); document.getElementById('qFreightVal').addEventListener('input', updateCartUI);
         
         document.getElementById('addToCartBtn').addEventListener('click', () => {
             if(!curDraft || document.getElementById('addToCartBtn').disabled) return;
             cart.push({...curDraft}); updateCartUI();
             
-            // Fix "Dirty Cart" Bug - Reset all builder fields
-            document.getElementById('iDesc').value = ""; document.getElementById('overrideMrp').value = ""; document.getElementById('offeredDiscPct').value = "0"; document.getElementById('offeredDiscFlat').value = "0"; 
-            document.querySelectorAll('.bom-row').forEach(e => e.remove());
-            document.getElementById('subAssemblyWrapper').innerHTML = "";
-            calcEngine();
-            
-            document.getElementById('step2').classList.add('hidden'); document.getElementById('proceedBtn').classList.remove('hidden'); document.getElementById('step1').classList.replace('border-gray-300', 'border-blue-600');
+            // Reset builder smoothly without hiding Step 2
+            document.getElementById('iDesc').value = ""; document.getElementById('iQty').value = "1"; document.getElementById('overrideMrp').value = ""; document.getElementById('offeredDiscPct').value = "0"; document.getElementById('offeredDiscFlat').value = "0"; 
+            document.querySelectorAll('.bom-row').forEach(e => e.remove()); document.getElementById('subAssemblyWrapper').innerHTML = ""; calcEngine();
         });
-        
-        window.removeCartItem = (idx) => { cart.splice(idx, 1); updateCartUI(); };
+        window.removeCartItem = (idx) => { cart.splice(idx, 1); updateCartUI(); calcEngine(); };
 
         function updateCartUI() {
             const list = document.getElementById('cartItems'); document.getElementById('emptyCartMsg').style.display = cart.length ? 'none' : 'flex';
             let html = "", tWt = 0, subNet = 0, tFloor = 0;
-            cart.forEach((item, i) => {
-                tWt += item.weight; subNet += item.netPrice; tFloor += item.floor;
-                html += `<div class="bg-white p-3 rounded-xl flex justify-between items-center text-xs border-2 ${item.netPrice < item.floor ? 'border-orange-300 bg-orange-50' : 'border-slate-100'} transition"><div class="w-3/4"><p class="font-bold text-slate-800 truncate">${item.desc}</p><p class="text-slate-400 font-semibold mt-1">Weight: ${item.weight.toFixed(2)} kg | ${item.discFlat > 0 ? `MRP: ₹${item.mrp.toFixed(2)} (-₹${item.discFlat.toFixed(0)})` : `MRP: ₹${item.mrp.toFixed(2)}`}</p></div><div class="text-right"><p class="font-black text-sm ${item.netPrice < item.floor ? 'text-orange-600' : 'text-emerald-600'}">₹ ${item.netPrice.toFixed(2)}</p><button onclick="window.removeCartItem(${i})" class="text-slate-400 hover:text-red-500 font-bold mt-1 transition">✕ Remove</button></div></div>`;
-            });
+            cart.forEach((item, i) => { tWt += item.weightTotal; subNet += item.netTotal; tFloor += item.floorTotal; html += `<div class="bg-white p-3 rounded-xl flex justify-between items-center text-xs border-2 ${item.netTotal < item.floorTotal ? 'border-orange-300 bg-orange-50' : 'border-slate-100'} transition"><div class="w-3/4"><p class="font-bold text-slate-800 truncate">${item.desc} (Qty: ${item.qty})</p><p class="text-slate-400 font-semibold mt-1">Weight: ${item.weightTotal.toFixed(2)} kg | ${item.discFlat > 0 ? `MRP: ₹${item.mrpTotal.toFixed(0)} (-₹${item.discFlat.toFixed(0)})` : `MRP: ₹${item.mrpTotal.toFixed(0)}`}</p></div><div class="text-right"><p class="font-black text-sm ${item.netTotal < item.floorTotal ? 'text-orange-600' : 'text-emerald-600'}">₹ ${item.netTotal.toFixed(0)}</p><button onclick="window.removeCartItem(${i})" class="text-slate-400 hover:text-red-500 font-bold mt-1 transition">✕ Remove</button></div></div>`; });
             list.innerHTML = html;
+            
             const aiBtn = document.getElementById('aiCartOptBtn'); if (subNet < tFloor) aiBtn.classList.remove('hidden'); else aiBtn.classList.add('hidden');
-            let freight = (document.getElementById('qFreightMode').value === 'auto') ? (tWt * Number(document.getElementById('qFreightVal').value || 0)) : Number(document.getElementById('qFreightVal').value || 0);
+            
+            let fRate = Math.max(0, Number(document.getElementById('qFreightVal').value) || 0);
+            let freight = document.getElementById('qFreightMode').value === 'auto' ? Math.ceil(tWt) * fRate : fRate;
+            
             const region = document.getElementById('qRegion').value; let taxRate = (document.getElementById('qModel').value === 'jobwork_cust') ? 0.12 : 0.18; if(region === 'export') taxRate = 0;
-            const taxes = (subNet + freight) * taxRate; quoteGrandTotal = subNet + freight + taxes; quoteSubtotal = subNet;
-            document.getElementById('cCount').innerText = `${cart.length} Items`; document.getElementById('cWt').innerText = `${tWt.toFixed(2)} kg`; document.getElementById('cSub').innerText = `₹ ${subNet.toFixed(2)}`; document.getElementById('cFreight').innerText = `₹ ${freight.toFixed(2)}`; document.getElementById('taxLine').children[0].innerText = region === 'export' ? "Taxes (0%)" : (region === 'mh' ? `CGST+SGST (${taxRate*100}%)` : `IGST (${taxRate*100}%)`); document.getElementById('cTax').innerText = `₹ ${taxes.toFixed(2)}`; document.getElementById('cGrand').innerText = `₹ ${quoteGrandTotal.toFixed(2)}`;
+            const taxes = (subNet + freight) * taxRate; 
+            
+            document.getElementById('cCount').innerText = `${cart.length} Items`; document.getElementById('cWt').innerText = `${tWt.toFixed(2)} kg`; document.getElementById('cSub').innerText = `₹ ${subNet.toFixed(0)}`; document.getElementById('cFreightOut').innerText = `₹ ${freight.toFixed(0)}`; document.getElementById('taxLine').children[0].innerText = region === 'export' ? "Taxes (0%)" : (region === 'mh' ? `CGST+SGST (${taxRate*100}%)` : `IGST (${taxRate*100}%)`); document.getElementById('cTax').innerText = `₹ ${taxes.toFixed(0)}`; document.getElementById('cGrand').innerText = `₹ ${(subNet + freight + taxes).toFixed(0)}`;
         }
 
         document.getElementById('aiCartOptBtn').addEventListener('click', () => {
-            let totalFloor = cart.reduce((a,c) => a + c.floor, 0); let totalNet = cart.reduce((a,c) => a + c.netPrice, 0); let deficit = totalFloor - totalNet; if (deficit <= 0) return;
-            let healthyItems = cart.filter(c => c.netPrice > c.floor && c.discFlat > 0);
+            let totalFloor = cart.reduce((a,c) => a + c.floorTotal, 0); let totalNet = cart.reduce((a,c) => a + c.netTotal, 0); let deficit = totalFloor - totalNet; if (deficit <= 0) return;
+            let healthyItems = cart.filter(c => c.netTotal > c.floorTotal && c.discFlat > 0);
             if (healthyItems.length === 0) return alert("AI Cannot Optimize: No other discounted items in cart to absorb the loss.");
-            let totalAvailableBuffer = healthyItems.reduce((a,c) => a + (c.netPrice - c.floor), 0);
-            healthyItems.forEach(item => { let itemBuffer = item.netPrice - item.floor; let proportion = itemBuffer / totalAvailableBuffer; let recoveryTarget = Math.min(deficit * proportion, itemBuffer); item.netPrice += recoveryTarget; item.discFlat = item.mrp - item.netPrice; item.discPercent = (item.discFlat / item.mrp) * 100; });
+            let totalAvailableBuffer = healthyItems.reduce((a,c) => a + (c.netTotal - c.floorTotal), 0);
+            healthyItems.forEach(item => { let itemBuffer = item.netTotal - item.floorTotal; let proportion = itemBuffer / totalAvailableBuffer; let recoveryTarget = Math.min(deficit * proportion, itemBuffer); item.netTotal += recoveryTarget; item.discFlat = item.mrpTotal - item.netTotal; item.discPercent = (item.discFlat / item.mrpTotal) * 100; });
             updateCartUI(); alert("✨ AI Optimized! Discounts on healthy items reduced to subsidize the loss.");
         });
 
@@ -825,90 +538,34 @@
             if(cart.length === 0) return alert("Cart is empty."); 
             const compName = document.getElementById('qCompany').value; const qSubject = document.getElementById('qSubject').value;
             if (!qSubject) return alert("Subject Line is compulsory!");
-            if (document.getElementById('saveNewCrm').checked && compName) { await addDoc(collection(db, "customers"), { name: compName, param1: document.getElementById('qContact').value || "", param2: activeRole || "Admin", isActive: true }); }
-            const hasLossOverride = cart.some(item => item.netPrice < item.floor);
-            const qData = { quoteId: document.getElementById('quoteId').value, company: compName || "Unknown", subject: qSubject, subTotal: quoteSubtotal, grandTotal: quoteGrandTotal, hasLossOverride: hasLossOverride, status: document.getElementById('dealStatus').value, probability: document.getElementById('dealProb').value, ownerRole: activeRole || "Admin", createdBy: currentUser.email, date: new Date().toISOString(), cart: cart };
+            const qData = { quoteId: document.getElementById('quoteId').value, company: compName || "Unknown", subject: qSubject, subTotal: Number(document.getElementById('cSub').innerText.replace('₹','').trim()), grandTotal: Number(document.getElementById('cGrand').innerText.replace('₹','').trim()), hasLossOverride: cart.some(item => item.netTotal < item.floorTotal), status: document.getElementById('dealStatus').value, probability: document.getElementById('dealProb').value, ownerRole: activeRole || "Admin", createdBy: currentUser.email, date: new Date().toISOString(), cart: cart };
             try { await addDoc(collection(db, "quotes"), qData); alert("Quote Saved to Pipeline!"); switchTab('dashboard'); } catch(e) { alert("Error saving quote."); }
         });
 
-        // PDF Generation with Attached Engineering Drawing
+        // PDF Generation
         document.getElementById('pdfBtn').addEventListener('click', () => {
             if(cart.length === 0) return alert("Cart is empty.");
             const { jsPDF } = window.jspdf; const doc = new jsPDF(); const qId = document.getElementById('quoteId').value; const subj = document.getElementById('qSubject').value || "Project";
-            
-            if (companyProfile.logo) {
-                try { doc.addImage(companyProfile.logo, 'PNG', 20, 15, 40, 15); } catch(e) { try { doc.addImage(companyProfile.logo, 'JPEG', 20, 15, 40, 15); } catch(e2) { doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(30, 58, 138); doc.text(companyProfile.name, 20, 25); } }
-                doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(30, 58, 138); doc.text(companyProfile.name, 65, 22);
-            } else { doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(30, 58, 138); doc.text(companyProfile.name, 20, 25); }
-            
-            doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-            let addressX = companyProfile.logo ? 65 : 20; let addressY = companyProfile.logo ? 27 : 31;
-            doc.text(companyProfile.address, addressX, addressY); 
-            doc.text(`GSTIN: ${companyProfile.gst} | IEC: ${companyProfile.iec} | PAN: ${companyProfile.pan}`, addressX, addressY+5);
-            doc.setLineWidth(0.5); doc.setDrawColor(200, 200, 200); doc.line(20, 40, 190, 40);
-
-            doc.setTextColor(0, 0, 0); doc.setFontSize(11); doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 50); doc.text(`Quote Ref: ${qId}`, 150, 56);
-            doc.setFont("helvetica", "bold"); doc.text(`To,`, 20, 50); doc.text(document.getElementById('qContact').value || "Client", 20, 56); doc.text(document.getElementById('qCompany').value || "Company", 20, 62);
-            doc.text(`Subject: ${subj}`, 20, 80);
-            doc.setFont("helvetica", "normal"); doc.text(`Dear Sir/Madam,\n\nWe thank you for your enquiry and the interest shown in ${companyProfile.name}.\n\nBased on our technical evaluation of your requirements, we are pleased to submit our most competitive commercial offer for your consideration.`, 20, 90, { maxWidth: 170, lineHeightFactor: 1.5 });
-
+            if (companyProfile.logo) { try { doc.addImage(companyProfile.logo, 'PNG', 20, 15, 40, 15); } catch(e) { doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(30, 58, 138); doc.text(companyProfile.name, 20, 25); } doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(30, 58, 138); doc.text(companyProfile.name, 65, 22); } 
+            else { doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(30, 58, 138); doc.text(companyProfile.name, 20, 25); }
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 100, 100); let addressX = companyProfile.logo ? 65 : 20; let addressY = companyProfile.logo ? 27 : 31; doc.text(companyProfile.address, addressX, addressY); doc.text(`GSTIN: ${companyProfile.gst} | IEC: ${companyProfile.iec} | PAN: ${companyProfile.pan}`, addressX, addressY+5); doc.setLineWidth(0.5); doc.setDrawColor(200, 200, 200); doc.line(20, 40, 190, 40);
+            doc.setTextColor(0, 0, 0); doc.setFontSize(11); doc.text(`Date: ${new Date().toLocaleDateString()}`, 150, 50); doc.text(`Quote Ref: ${qId}`, 150, 56); doc.setFont("helvetica", "bold"); doc.text(`To,`, 20, 50); doc.text(document.getElementById('qContact').value || "Client", 20, 56); doc.text(document.getElementById('qCompany').value || "Company", 20, 62); doc.text(`Subject: ${subj}`, 20, 80); doc.setFont("helvetica", "normal"); doc.text(`Dear Sir/Madam,\n\nWe thank you for your enquiry and the interest shown in ${companyProfile.name}.\n\nBased on our technical evaluation of your requirements, we are pleased to submit our most competitive commercial offer for your consideration.`, 20, 90, { maxWidth: 170, lineHeightFactor: 1.5 });
             doc.addPage(); doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(30, 58, 138); doc.text("COMMERCIAL QUOTATION", 20, 20); doc.setFontSize(10); doc.setTextColor(0,0,0); doc.text(`Quote Ref: ${qId}`, 150, 20);
-
-            let tableData = cart.map((c, idx) => { let discStr = c.discFlat > 0 ? `Rs. ${c.discFlat.toFixed(0)} (${c.discPercent.toFixed(1)}%)` : "-"; return [idx+1, c.desc, "1.00", `${c.weight.toFixed(2)} kg`, discStr, `Rs. ${c.netPrice.toFixed(2)}`]; });
+            let tableData = cart.map((c, idx) => { let discStr = c.discFlat > 0 ? `Rs. ${c.discFlat.toFixed(0)}` : "-"; return [idx+1, c.desc, c.qty.toString(), `${(c.weightTotal/c.qty).toFixed(2)} kg`, discStr, `Rs. ${c.netTotal.toFixed(0)}`]; });
             doc.autoTable({ startY: 30, head: [['Sr', 'Item Description', 'Qty', 'Unit Wt', 'Discount', 'Net Amount (INR)']], body: tableData, theme: 'grid', headStyles: { fillColor: [30, 58, 138], textColor: 255 } });
-
-            let finalY = doc.lastAutoTable.finalY + 10;
-            doc.setFont("helvetica", "normal"); doc.text(`Subtotal:`, 130, finalY); doc.text(document.getElementById('cSub').innerText, 190, finalY, {align: 'right'}); finalY += 6; doc.text(`Freight/Pkg:`, 130, finalY); doc.text(document.getElementById('cFreight').innerText, 190, finalY, {align: 'right'}); finalY += 6; doc.text(document.getElementById('taxLine').children[0].innerText, 130, finalY); doc.text(document.getElementById('cTax').innerText, 190, finalY, {align: 'right'}); finalY += 6;
-            doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text(`Grand Total:`, 130, finalY); doc.text(document.getElementById('cGrand').innerText, 190, finalY, {align: 'right'});
-
-            // Attach 2D Engineering Drawing to Page 3
-            if(document.getElementById('iType').value === 'custom') {
-                try {
-                    const imgData = renderer.domElement.toDataURL('image/png');
-                    doc.addPage();
-                    doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(30, 58, 138); doc.text("TECHNICAL ANNEXURE", 20, 20); 
-                    doc.setFontSize(10); doc.setTextColor(100, 100, 100); doc.text(`Reference: ${qId}`, 20, 26);
-                    doc.setDrawColor(0); doc.setLineWidth(0.5); doc.rect(20, 35, 170, 120);
-                    doc.addImage(imgData, 'PNG', 25, 40, 160, 110);
-                } catch(e) { console.log("No 3D rendering available for PDF"); }
-            }
-            
+            let finalY = doc.lastAutoTable.finalY + 10; doc.setFont("helvetica", "normal"); doc.text(`Subtotal:`, 130, finalY); doc.text(document.getElementById('cSub').innerText, 190, finalY, {align: 'right'}); finalY += 6; doc.text(`Freight/Pkg:`, 130, finalY); doc.text(document.getElementById('cFreightOut').innerText, 190, finalY, {align: 'right'}); finalY += 6; doc.text(document.getElementById('taxLine').children[0].innerText, 130, finalY); doc.text(document.getElementById('cTax').innerText, 190, finalY, {align: 'right'}); finalY += 6; doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text(`Grand Total:`, 130, finalY); doc.text(document.getElementById('cGrand').innerText, 190, finalY, {align: 'right'});
             doc.save(`${qId}_Proposal.pdf`);
         });
 
-        // Dashboard Data Filtering
         function filterDashboardData() {
-            let activeCount = 0, wonCount = 0, pipelineVal = 0, statusCounts = { 'Draft':0, 'Sent':0, 'Won':0, 'Lost':0 };
-            const tbody = document.getElementById('quoteTableBody'); tbody.innerHTML = "";
-            const searchTerm = document.getElementById('quoteSearch').value.toLowerCase();
+            let activeCount = 0, wonCount = 0, pipelineVal = 0; const tbody = document.getElementById('quoteTableBody'); tbody.innerHTML = ""; const searchTerm = document.getElementById('quoteSearch').value.toLowerCase();
             const roleQuotes = quotesData.filter(q => myHierarchyRoles.includes("ALL") || myHierarchyRoles.includes(q.ownerRole));
-            const filteredQuotes = roleQuotes.filter(q => q.quoteId.toLowerCase().includes(searchTerm) || q.company.toLowerCase().includes(searchTerm) || (q.subject || '').toLowerCase().includes(searchTerm));
-
-            let perf = {};
-            filteredQuotes.forEach(q => {
-                const isAct = ['Draft', 'Sent'].includes(q.status);
-                if (isAct) { activeCount++; pipelineVal += (q.subTotal || 0); }
-                if (q.status === 'Won') wonCount++; 
-                statusCounts[q.status] = (statusCounts[q.status] || 0) + 1;
-                if (!perf[q.createdBy]) perf[q.createdBy] = { pipe:0, won:0, totalOps:0, wonOps:0 };
-                if (isAct) perf[q.createdBy].pipe += (q.subTotal || 0);
-                if (q.status !== 'Draft') perf[q.createdBy].totalOps++;
-                if (q.status === 'Won') { perf[q.createdBy].won += (q.subTotal || 0); perf[q.createdBy].wonOps++; }
-                
-                const rowColor = q.status === 'Won' ? 'bg-green-50' : q.status === 'Lost' ? 'bg-red-50' : q.status === 'Sent' ? 'bg-blue-50' : 'bg-slate-50';
-                const overrideBadge = q.hasLossOverride ? `<span class="bg-orange-100 text-orange-700 text-[10px] px-2 py-1 rounded-full font-black ml-2 border border-orange-400">🚨 LOSS</span>` : '';
-                tbody.insertAdjacentHTML('beforeend', `<tr class="${rowColor} border-b transition hover:brightness-95"><td class="p-3 font-black text-blue-800">${q.quoteId}</td><td class="p-3"><p class="font-black text-gray-900">${q.company}</p><p class="text-[10px] font-bold mt-1 text-slate-500">${q.subject || 'No Subject'}</p></td><td class="p-3 font-black text-slate-800">₹ ${(q.subTotal || 0).toFixed(2)}</td><td class="p-3 text-[10px] font-bold text-slate-500">${q.createdBy}</td><td class="p-3"><select onchange="updateQuoteStatus('${q.id}', this.value)" class="border-2 border-white rounded-lg text-xs p-1.5 font-bold outline-none bg-white/50 focus:border-blue-400"><option value="Draft" ${q.status==='Draft'?'selected':''}>Draft</option><option value="Sent" ${q.status==='Sent'?'selected':''}>Sent</option><option value="Won" ${q.status==='Won'?'selected':''}>Won</option><option value="Lost" ${q.status==='Lost'?'selected':''}>Lost</option></select>${overrideBadge}</td><td class="p-3 font-black ${q.probability==='Hot'?'text-red-500':'text-slate-400'}">${q.probability}</td></tr>`);
+            roleQuotes.filter(q => q.quoteId.toLowerCase().includes(searchTerm) || q.company.toLowerCase().includes(searchTerm) || (q.subject || '').toLowerCase().includes(searchTerm)).forEach(q => {
+                const isAct = ['Draft', 'Sent'].includes(q.status); if (isAct) { activeCount++; pipelineVal += (q.subTotal || 0); } if (q.status === 'Won') wonCount++;
+                const rowColor = q.status === 'Won' ? 'bg-green-50' : q.status === 'Lost' ? 'bg-red-50' : q.status === 'Sent' ? 'bg-blue-50' : 'bg-slate-50'; const overrideBadge = q.hasLossOverride ? `<span class="bg-orange-100 text-orange-700 text-[10px] px-2 py-1 rounded-full font-black ml-2">🚨 LOSS</span>` : '';
+                tbody.insertAdjacentHTML('beforeend', `<tr class="${rowColor} border-b transition hover:brightness-95"><td class="p-3 font-black text-blue-800">${q.quoteId}</td><td class="p-3"><p class="font-black text-gray-900">${q.company}</p><p class="text-[10px] font-bold mt-1 text-slate-500">${q.subject || 'No Subject'}</p></td><td class="p-3 font-black text-slate-800">₹ ${(q.subTotal || 0).toLocaleString('en-IN')}</td><td class="p-3"><select class="border-2 border-white rounded-lg text-xs p-1.5 font-bold outline-none"><option value="Draft" ${q.status==='Draft'?'selected':''}>Draft</option><option value="Sent" ${q.status==='Sent'?'selected':''}>Sent</option><option value="Won" ${q.status==='Won'?'selected':''}>Won</option><option value="Lost" ${q.status==='Lost'?'selected':''}>Lost</option></select>${overrideBadge}</td><td class="p-3 font-black ${q.probability==='Hot'?'text-red-500':'text-slate-400'}">${q.probability}</td></tr>`);
             });
-
             document.getElementById('statPipeline').innerText = `₹ ${pipelineVal.toLocaleString('en-IN')}`; document.getElementById('statActive').innerText = activeCount; document.getElementById('statWon').innerText = wonCount;
-            const perfBody = document.getElementById('performanceBody'); perfBody.innerHTML = "";
-            for (let user in perf) {
-                let winRate = perf[user].totalOps > 0 ? ((perf[user].wonOps / perf[user].totalOps)*100).toFixed(1) : 0;
-                perfBody.insertAdjacentHTML('beforeend', `<tr><td class="p-3 font-black text-slate-700">${user}</td><td class="p-3 text-right font-bold text-slate-600">₹ ${perf[user].pipe.toLocaleString('en-IN')}</td><td class="p-3 text-right text-emerald-600 font-black">₹ ${perf[user].won.toLocaleString('en-IN')}</td><td class="p-3 text-center font-black text-slate-700">${winRate}%</td></tr>`);
-            }
-
-            if(statChartInst) statChartInst.destroy();
-            statChartInst = new Chart(document.getElementById('statusChart').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(statusCounts), datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#94a3b8', '#3b82f6', '#10b981', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, cutout: '70%', plugins: { legend: { position: 'right', labels: { font: { weight: 'bold' } } } } } });
         }
     </script>
 </body>

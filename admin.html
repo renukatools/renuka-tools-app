@@ -43,8 +43,8 @@
         
         <div class="flex-1 overflow-y-auto custom-scrollbar py-4">
             <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">CRM & Access</p></div><div id="nav-crm" class="space-y-1 mb-4"></div>
-            <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Manufacturing Engine</p></div><div id="nav-mfg" class="space-y-1 mb-4"></div>
-            <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Commercial & Spares</p></div><div id="nav-com" class="space-y-1 mb-4"></div>
+            <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Quote-Level (Global)</p></div><div id="nav-quote" class="space-y-1 mb-4"></div>
+            <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Component-Level (Loop)</p></div><div id="nav-comp" class="space-y-1 mb-4"></div>
             
             <div class="px-4 mt-6 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">System Control</p></div>
             <button onclick="window.showProfile()" id="btnProfile" class="w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-gray-400">🏢 Company Profile</button>
@@ -53,8 +53,6 @@
             <div class="px-4 mt-6 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Module Access Hub</p></div>
             <a href="index.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-yellow-400">🏠 Master Portal</a>
             <a href="sales.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-blue-400">🛒 Sales Engine</a>
-            <a href="design.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-purple-400">📐 Design Library</a>
-            <a href="purchase.html" class="block w-full text-left px-6 py-2 text-sm font-medium transition-colors hover:bg-gray-800 text-emerald-400">📦 Purchase Portal</a>
         </div>
         <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2">
             <button id="schemaBuilderBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg text-sm font-bold shadow transition">⚙️ Create New Master</button>
@@ -92,23 +90,20 @@
             <!-- SCHEMA MANAGER (KILL SWITCH & SCHEMA EDITOR) -->
             <div id="schemaManagerContainer" class="hidden bg-white rounded-xl shadow-sm border p-4 sm:p-8 max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-6 border-b pb-2">
-                    <h3 class="text-xl font-bold text-gray-800">Database Schema Manager & Renaming</h3>
+                    <h3 class="text-xl font-bold text-gray-800">Database Schema Manager</h3>
                     <p class="text-xs text-red-600 font-bold bg-red-50 px-3 py-1 rounded-full border border-red-200">⚠️ God Mode</p>
                 </div>
-                <p class="text-sm text-gray-500 mb-6 font-semibold">Modify database titles, column header names, behaviors, or toggle global active states.</p>
-                <div class="overflow-x-auto"><table class="w-full text-left text-sm border-collapse"><thead class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider"><tr><th class="p-3 border-b rounded-tl-lg">Module</th><th class="p-3 border-b">Database Title & Columns</th><th class="p-3 border-b">Behavior</th><th class="p-3 border-b text-center">Global Status</th><th class="p-3 border-b text-right rounded-tr-lg">Action</th></tr></thead><tbody id="schemaManagerBody" class="divide-y divide-gray-100"></tbody></table></div>
+                <div class="overflow-x-auto"><table class="w-full text-left text-sm border-collapse"><thead class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider"><tr><th class="p-3 border-b">Category</th><th class="p-3 border-b">Database Title</th><th class="p-3 border-b">Behavior</th><th class="p-3 border-b text-center">Global Status</th><th class="p-3 border-b text-right">Action</th></tr></thead><tbody id="schemaManagerBody" class="divide-y divide-gray-100"></tbody></table></div>
             </div>
         </main>
     </div>
 
-    <!-- UNIVERSAL MODALS -->
-    <input type="file" id="excelUpload" class="hidden" accept=".xlsx, .xls">
-
+    <!-- UNIVERSAL ENTRY MODAL (STANDARD) -->
     <div id="dataModal" class="fixed inset-0 bg-slate-900/60 hidden flex items-center justify-center z-50 backdrop-blur-sm p-4 transition-opacity">
         <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center mb-5 border-b pb-3">
                 <h3 id="modalTitle" class="text-xl font-black text-gray-800 truncate">Add Record</h3>
-                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 cursor-pointer hover:bg-slate-200 transition" onclick="document.getElementById('isActive').click()">
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 cursor-pointer" onclick="document.getElementById('isActive').click()">
                     <input type="checkbox" id="isActive" class="w-4 h-4 text-blue-600 rounded cursor-pointer pointer-events-none" checked>
                     <label class="text-xs font-bold text-gray-700 cursor-pointer pointer-events-none">Active</label>
                 </div>
@@ -116,14 +111,49 @@
             <input type="hidden" id="activeCollection"><input type="hidden" id="activeDocId">
             <div class="space-y-4">
                 <div id="grp1"><label id="lbl1" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp1" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-bold text-gray-900 transition"></div>
-                <div class="hidden" id="grp2"><label id="lbl2" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp2" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold transition"><select id="sel2" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm bg-blue-50 font-semibold transition"></select></div>
-                <div class="hidden" id="grp3"><label id="lbl3" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp3" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold transition"><select id="sel3" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm bg-blue-50 font-semibold transition"></select><div id="multiCheck3" class="hidden max-h-40 overflow-y-auto border-2 border-gray-200 p-3 rounded-lg bg-slate-50 space-y-2 custom-scrollbar"></div></div>
-                <div class="hidden" id="grp4"><label id="lbl4" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp4" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold transition"><select id="sel4" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm bg-blue-50 font-semibold transition"><option value="No">No (Strict Lock)</option><option value="Yes">Yes (Allow Access)</option></select></div>
+                <div class="hidden" id="grp2"><label id="lbl2" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="number" min="0" oninput="validity.valid||(value='');" id="inp2" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold transition"><input type="text" id="inp2_text" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold"><select id="sel2" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm bg-blue-50 font-semibold transition"></select></div>
+                <div class="hidden" id="grp3"><label id="lbl3" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="number" min="0" oninput="validity.valid||(value='');" id="inp3" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold transition"><input type="text" id="inp3_text" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold"><select id="sel3" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm bg-blue-50 font-semibold transition"></select><div id="multiCheck3" class="hidden max-h-40 overflow-y-auto border-2 border-gray-200 p-3 rounded-lg bg-slate-50 space-y-2 custom-scrollbar"></div></div>
+                <div class="hidden" id="grp4"><label id="lbl4" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="number" min="0" oninput="validity.valid||(value='');" id="inp4" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold transition"><input type="text" id="inp4_text" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm font-semibold"><select id="sel4" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm bg-blue-50 font-semibold transition"><option value="No">No (Strict Lock)</option><option value="Yes">Yes (Allow Access)</option></select></div>
                 <div class="hidden" id="grp5"><label id="lbl5" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><select id="sel5" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-blue-500 outline-none text-sm bg-blue-50 font-semibold transition"><option value="No">No (Hide Costing)</option><option value="Yes">Yes (Show Breakup)</option></select></div>
             </div>
             <div class="flex justify-end space-x-3 border-t mt-6 pt-4">
-                <button id="cancelModalBtn" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-bold transition">Cancel</button>
-                <button id="saveDataBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg shadow-blue-500/30 transition">Save Record</button>
+                <button id="cancelModalBtn" class="px-5 py-2.5 bg-slate-200 text-slate-800 rounded-lg font-bold">Cancel</button>
+                <button id="saveDataBtn" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-lg">Save Record</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADVANCED CRM CUSTOMER MODAL -->
+    <div id="crmModal" class="fixed inset-0 bg-slate-900/60 hidden flex items-center justify-center z-50 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[95vh] overflow-y-auto custom-scrollbar relative">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-xl font-black text-blue-900">Advanced Customer Profile</h3>
+                <button onclick="document.getElementById('crmModal').classList.add('hidden')" class="text-gray-400 hover:text-red-500 font-bold text-xl">✕</button>
+            </div>
+            <input type="hidden" id="crmDocId">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div class="col-span-2 sm:col-span-1"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Company Name *</label><input type="text" id="crmName" class="w-full border-2 border-gray-200 p-2 rounded-lg font-bold focus:border-blue-500 outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">GST Number</label><input type="text" id="crmGst" class="w-full border-2 border-gray-200 p-2 rounded-lg font-semibold focus:border-blue-500 outline-none"></div>
+                <div class="col-span-2"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Billing Address</label><textarea id="crmBilling" rows="2" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm focus:border-blue-500 outline-none"></textarea></div>
+                <div class="col-span-2"><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Shipping Address</label><textarea id="crmShipping" rows="2" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm focus:border-blue-500 outline-none"></textarea></div>
+                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Default Payment Terms</label><select id="crmPayTerms" class="w-full border-2 border-gray-200 p-2 rounded-lg font-semibold focus:border-blue-500 outline-none"></select></div>
+                <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Default INCO Terms</label><select id="crmIncoTerms" class="w-full border-2 border-gray-200 p-2 rounded-lg font-semibold focus:border-blue-500 outline-none"></select></div>
+            </div>
+            
+            <div class="border-t border-gray-200 pt-4 mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-black text-sm text-gray-800">Contact Directory</h4>
+                    <button onclick="window.addCrmContact()" class="bg-blue-100 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">+ Add Contact</button>
+                </div>
+                <div id="crmContactsWrapper" class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar p-1"></div>
+            </div>
+
+            <div class="flex justify-between items-center border-t mt-4 pt-4">
+                <div class="flex items-center space-x-2 bg-slate-100 px-3 py-2 rounded-lg cursor-pointer" onclick="document.getElementById('crmActive').click()">
+                    <input type="checkbox" id="crmActive" class="w-4 h-4 text-blue-600 rounded cursor-pointer pointer-events-none" checked>
+                    <label class="text-xs font-bold text-gray-700 cursor-pointer pointer-events-none">Customer Active</label>
+                </div>
+                <button id="saveCrmBtn" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition">Save Customer Profile</button>
             </div>
         </div>
     </div>
@@ -134,21 +164,23 @@
             <h3 id="schemaModalTitle" class="text-xl font-black mb-4 text-purple-900 border-b pb-2">Deploy Custom Database</h3>
             <input type="hidden" id="editingSchemaId">
             <div class="space-y-4">
-                <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Module Category</label><select id="schCat" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-semibold transition"><option value="com">Commercial & Trading</option><option value="mfg">Manufacturing Engine</option><option value="crm">CRM & Operations</option></select></div>
-                <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Master Title</label><input type="text" id="schTitle" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-bold transition" placeholder="e.g. Agent Commission"></div>
-                <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Calculation Behavior</label><select id="schBehavior" class="w-full border-2 border-gray-200 p-2.5 rounded-lg bg-purple-50 text-sm font-bold text-purple-900 focus:border-purple-500 outline-none transition"><option value="flat">Flat Cost Adder (₹)</option><option value="variable">Variable Cost Adder (₹ × Qty/Hrs)</option><option value="percentage">MRP Percentage Adder (%)</option><option value="margin">Margin Modifier (%)</option><option value="lookup">Standalone Lookup (Dropdown only)</option><option value="crm">CRM Relational Data</option></select></div>
+                <!-- VITAL FIX: STRICT CATEGORIZATION -->
+                <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Database Category (Crucial for Sales Engine)</label><select id="schCat" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-black text-blue-900 bg-blue-50 transition"><option value="quote_level">Quote-Level (Global / Occurs Once)</option><option value="component_level">Component-Level (Loops / Requires Qty)</option></select><p class="text-[9px] text-gray-500 mt-1">Quote-Level: Freight, Terms, Tier Margins. Component-Level: Operations, Materials, Spares.</p></div>
+                
+                <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Master Title</label><input type="text" id="schTitle" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-bold transition"></div>
+                <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Calculation Behavior</label><select id="schBehavior" class="w-full border-2 border-gray-200 p-2.5 rounded-lg bg-white text-sm font-bold text-gray-700 focus:border-purple-500 outline-none transition"><option value="flat">Flat Cost Adder (₹)</option><option value="variable">Variable Cost Adder (₹ × Qty/Hrs)</option><option value="percentage">MRP Percentage Adder (%)</option><option value="margin">Margin Modifier (%)</option><option value="lookup">Standalone Lookup (Dropdown only)</option></select></div>
                 <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Data Columns Needed</label><select id="schType" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-purple-500 outline-none font-semibold transition"><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option><option value="4">4 Columns</option></select></div>
                 
                 <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border-2 border-slate-100">
-                    <div><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 1 Header</label><input type="text" id="schCol1" value="Name" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-800 outline-none transition focus:border-purple-400"></div>
-                    <div id="schCol2Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 2 Header</label><input type="text" id="schCol2" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
-                    <div id="schCol3Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 3 Header</label><input type="text" id="schCol3" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
-                    <div id="schCol4Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 4 Header</label><input type="text" id="schCol4" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold text-gray-800 outline-none transition focus:border-purple-400"></div>
+                    <div><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 1 Header</label><input type="text" id="schCol1" value="Name" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-bold text-gray-800 outline-none"></div>
+                    <div id="schCol2Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 2 Header</label><input type="text" id="schCol2" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold outline-none"></div>
+                    <div id="schCol3Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 3 Header</label><input type="text" id="schCol3" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold outline-none"></div>
+                    <div id="schCol4Grp" class="hidden"><label class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Col 4 Header</label><input type="text" id="schCol4" class="w-full border-2 border-gray-200 p-2 rounded-lg text-sm font-semibold outline-none"></div>
                 </div>
             </div>
             <div class="flex justify-end space-x-3 border-t mt-6 pt-4">
-                <button id="cancelSchemaBtn" class="px-5 py-2.5 bg-slate-200 rounded-lg font-bold text-slate-800 hover:bg-slate-300 transition">Cancel</button>
-                <button id="saveSchemaBtn" class="px-5 py-2.5 bg-purple-600 text-white font-bold rounded-lg shadow-lg shadow-purple-500/30 hover:bg-purple-700 transition">Save Changes</button>
+                <button id="cancelSchemaBtn" class="px-5 py-2.5 bg-slate-200 rounded-lg font-bold text-slate-800">Cancel</button>
+                <button id="saveSchemaBtn" class="px-5 py-2.5 bg-purple-600 text-white font-bold rounded-lg">Save Changes</button>
             </div>
         </div>
     </div>
@@ -163,70 +195,43 @@
         
         const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
 
-        let appSchemas = []; let mst = {}; let currentTabId = "roles"; let pendingImportCollection = ""; let base64Logo = "";
+        let appSchemas = []; let mst = {}; let currentTabId = "roles"; let base64Logo = "";
         let unsubSchemas = null; let unsubTable = null; let unsubProfile = null; let roleCache = [];
 
+        // STRICT NEW CATEGORIZATION: quote_level vs component_level
         const defaultSchemas = [
             { id: "roles", category: "crm", title: "System Roles Hierarchy", cols: ["Role Name", "Reports To (Role)", "Region"], params: 3, behavior: "crm" },
             { id: "users", category: "crm", title: "User Access Map", cols: ["Employee Name", "Login Email", "Assigned Roles", "Allow Override", "Show Cost Breakup"], params: 5, behavior: "crm" },
-            { id: "customers", category: "crm", title: "Customer Directory", cols: ["Company Name", "Contact Person", "Owner Role", "GST No"], params: 4, behavior: "crm" },
-            { id: "raw_materials", category: "mfg", title: "Raw Materials", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3, behavior: "variable" },
-            { id: "blanks", category: "mfg", title: "Taper Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 4, behavior: "lookup" },
-            { id: "operations", category: "mfg", title: "Machine Operations", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 3, behavior: "variable" },
-            { id: "features", category: "mfg", title: "Features & Pocketing", cols: ["Feature Name", "Rate per Qty (₹)"], params: 2, behavior: "variable" },
-            { id: "assembly", category: "mfg", title: "Assembly & Surface", cols: ["Process Name", "Flat Cost (₹)"], params: 2, behavior: "flat" },
-            { id: "inserts", category: "mfg", title: "Cutting Inserts Master", cols: ["Designation (e.g. CNMG)", "Shape Letter (C,W,S,T,D,V)", "Cost (₹)"], params: 3, behavior: "variable" },
-            { id: "customer_tiers", category: "com", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 3, behavior: "margin" },
-            { id: "tool_categories", category: "com", title: "Tool Categories", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 3, behavior: "margin" },
-            { id: "spares", category: "com", title: "Spares & Standard Items", cols: ["Item Name", "List Price (₹)", "Max Disc (%)"], params: 3, behavior: "lookup" },
-            { id: "freight", category: "com", title: "Freight & Transport", cols: ["Method", "Rate (₹/kg)", "Flat Cost (₹)"], params: 3, behavior: "variable" },
-            { id: "payment_terms", category: "com", title: "Payment Terms", cols: ["Description"], params: 1, behavior: "lookup" },
-            { id: "inco_terms", category: "com", title: "INCO / Shipping", cols: ["Term Description"], params: 1, behavior: "lookup" }
+            { id: "customers", category: "crm", title: "Detailed Customer Master", cols: ["Company Name", "GST", "Billing Address"], params: 3, behavior: "crm" },
+            { id: "customer_tiers", category: "quote_level", title: "Customer Tiers", cols: ["Tier Name", "Floor Margin (%)", "Trading Margin (%)"], params: 3, behavior: "margin" },
+            { id: "payment_terms", category: "quote_level", title: "Payment Terms", cols: ["Description"], params: 1, behavior: "lookup" },
+            { id: "inco_terms", category: "quote_level", title: "INCO / Shipping Terms", cols: ["Term Description"], params: 1, behavior: "lookup" },
+            { id: "freight", category: "quote_level", title: "Freight Options", cols: ["Method", "Rate (₹/kg)", "Flat Cost (₹)"], params: 3, behavior: "variable" },
+            
+            { id: "tool_categories", category: "component_level", title: "Tool Categories (Margins)", cols: ["Category Name", "Criticality (%)", "Escalation (%)"], params: 3, behavior: "margin" },
+            { id: "raw_materials", category: "component_level", title: "Raw Material Grades", cols: ["Grade", "Density (g/cm³)", "Cost (₹/kg)"], params: 3, behavior: "variable" },
+            { id: "blanks", category: "component_level", title: "Standard Taper Blanks", cols: ["Taper Name", "Dia (mm)", "Max GPL (mm)", "Cost (₹)"], params: 4, behavior: "lookup" },
+            { id: "operations", category: "component_level", title: "Machine Operations", cols: ["Machine", "Hourly Rate (₹)", "Setup Cost (₹)"], params: 3, behavior: "variable" },
+            { id: "features", category: "component_level", title: "Features & Pocketing", cols: ["Feature Name", "Rate per Qty (₹)"], params: 2, behavior: "variable" },
+            { id: "assembly", category: "component_level", title: "Assembly & Surface", cols: ["Process Name", "Flat Cost (₹)"], params: 2, behavior: "flat" },
+            { id: "inserts", category: "component_level", title: "Cutting Inserts Master", cols: ["Designation (e.g. CNMG)", "Shape Letter", "Cost (₹)"], params: 3, behavior: "variable" },
+            { id: "spares", category: "component_level", title: "Spares & Standard Items", cols: ["Item Name", "List Price (₹)", "Max Disc (%)"], params: 3, behavior: "lookup" }
         ];
 
-        window.toggleSidebar = () => {
-            const sb = document.getElementById('sidebar'); const overlay = document.getElementById('mobileOverlay');
-            if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } 
-            else { sb.classList.add('-translate-x-full'); overlay.classList.add('hidden'); }
-        };
+        window.toggleSidebar = () => { const sb = document.getElementById('sidebar'); const overlay = document.getElementById('mobileOverlay'); if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } else { sb.classList.add('-translate-x-full'); overlay.classList.add('hidden'); } };
 
         onAuthStateChanged(auth, async (user) => { 
             if (user) { 
-                if (!ADMIN_EMAILS.includes(user.email)) { alert("Unauthorized Access. Admin Privileges Required."); signOut(auth); return; }
+                if (!ADMIN_EMAILS.includes(user.email)) { alert("Unauthorized Access."); signOut(auth); return; }
                 document.getElementById('loginSection').classList.add('hidden'); bootSequence(); 
-            } else { 
-                document.getElementById('loginSection').classList.remove('hidden'); 
-                if(unsubSchemas) unsubSchemas(); if(unsubTable) unsubTable(); if(unsubProfile) unsubProfile();
-            } 
+            } else { document.getElementById('loginSection').classList.remove('hidden'); if(unsubSchemas) unsubSchemas(); if(unsubTable) unsubTable(); if(unsubProfile) unsubProfile(); } 
         });
 
         document.getElementById('loginBtn').addEventListener('click', () => {
             const btn = document.getElementById('loginBtn'); btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>`;
-            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(() => {
-                alert("Invalid credentials"); btn.innerHTML = `<span>Authorize Access</span>`;
-            });
+            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(() => { alert("Invalid credentials"); btn.innerHTML = `<span>Authorize Access</span>`; });
         });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
-
-        async function runInitializationMatrix() {
-            const rmSnap = await getDocs(collection(db, "raw_materials"));
-            if (rmSnap.empty) {
-                const b = writeBatch(db);
-                const rms = [ {n:"EN8 Steel", d:7.85, c:85}, {n:"EN19 Steel", d:7.85, c:105}, {n:"EN24 Steel", d:7.85, c:125}, {n:"20MnCr5 Steel", d:7.85, c:115}, {n:"H13 Tool Steel", d:7.80, c:240}, {n:"P20 Die Steel", d:7.85, c:160}, {n:"Aluminium 6061-T6", d:2.70, c:350}, {n:"Aluminium 7075", d:2.81, c:480}, {n:"Solid Carbide (Standard)", d:14.50, c:4500}, {n:"Electrolytic Copper", d:8.96, c:950} ];
-                rms.forEach(r => { b.set(doc(collection(db, "raw_materials")), { name: r.n, param1: r.d, param2: r.c, isActive: true }); });
-                
-                const shapes = ['C','W','T','D','V']; const clears = ['N','C','P']; const sizes = ['06','08','12','16'];
-                let cnt = 0;
-                shapes.forEach(s => { clears.forEach(c => { sizes.forEach(sz => {
-                    if(cnt < 350) { let n = `${s}${c}MG ${sz}0408`; b.set(doc(collection(db, "inserts")), { name: n, param1: s, param2: 120, isActive: true }); cnt++; }
-                }); }); });
-                
-                const blanks = [ {n:"BT40 Standard", d:44.45, l:65.4, c:1500}, {n:"BT50 Standard", d:69.85, l:101.8, c:3200}, {n:"HSK63A", d:63, l:32, c:2500}, {n:"HSK100A", d:100, l:50, c:4500} ];
-                blanks.forEach(r => { b.set(doc(collection(db, "blanks")), { name: r.n, param1: r.d, param2: r.l, param3: r.c, isActive: true }); });
-                
-                await b.commit();
-            }
-        }
 
         async function bootSequence() {
             const checkSch = await getDocs(collection(db, "system_schemas"));
@@ -235,7 +240,6 @@
                 defaultSchemas.forEach(schema => { schema.isActive = true; b.set(doc(collection(db, "system_schemas"), schema.id), schema, { merge: true }); });
                 await b.commit();
             }
-            await runInitializationMatrix();
             setupRealTimeListeners();
         }
 
@@ -250,6 +254,8 @@
             });
 
             onSnapshot(collection(db, "roles"), (snap) => { roleCache = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); });
+            onSnapshot(collection(db, "payment_terms"), (snap) => { mst.payment_terms = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); });
+            onSnapshot(collection(db, "inco_terms"), (snap) => { mst.inco_terms = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })); });
 
             if(unsubSchemas) unsubSchemas();
             unsubSchemas = onSnapshot(collection(db, "system_schemas"), (snap) => {
@@ -261,19 +267,19 @@
         }
 
         function renderSidebar() {
-            document.getElementById('nav-crm').innerHTML = ""; document.getElementById('nav-mfg').innerHTML = ""; document.getElementById('nav-com').innerHTML = "";
+            document.getElementById('nav-crm').innerHTML = ""; document.getElementById('nav-quote').innerHTML = ""; document.getElementById('nav-comp').innerHTML = "";
             appSchemas.forEach(sch => {
-                const targetDiv = sch.category === 'crm' ? 'nav-crm' : (sch.category === 'mfg' ? 'nav-mfg' : 'nav-com');
+                const targetDiv = sch.category === 'crm' ? 'nav-crm' : (sch.category === 'quote_level' ? 'nav-quote' : 'nav-comp');
                 const btn = document.createElement('button'); 
                 const dimClass = sch.isActive === false ? 'opacity-50 line-through' : '';
-                btn.className = `w-full text-left px-4 py-2 sm:px-6 sm:py-2 text-xs sm:text-sm font-bold transition-all hover:bg-slate-800 rounded-lg mb-1 ${sch.id === currentTabId ? 'active-nav' : 'text-slate-400'} ${dimClass}`; 
+                btn.className = `w-full text-left px-4 py-2 text-xs sm:text-sm font-bold transition-all hover:bg-slate-800 rounded-lg mb-1 ${sch.id === currentTabId ? 'active-nav' : 'text-slate-400'} ${dimClass}`; 
                 btn.innerText = sch.title;
                 btn.onclick = () => { 
                     currentTabId = sch.id; document.getElementById('btnProfile').classList.remove('active-nav'); document.getElementById('btnSchemaMgr').classList.remove('active-nav'); 
                     if(window.innerWidth < 1024) toggleSidebar(); 
                     renderSidebar(); mountTableListener(sch.id); 
                 };
-                if(document.getElementById(targetDiv)) document.getElementById(targetDiv).appendChild(btn); else document.getElementById('nav-com').appendChild(btn);
+                if(document.getElementById(targetDiv)) document.getElementById(targetDiv).appendChild(btn);
             });
         }
 
@@ -282,7 +288,6 @@
             document.getElementById('btnSchemaMgr').classList.add('active-nav'); 
             document.getElementById('tableContainer').classList.add('hidden'); document.getElementById('profileContainer').classList.add('hidden'); 
             document.getElementById('schemaManagerContainer').classList.remove('hidden'); document.getElementById('pageTitle').innerText = "Schema Manager"; document.getElementById('topActionButtons').innerHTML = "";
-            if(window.innerWidth < 1024) toggleSidebar();
             renderSchemaManager();
         };
 
@@ -290,25 +295,22 @@
             const body = document.getElementById('schemaManagerBody'); body.innerHTML = "";
             appSchemas.forEach(sch => {
                 const badge = sch.isActive !== false ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">Active</span>` : `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-bold">Inactive</span>`;
-                const catStr = sch.category === 'crm' ? 'CRM' : (sch.category === 'mfg' ? 'Manufacturing' : 'Commercial');
-                const colsList = (sch.cols || []).join(' | ');
+                const catStr = sch.category === 'quote_level' ? 'Quote-Level' : (sch.category === 'component_level' ? 'Component-Level' : 'CRM');
                 body.insertAdjacentHTML('beforeend', `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-3 font-semibold text-slate-500">${catStr}</td>
-                        <td class="p-3"><p class="font-black text-slate-800">${sch.title}</p><p class="text-[10px] text-slate-400 font-bold">${colsList}</p></td>
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="p-3 font-semibold text-slate-500 text-[10px] uppercase tracking-wider">${catStr}</td>
+                        <td class="p-3 font-black text-slate-800">${sch.title}</td>
                         <td class="p-3 text-[10px] uppercase tracking-wider text-blue-600 font-bold">${sch.behavior}</td>
                         <td class="p-3 text-center cursor-pointer hover:opacity-80 transition" onclick="window.toggleSchemaStatus('${sch.id}', ${sch.isActive !== false})">${badge}</td>
-                        <td class="p-3 text-right"><button onclick="window.openEditSchemaModal('${sch.id}')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold text-xs px-3 py-1 rounded-lg transition">Edit Schema</button></td>
+                        <td class="p-3 text-right"><button onclick="window.openEditSchemaModal('${sch.id}')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold text-[10px] px-3 py-1 rounded transition uppercase tracking-wider">Edit</button></td>
                     </tr>
                 `);
             });
         }
 
         window.toggleSchemaStatus = async (schId, currentStatus) => {
-            if(['roles', 'users', 'customers', 'customer_tiers'].includes(schId)) return alert("Core structural modules cannot be deactivated.");
-            if(confirm(`Are you sure you want to mark this database as ${currentStatus ? 'Inactive' : 'Active'} globally?`)) {
-                await updateDoc(doc(db, "system_schemas", schId), { isActive: !currentStatus });
-            }
+            if(['roles', 'users', 'customers', 'customer_tiers'].includes(schId)) return alert("Core modules cannot be deactivated.");
+            if(confirm(`Mark as ${currentStatus ? 'Inactive' : 'Active'} globally?`)) { await updateDoc(doc(db, "system_schemas", schId), { isActive: !currentStatus }); }
         };
 
         function mountTableListener(schemaId) {
@@ -319,14 +321,10 @@
             const sch = appSchemas.find(s => s.id === schemaId); if(!sch) return;
             document.getElementById('pageTitle').innerText = sch.title;
             
-            document.getElementById('topActionButtons').innerHTML = `
-                <button onclick="window.downloadTemplate('${sch.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold shadow-lg shadow-yellow-500/30 transition flex items-center"><span class="hidden sm:inline mr-1">📥 </span>Template</button>
-                <button onclick="window.triggerImport('${sch.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold shadow-lg shadow-indigo-500/30 transition flex items-center"><span class="hidden sm:inline mr-1">📤 </span>Import</button>
-                <button onclick="window.exportExcel('${sch.id}')" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold shadow-lg shadow-teal-500/30 transition flex items-center"><span class="hidden sm:inline mr-1">📊 </span>Export</button>
-                <button onclick="window.openEntryModal('${sch.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 sm:px-5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold shadow-lg shadow-green-500/30 transition flex items-center">+ Add</button>`;
+            document.getElementById('topActionButtons').innerHTML = `<button onclick="window.openEntryModal('${sch.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg transition flex items-center">+ Add Record</button>`;
                 
             let thHtml = (sch.cols || ["Name"]).map(c => `<th class="px-4 py-4 border-b font-black">${c}</th>`).join('');
-            document.getElementById('tableContainer').innerHTML = `<div class="overflow-x-auto"><table class="w-full text-left whitespace-nowrap"><thead class="bg-slate-100 text-slate-500 text-[10px] sm:text-xs uppercase tracking-wider"><tr>${thHtml}<th class="px-4 py-4 border-b w-24 font-black">Status</th><th class="px-4 py-4 border-b text-right w-24 font-black">Actions</th></tr></thead><tbody id="tbody_${sch.id}" class="text-xs sm:text-sm divide-y divide-slate-100"><tr><td colspan="6" class="text-center py-10 text-slate-400 font-bold"><div class="animate-pulse">Loading live data...</div></td></tr></tbody></table></div>`;
+            document.getElementById('tableContainer').innerHTML = `<div class="overflow-x-auto"><table class="w-full text-left whitespace-nowrap"><thead class="bg-slate-100 text-slate-500 text-[10px] uppercase tracking-wider"><tr>${thHtml}<th class="px-4 py-4 border-b w-24 font-black">Status</th><th class="px-4 py-4 border-b text-right w-24 font-black">Actions</th></tr></thead><tbody id="tbody_${sch.id}" class="text-xs divide-y divide-slate-100"></tbody></table></div>`;
 
             if(unsubTable) unsubTable();
             unsubTable = onSnapshot(collection(db, schemaId), (snap) => {
@@ -338,149 +336,130 @@
         function renderTableData(schemaId) {
             const sch = appSchemas.find(s => s.id === schemaId);
             let html = "";
-            if(mst[schemaId].length === 0) { html = `<tr><td colspan="6" class="text-center py-12 text-slate-400 font-semibold">No records found. Click "+ Add" to begin.</td></tr>`; } 
+            if(mst[schemaId].length === 0) { html = `<tr><td colspan="6" class="text-center py-12 text-slate-400 font-semibold">No records found.</td></tr>`; } 
             else { mst[schemaId].forEach(d => {
-                const activeBadge = (d.isActive !== false) ? `<span class="bg-green-100 text-green-700 text-[9px] sm:text-[10px] px-2.5 py-1 rounded-full font-black border border-green-200">Active</span>` : `<span class="bg-red-100 text-red-700 text-[9px] sm:text-[10px] px-2.5 py-1 rounded-full font-black border border-red-200">Inactive</span>`;
-                let trCols = `<td class="px-4 py-3 font-black text-slate-800">${d.name || ''}</td>`;
-                if(sch.params >= 2) trCols += `<td class="px-4 py-3 text-slate-600 font-medium">${sch.id==='inserts' ? (d.param1 || '-') : (d.param1 || '-')}</td>`; 
-                if(sch.params >= 3) trCols += `<td class="px-4 py-3 text-slate-600 font-medium truncate max-w-[150px] sm:max-w-[200px]">${d.param2 || '-'}</td>`; 
-                if(sch.params >= 4) trCols += `<td class="px-4 py-3 text-slate-600 font-medium">${d.param3 || '-'}</td>`;
-                if(sch.params >= 5) trCols += `<td class="px-4 py-3 text-slate-600 font-medium">${d.param4 || '-'}</td>`;
-                html += `<tr class="hover:bg-slate-50 transition-colors">${trCols}<td class="px-4 py-3">${activeBadge}</td><td class="px-4 py-3 text-right space-x-3"><button class="text-blue-600 hover:text-blue-800 font-black text-[10px] tracking-wide" onclick="window.openEntryModal('${sch.id}', '${d.id}')">EDIT</button><button class="text-red-500 hover:text-red-700 font-black text-[10px] tracking-wide" onclick="window.deleteItem('${sch.id}','${d.id}')">DEL</button></td></tr>`;
+                const activeBadge = (d.isActive !== false) ? `<span class="bg-green-100 text-green-700 text-[9px] px-2 py-1 rounded-full font-black">Active</span>` : `<span class="bg-red-100 text-red-700 text-[9px] px-2 py-1 rounded-full font-black">Inactive</span>`;
+                let trCols = `<td class="px-4 py-3 font-black text-slate-800 truncate max-w-[200px]">${d.name || ''}</td>`;
+                if(sch.params >= 2) trCols += `<td class="px-4 py-3 text-slate-600 font-medium truncate max-w-[150px]">${d.param1 || '-'}</td>`; 
+                if(sch.params >= 3) trCols += `<td class="px-4 py-3 text-slate-600 font-medium truncate max-w-[150px]">${d.param2 || '-'}</td>`; 
+                if(sch.params >= 4) trCols += `<td class="px-4 py-3 text-slate-600 font-medium truncate max-w-[150px]">${d.param3 || '-'}</td>`;
+                if(sch.params >= 5) trCols += `<td class="px-4 py-3 text-slate-600 font-medium truncate max-w-[150px]">${d.param4 || '-'}</td>`;
+                html += `<tr class="hover:bg-slate-50">${trCols}<td class="px-4 py-3">${activeBadge}</td><td class="px-4 py-3 text-right space-x-3"><button class="text-blue-600 font-black text-[10px] tracking-wide" onclick="window.openEntryModal('${sch.id}', '${d.id}')">EDIT</button><button class="text-red-500 font-black text-[10px]" onclick="window.deleteItem('${sch.id}','${d.id}')">DEL</button></td></tr>`;
             }); }
-            const tBody = document.getElementById(`tbody_${schemaId}`);
-            if(tBody) tBody.innerHTML = html;
+            const tBody = document.getElementById(`tbody_${schemaId}`); if(tBody) tBody.innerHTML = html;
         }
 
-        window.showProfile = () => { 
-            document.querySelectorAll('#sidebar button').forEach(b => b.classList.remove('active-nav')); 
-            document.getElementById('btnProfile').classList.add('active-nav'); 
-            document.getElementById('tableContainer').classList.add('hidden'); 
-            document.getElementById('schemaManagerContainer').classList.add('hidden');
-            document.getElementById('profileContainer').classList.remove('hidden'); 
-            document.getElementById('pageTitle').innerText = "Company Settings"; 
-            document.getElementById('topActionButtons').innerHTML = ""; 
-            if(window.innerWidth < 1024) toggleSidebar();
-        };
+        window.showProfile = () => { document.querySelectorAll('#sidebar button').forEach(b => b.classList.remove('active-nav')); document.getElementById('btnProfile').classList.add('active-nav'); document.getElementById('tableContainer').classList.add('hidden'); document.getElementById('schemaManagerContainer').classList.add('hidden'); document.getElementById('profileContainer').classList.remove('hidden'); document.getElementById('pageTitle').innerText = "Company Settings"; document.getElementById('topActionButtons').innerHTML = ""; };
 
-        document.getElementById('logoUpload').addEventListener('change', function(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(event) { base64Logo = event.target.result; document.getElementById('logoPreview').src = base64Logo; document.getElementById('logoPreview').classList.remove('hidden'); }; reader.readAsDataURL(file); });
-        document.getElementById('saveProfileBtn').addEventListener('click', async () => { const profile = { name: document.getElementById('cpName').value, email: document.getElementById('cpEmail').value, address: document.getElementById('cpAddress').value, gst: document.getElementById('cpGst').value, pan: document.getElementById('cpPan').value, iec: document.getElementById('cpIec').value, phone: document.getElementById('cpPhone').value, bank: document.getElementById('cpBank').value, logo: base64Logo }; await setDoc(doc(db, "settings", "company_profile"), profile); alert("Company Profile Updated Globally!"); });
+        // DEEP CRM MODAL LOGIC
+        let crmContactCount = 0;
+        window.addCrmContact = (c = {}) => {
+            crmContactCount++; const id = `crmContact_${crmContactCount}`;
+            document.getElementById('crmContactsWrapper').insertAdjacentHTML('beforeend', `
+                <div class="crm-contact-row bg-slate-50 border border-slate-200 p-3 rounded-lg flex flex-col sm:flex-row gap-3 items-end relative" id="${id}">
+                    <button onclick="document.getElementById('${id}').remove()" class="absolute top-2 right-2 text-red-400 font-black text-xs hover:text-red-600">✕</button>
+                    <div class="w-full sm:w-1/4"><label class="text-[9px] font-bold text-slate-500 uppercase">Name</label><input type="text" value="${c.name||''}" class="c-name w-full border border-gray-200 p-1.5 text-xs rounded outline-none font-bold focus:border-blue-400"></div>
+                    <div class="w-full sm:w-1/4"><label class="text-[9px] font-bold text-slate-500 uppercase">Designation</label><input type="text" value="${c.desig||''}" class="c-desig w-full border border-gray-200 p-1.5 text-xs rounded outline-none font-semibold focus:border-blue-400"></div>
+                    <div class="w-full sm:w-1/4"><label class="text-[9px] font-bold text-slate-500 uppercase">Mobile</label><input type="text" value="${c.mob||''}" class="c-mob w-full border border-gray-200 p-1.5 text-xs rounded outline-none font-semibold focus:border-blue-400"></div>
+                    <div class="w-full sm:w-1/4"><label class="text-[9px] font-bold text-slate-500 uppercase">Email</label><input type="text" value="${c.email||''}" class="c-email w-full border border-gray-200 p-1.5 text-xs rounded outline-none font-semibold focus:border-blue-400"></div>
+                    <div class="flex items-center space-x-1 pb-1 w-full sm:w-auto"><input type="radio" name="primaryContact" class="c-primary w-4 h-4 text-blue-600" ${c.isPrimary?'checked':''}><label class="text-[10px] font-bold text-blue-700">Primary</label></div>
+                </div>
+            `);
+        };
 
         window.openEntryModal = (schemaId, docId = "") => {
             const sch = appSchemas.find(s => s.id === schemaId); let eData = {}; if (docId) eData = mst[schemaId].find(x => x.id === docId) || {};
+            
+            // IF CUSTOMER, OPEN DEEP CRM MODAL
+            if (schemaId === 'customers') {
+                document.getElementById('crmDocId').value = docId;
+                document.getElementById('crmName').value = eData.name || "";
+                document.getElementById('crmGst').value = eData.gst || "";
+                document.getElementById('crmBilling').value = eData.billing || "";
+                document.getElementById('crmShipping').value = eData.shipping || "";
+                
+                const popSelect = (id, arr, val) => { const el = document.getElementById(id); el.innerHTML = `<option value="">-- Select Default --</option>` + (arr||[]).map(i=>`<option value="${i.id}">${i.name}</option>`).join(''); el.value = val || ""; };
+                popSelect('crmPayTerms', mst.payment_terms, eData.defaultPay);
+                popSelect('crmIncoTerms', mst.inco_terms, eData.defaultInco);
+                
+                document.getElementById('crmContactsWrapper').innerHTML = ""; crmContactCount = 0;
+                let contacts = []; try { contacts = JSON.parse(eData.contacts || "[]"); } catch(e){}
+                if(contacts.length===0) window.addCrmContact({isPrimary: true}); else contacts.forEach(c => window.addCrmContact(c));
+                document.getElementById('crmActive').checked = eData.isActive !== false;
+                document.getElementById('crmModal').classList.remove('hidden');
+                return;
+            }
+
+            // STANDARD MODAL FOR OTHERS
             document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`; document.getElementById('activeCollection').value = sch.id; document.getElementById('activeDocId').value = docId;
-            [2,3,4,5].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden')); document.getElementById('inp2').classList.remove('hidden'); document.getElementById('sel2').classList.add('hidden'); document.getElementById('inp3').classList.remove('hidden'); document.getElementById('sel3').classList.add('hidden'); document.getElementById('multiCheck3').classList.add('hidden'); document.getElementById('inp4').classList.remove('hidden'); document.getElementById('sel4').classList.add('hidden');
-            document.getElementById('inp1').value = eData.name || ""; document.getElementById('inp2').value = eData.param1 || ""; document.getElementById('inp3').value = eData.param2 || ""; document.getElementById('inp4').value = eData.param3 || ""; document.getElementById('isActive').checked = eData.isActive !== false;
+            [2,3,4,5].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden')); 
+            const showInp = (id, isText) => { document.getElementById(id).classList.toggle('hidden', isText); document.getElementById(id+'_text').classList.toggle('hidden', !isText); };
+            
+            document.getElementById('inp1').value = eData.name || ""; document.getElementById('isActive').checked = eData.isActive !== false;
             document.getElementById('lbl1').innerText = sch.cols[0]; 
-            if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; } 
-            if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; } 
-            if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
+            
+            const isTextType = (sch.category === 'crm' || sch.id === 'inserts' || sch.id === 'roles' || sch.behavior === 'lookup');
+
+            if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; showInp('inp2', isTextType); if(isTextType) document.getElementById('inp2_text').value = eData.param1||""; else document.getElementById('inp2').value = eData.param1||""; document.getElementById('sel2').classList.add('hidden'); } 
+            if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; showInp('inp3', isTextType); if(isTextType) document.getElementById('inp3_text').value = eData.param2||""; else document.getElementById('inp3').value = eData.param2||""; document.getElementById('sel3').classList.add('hidden'); document.getElementById('multiCheck3').classList.add('hidden'); } 
+            if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; showInp('inp4', isTextType); if(isTextType) document.getElementById('inp4_text').value = eData.param3||""; else document.getElementById('inp4').value = eData.param3||""; document.getElementById('sel4').classList.add('hidden'); }
             if(sch.params >= 5) { document.getElementById('grp5').classList.remove('hidden'); document.getElementById('lbl5').innerText = sch.cols[4]; document.getElementById('sel5').value = eData.param4 || "No"; }
 
-            if (schemaId === 'roles') { document.getElementById('inp2').classList.add('hidden'); let sel2 = document.getElementById('sel2'); sel2.classList.remove('hidden'); sel2.innerHTML = `<option value="ALL">ALL (Top Level)</option>` + roleCache.map(r => `<option value="${r.name}">${r.name}</option>`).join(''); sel2.value = eData.param1 || "ALL"; }
-            if (schemaId === 'customers') { document.getElementById('inp3').classList.add('hidden'); let sel3 = document.getElementById('sel3'); sel3.classList.remove('hidden'); sel3.innerHTML = `<option value="Admin">Admin</option>` + roleCache.map(r => `<option value="${r.name}">${r.name}</option>`).join(''); sel3.value = eData.param2 || "Admin"; }
-            if (schemaId === 'users') { document.getElementById('inp3').classList.add('hidden'); let mc = document.getElementById('multiCheck3'); mc.classList.remove('hidden'); let assignedRoles = (eData.param2 || "").split(',').map(s=>s.trim()); mc.innerHTML = roleCache.map(r => `<label class="flex items-center space-x-2 text-sm text-gray-800 cursor-pointer p-2 hover:bg-slate-100 rounded-lg transition"><input type="checkbox" value="${r.name}" class="role-check w-4 h-4 text-blue-600 rounded" ${assignedRoles.includes(r.name) ? 'checked' : ''}><span class="font-bold">${r.name}</span></label>`).join(''); document.getElementById('inp4').classList.add('hidden'); let sel4 = document.getElementById('sel4'); sel4.classList.remove('hidden'); sel4.value = eData.param3 || "No"; }
+            if (schemaId === 'roles') { document.getElementById('inp2').classList.add('hidden'); document.getElementById('inp2_text').classList.add('hidden'); let sel2 = document.getElementById('sel2'); sel2.classList.remove('hidden'); sel2.innerHTML = `<option value="ALL">ALL (Top Level)</option>` + roleCache.map(r => `<option value="${r.name}">${r.name}</option>`).join(''); sel2.value = eData.param1 || "ALL"; }
+            if (schemaId === 'users') { document.getElementById('inp3').classList.add('hidden'); document.getElementById('inp3_text').classList.add('hidden'); let mc = document.getElementById('multiCheck3'); mc.classList.remove('hidden'); let assignedRoles = (eData.param2 || "").split(',').map(s=>s.trim()); mc.innerHTML = roleCache.map(r => `<label class="flex items-center space-x-2 text-sm cursor-pointer p-2 hover:bg-slate-100 rounded-lg"><input type="checkbox" value="${r.name}" class="role-check w-4 h-4 text-blue-600" ${assignedRoles.includes(r.name) ? 'checked' : ''}><span class="font-bold">${r.name}</span></label>`).join(''); document.getElementById('inp4').classList.add('hidden'); document.getElementById('inp4_text').classList.add('hidden'); let sel4 = document.getElementById('sel4'); sel4.classList.remove('hidden'); sel4.value = eData.param3 || "No"; }
             
             document.getElementById('dataModal').classList.remove('hidden');
         };
 
+        // SAVE CRM PROFILE
+        document.getElementById('saveCrmBtn').addEventListener('click', async () => {
+            const name = document.getElementById('crmName').value; if(!name) return alert("Company Name required.");
+            let contacts = [];
+            document.querySelectorAll('.crm-contact-row').forEach(row => {
+                contacts.push({ name: row.querySelector('.c-name').value, desig: row.querySelector('.c-desig').value, mob: row.querySelector('.c-mob').value, email: row.querySelector('.c-email').value, isPrimary: row.querySelector('.c-primary').checked });
+            });
+            const dataObj = { name: name, gst: document.getElementById('crmGst').value, billing: document.getElementById('crmBilling').value, shipping: document.getElementById('crmShipping').value, defaultPay: document.getElementById('crmPayTerms').value, defaultInco: document.getElementById('crmIncoTerms').value, contacts: JSON.stringify(contacts), isActive: document.getElementById('crmActive').checked };
+            try { const id = document.getElementById('crmDocId').value; if(id) await updateDoc(doc(db, "customers", id), dataObj); else await addDoc(collection(db, "customers"), dataObj); document.getElementById('crmModal').classList.add('hidden'); } catch(e) { alert("Error saving."); }
+        });
+
+        // SAVE STANDARD DATA
         document.getElementById('cancelModalBtn').addEventListener('click', () => document.getElementById('dataModal').classList.add('hidden'));
         document.getElementById('saveDataBtn').addEventListener('click', async () => {
             const col = document.getElementById('activeCollection').value; const id = document.getElementById('activeDocId').value; const sch = appSchemas.find(s => s.id === col);
-            const dataObj = { name: document.getElementById('inp1').value, isActive: document.getElementById('isActive').checked }; const isText = (sch.category === 'crm' || col === 'inserts');
-            if (col === 'roles') dataObj.param1 = document.getElementById('sel2').value; else if (sch.params >= 2) dataObj.param1 = isText ? document.getElementById('inp2').value : Number(document.getElementById('inp2').value);
-            if (col === 'customers') dataObj.param2 = document.getElementById('sel3').value; else if (col === 'users') dataObj.param2 = Array.from(document.querySelectorAll('.role-check:checked')).map(c => c.value).join(', '); else if (sch.params >= 3) dataObj.param2 = isText ? document.getElementById('inp3').value : Number(document.getElementById('inp3').value);
-            if (col === 'users') dataObj.param3 = document.getElementById('sel4').value; else if (sch.params >= 4) dataObj.param3 = isText ? document.getElementById('inp4').value : Number(document.getElementById('inp4').value);
+            const isText = (sch.category === 'crm' || col === 'inserts' || col === 'roles' || sch.behavior === 'lookup');
+            const dataObj = { name: document.getElementById('inp1').value, isActive: document.getElementById('isActive').checked }; 
+            
+            if (col === 'roles') dataObj.param1 = document.getElementById('sel2').value; 
+            else if (sch.params >= 2) dataObj.param1 = isText ? document.getElementById('inp2_text').value : Number(document.getElementById('inp2').value);
+            
+            if (col === 'users') dataObj.param2 = Array.from(document.querySelectorAll('.role-check:checked')).map(c => c.value).join(', '); 
+            else if (sch.params >= 3) dataObj.param2 = isText ? document.getElementById('inp3_text').value : Number(document.getElementById('inp3').value);
+            
+            if (col === 'users') dataObj.param3 = document.getElementById('sel4').value; 
+            else if (sch.params >= 4) dataObj.param3 = isText ? document.getElementById('inp4_text').value : Number(document.getElementById('inp4').value);
+            
             if (col === 'users') dataObj.param4 = document.getElementById('sel5').value;
-            try { 
-                if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); 
-                document.getElementById('dataModal').classList.add('hidden'); 
-            } catch (err) { alert("Error saving data."); }
+            
+            try { if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); document.getElementById('dataModal').classList.add('hidden'); } catch (err) { alert("Error saving data."); }
         });
 
-        window.deleteItem = async (col, id) => { if(confirm("Permanently delete? Note: This may affect historic quote calculations. Consider making it 'Inactive' instead.")) { await deleteDoc(doc(db, col, id)); } };
+        window.deleteItem = async (col, id) => { if(confirm("Permanently delete? Note: This may affect historic quote calculations. Consider marking it 'Inactive' instead.")) { await deleteDoc(doc(db, col, id)); } };
         
-        // Schema Builder & Editor Logic
-        document.getElementById('schemaBuilderBtn').addEventListener('click', () => { 
-            document.getElementById('schemaModalTitle').innerText = "Deploy Custom Database";
-            document.getElementById('editingSchemaId').value = "";
-            document.getElementById('schTitle').value = "";
-            document.getElementById('schCat').value = "mfg";
-            document.getElementById('schBehavior').value = "flat";
-            document.getElementById('schType').value = "1";
-            document.getElementById('schCol1').value = "Name";
-            ['schCol2Grp','schCol3Grp','schCol4Grp'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById('schemaModal').classList.remove('hidden'); 
-            if(window.innerWidth < 1024) toggleSidebar(); 
-        }); 
-
-        window.openEditSchemaModal = (schId) => {
-            const sch = appSchemas.find(s => s.id === schId);
-            if(!sch) return;
-            document.getElementById('schemaModalTitle').innerText = `Edit Schema: ${sch.title}`;
-            document.getElementById('editingSchemaId').value = sch.id;
-            document.getElementById('schTitle').value = sch.title || "";
-            document.getElementById('schCat').value = sch.category || "mfg";
-            document.getElementById('schBehavior').value = sch.behavior || "flat";
-            document.getElementById('schType').value = String(sch.params || 1);
-            
-            const cols = sch.cols || ["Name"];
-            document.getElementById('schCol1').value = cols[0] || "Name";
-            document.getElementById('schCol2').value = cols[1] || "";
-            document.getElementById('schCol3').value = cols[2] || "";
-            document.getElementById('schCol4').value = cols[3] || "";
-
-            const val = sch.params || 1;
-            document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2); 
-            document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3); 
-            document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4);
-
-            document.getElementById('schemaModal').classList.remove('hidden');
-        };
-
+        // Schema Builder Logic
+        document.getElementById('schemaBuilderBtn').addEventListener('click', () => { document.getElementById('schemaModalTitle').innerText = "Deploy Custom Database"; document.getElementById('editingSchemaId').value = ""; document.getElementById('schTitle').value = ""; document.getElementById('schCat').value = "component_level"; document.getElementById('schBehavior').value = "variable"; document.getElementById('schType').value = "1"; document.getElementById('schCol1').value = "Name"; ['schCol2Grp','schCol3Grp','schCol4Grp'].forEach(id => document.getElementById(id).classList.add('hidden')); document.getElementById('schemaModal').classList.remove('hidden'); }); 
+        window.openEditSchemaModal = (schId) => { const sch = appSchemas.find(s => s.id === schId); if(!sch) return; document.getElementById('schemaModalTitle').innerText = `Edit Schema: ${sch.title}`; document.getElementById('editingSchemaId').value = sch.id; document.getElementById('schTitle').value = sch.title || ""; document.getElementById('schCat').value = sch.category || "component_level"; document.getElementById('schBehavior').value = sch.behavior || "variable"; document.getElementById('schType').value = String(sch.params || 1); const cols = sch.cols || ["Name"]; document.getElementById('schCol1').value = cols[0] || "Name"; document.getElementById('schCol2').value = cols[1] || ""; document.getElementById('schCol3').value = cols[2] || ""; document.getElementById('schCol4').value = cols[3] || ""; const val = sch.params || 1; document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2); document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3); document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4); document.getElementById('schemaModal').classList.remove('hidden'); };
         document.getElementById('cancelSchemaBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.add('hidden')); 
         document.getElementById('schType').addEventListener('change', (e) => { const val = Number(e.target.value); document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2); document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3); document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4); });
         
         document.getElementById('saveSchemaBtn').addEventListener('click', async () => { 
             const title = document.getElementById('schTitle').value; if(!title) return alert("Title required"); 
-            const existingId = document.getElementById('editingSchemaId').value;
-            const id = existingId ? existingId : title.toLowerCase().replace(/[^a-z0-9]/g, '_'); 
-            const cat = document.getElementById('schCat').value;
-            const behavior = document.getElementById('schBehavior').value; 
-            const params = Number(document.getElementById('schType').value); 
-            let cols = [document.getElementById('schCol1').value]; 
-            if(params >= 2) cols.push(document.getElementById('schCol2').value); 
-            if(params >= 3) cols.push(document.getElementById('schCol3').value); 
-            if(params >= 4) cols.push(document.getElementById('schCol4').value); 
-            
-            // Fetch existing schema to preserve active status if editing
-            let existingSch = appSchemas.find(s => s.id === id);
-            let isActiveState = existingSch ? (existingSch.isActive !== false) : true;
-
+            const existingId = document.getElementById('editingSchemaId').value; const id = existingId ? existingId : title.toLowerCase().replace(/[^a-z0-9]/g, '_'); 
+            const cat = document.getElementById('schCat').value; const behavior = document.getElementById('schBehavior').value; const params = Number(document.getElementById('schType').value); 
+            let cols = [document.getElementById('schCol1').value]; if(params >= 2) cols.push(document.getElementById('schCol2').value); if(params >= 3) cols.push(document.getElementById('schCol3').value); if(params >= 4) cols.push(document.getElementById('schCol4').value); 
+            let existingSch = appSchemas.find(s => s.id === id); let isActiveState = existingSch ? (existingSch.isActive !== false) : true;
             await setDoc(doc(db, "system_schemas", id), { id, title, params, cols, behavior, category: cat, isActive: isActiveState }, { merge: true }); 
-            document.getElementById('schemaModal').classList.add('hidden'); 
-            alert(`Schema "${title}" successfully updated! All modules updated in real-time.`);
+            document.getElementById('schemaModal').classList.add('hidden'); alert(`Schema "${title}" successfully updated!`);
         });
-
-        window.downloadTemplate = (schemaId) => { const sch = appSchemas.find(s => s.id === schemaId); const ws = XLSX.utils.aoa_to_sheet([sch.cols]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template"); XLSX.writeFile(wb, `${sch.title}_Template.xlsx`); }; 
-        window.triggerImport = (schemaId) => { pendingImportCollection = schemaId; document.getElementById('excelUpload').click(); };
-        document.getElementById('excelUpload').addEventListener('change', (e) => { 
-            const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); 
-            reader.onload = async (event) => { 
-                const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'}); const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); const sch = appSchemas.find(s => s.id === pendingImportCollection); let count = 0; const b = writeBatch(db);
-                for(let row of jsonData) { 
-                    const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true }; 
-                    if(sch.params >= 2) dataObj.param1 = pendingImportCollection === 'inserts' ? String(row[sch.cols[1]] || "") : Number(row[sch.cols[1]] || 0); 
-                    if(sch.params >= 3) dataObj.param2 = isText ? String(row[sch.cols[2]] || "") : Number(row[sch.cols[2]] || 0); 
-                    if(sch.params >= 4) dataObj.param3 = isText ? String(row[sch.cols[3]] || "") : Number(row[sch.cols[3]] || 0); 
-                    b.set(doc(collection(db, pendingImportCollection)), dataObj); count++; 
-                } 
-                await b.commit();
-                document.getElementById('excelUpload').value = ""; alert(`Imported ${count} items globally!`); 
-            }; 
-            reader.readAsArrayBuffer(file); 
-        });
-        window.exportExcel = async (schemaId) => { const sch = appSchemas.find(s => s.id === schemaId); let dataArr = mst[schemaId].map(d => { let row = {}; row[sch.cols[0]] = d.name; if(sch.params >= 2) row[sch.cols[1]] = d.param1; if(sch.params >= 3) row[sch.cols[2]] = d.param2; if(sch.params >= 4) row[sch.cols[3]] = d.param3; row["Is Active"] = (d.isActive !== false) ? "Yes" : "No"; return row; }); const ws = XLSX.utils.json_to_sheet(dataArr); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, sch.title); XLSX.writeFile(wb, `${sch.title}_Export.xlsx`); };
     </script>
 </body>
 </html>

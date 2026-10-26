@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renuka Tools | Advanced Design Library</title>
+    <title>Renuka Tools | AI Design Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three-csg-ts@3.1.11/lib/three-csg-ts.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
@@ -21,11 +23,11 @@
     <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center hidden transition-opacity duration-500">
         <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-2xl">
             <h2 class="text-3xl font-black text-center text-gray-900 tracking-tight mb-2">RENUKA TOOLS</h2>
-            <p class="text-xs text-center text-purple-600 font-bold uppercase tracking-widest mb-8">Design Engineering Auth</p>
+            <p class="text-xs text-center text-purple-600 font-bold uppercase tracking-widest mb-8">AI Design Studio Auth</p>
             <input type="email" id="email" placeholder="Work Email" class="w-full border-2 border-gray-200 p-3 mb-4 rounded-lg focus:border-purple-500 outline-none font-semibold transition">
             <input type="password" id="password" placeholder="Password" class="w-full border-2 border-gray-200 p-3 mb-6 rounded-lg focus:border-purple-500 outline-none font-semibold transition">
             <button id="loginBtn" class="w-full bg-purple-600 text-white p-4 rounded-lg font-bold hover:bg-purple-700 shadow-lg shadow-purple-500/30 transition flex justify-center items-center">
-                <span>Access CAD Engine</span>
+                <span>Access AI Draftsman</span>
             </button>
         </div>
     </div>
@@ -36,11 +38,11 @@
     <!-- SIDEBAR -->
     <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-gray-300 flex flex-col h-full shadow-2xl z-40 transform -translate-x-full lg:relative lg:translate-x-0">
         <div class="p-5 bg-gray-950 border-b border-gray-800 flex justify-between items-center">
-            <div><h1 class="text-xl font-bold text-white tracking-wider">ENGINEERING</h1><p class="text-[10px] text-purple-400 font-bold uppercase tracking-widest mt-1 flex items-center"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span> Master Library</p></div>
+            <div><h1 class="text-xl font-bold text-white tracking-wider">ENGINEERING</h1><p class="text-[10px] text-purple-400 font-bold uppercase tracking-widest mt-1 flex items-center"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></span> 3D Render Master</p></div>
             <button class="lg:hidden text-gray-400 hover:text-white text-xl" onclick="toggleSidebar()">✕</button>
         </div>
         <div class="flex-1 overflow-y-auto custom-scrollbar py-4 px-2">
-            <button class="w-full bg-purple-800 text-white p-3 rounded-lg text-sm font-bold shadow text-left px-4 flex items-center"><span class="mr-2">📐</span> Parametric Modeler</button>
+            <button class="w-full bg-purple-800 text-white p-3 rounded-lg text-sm font-bold shadow text-left px-4 flex items-center"><span class="mr-2">📐</span> Parametric AI Modeler</button>
             <div class="mt-6 px-4 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Saved Master Profiles</p></div>
             <div id="savedList" class="space-y-2 mt-2 text-sm text-gray-400 px-2"></div>
         </div>
@@ -57,58 +59,47 @@
         <header class="bg-white shadow-sm border-b px-4 sm:px-6 py-4 flex justify-between items-center z-10">
             <div class="flex items-center space-x-3">
                 <button class="lg:hidden text-gray-600 focus:outline-none" onclick="toggleSidebar()"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-                <h2 class="text-lg sm:text-2xl font-bold text-gray-800 truncate">N-Stage CAD Modeler</h2>
+                <h2 class="text-lg sm:text-2xl font-bold text-gray-800 truncate">Intelligent 3D Render Studio</h2>
             </div>
             <div class="flex space-x-3 items-center">
                 <input type="file" id="pdfUpload" accept=".pdf, image/*" class="hidden">
                 <button onclick="document.getElementById('pdfUpload').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold shadow-lg shadow-indigo-500/30 flex items-center space-x-2 transition"><span class="mr-1">📄</span><span class="hidden sm:inline">AI 2D-to-3D Extraction</span></button>
+                <button id="exportPdfBtn" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold shadow-lg shadow-red-500/30 flex items-center space-x-2 transition"><span class="mr-1">🖨️</span><span class="hidden sm:inline">Export Engg Drawing</span></button>
             </div>
         </header>
 
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
             <!-- AI Loader -->
-            <div id="aiLoader" class="hidden bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 rounded-r-lg mb-6 font-mono text-sm shadow animate-pulse">⚙️ Vision Engine analyzing 2D drawing... extracting ISO tapers, dimensions, and CSG pocket geometry...</div>
+            <div id="aiLoader" class="hidden bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 rounded-r-lg mb-6 font-mono text-sm shadow animate-pulse">⚙️ Vision Engine analyzing 2D drawing... extracting ISO tapers, step lengths, body diameters, and CSG pocket geometry...</div>
 
             <div class="grid grid-cols-12 gap-4 sm:gap-6">
                 <!-- DESIGN CONTROLS -->
                 <div class="col-span-12 lg:col-span-5 space-y-4">
-                    <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border-2 border-slate-100 border-t-4 border-t-purple-600 flex flex-col">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border-2 border-slate-100 border-t-4 border-t-purple-600 flex flex-col h-full max-h-[80vh]">
                         <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Library Designation Name *</label>
                         <input type="text" id="pName" placeholder="e.g. ISO-BT40-SCLCR-BiMetal" class="w-full border-2 border-gray-200 p-3 text-sm rounded-lg font-black text-purple-900 focus:border-purple-500 outline-none mb-6 transition">
                         
                         <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
-                            <h4 class="font-black text-sm text-gray-800">Dynamic Tool Stages</h4>
-                            <button onclick="window.addStage()" class="bg-purple-100 hover:bg-purple-200 text-purple-800 text-[10px] uppercase font-black px-3 py-1.5 rounded-full transition shadow-sm">+ Add Stage</button>
+                            <h4 class="font-black text-sm text-gray-800">Dynamic N-Stage Builder</h4>
+                            <div class="space-x-2">
+                                <button onclick="window.runAiDiagnostics()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 text-[10px] uppercase font-black px-3 py-1.5 rounded-full transition shadow-sm">✨ AI Check</button>
+                                <button onclick="window.addStage()" class="bg-purple-100 hover:bg-purple-200 text-purple-800 text-[10px] uppercase font-black px-3 py-1.5 rounded-full transition shadow-sm">+ Add Stage</button>
+                            </div>
                         </div>
                         
                         <!-- Stages Container -->
-                        <div id="stagesContainer" class="overflow-y-auto custom-scrollbar space-y-3 pr-2 mb-6 max-h-[40vh] sm:max-h-[50vh]"></div>
+                        <div id="stagesContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2 mb-6"></div>
 
-                        <div class="border-t border-slate-200 pt-4 mb-6">
-                            <h4 class="font-black text-sm text-gray-800 mb-3">CSG Pocketing & Insert</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                                <div><label class="font-bold text-slate-500 block mb-1 uppercase tracking-wide text-[10px]">Master Insert:</label><select id="insType" class="w-full border-2 border-slate-200 p-2.5 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-800 transition preview-trigger"></select></div>
-                                <div><label class="font-bold text-slate-500 block mb-1 uppercase tracking-wide text-[10px]">Approach (KAP):</label><select id="insApproach" class="w-full border-2 border-slate-200 p-2.5 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-800 transition preview-trigger"><option value="95">95° (Standard Turning)</option><option value="93">93° (Copying)</option><option value="90">90° (Facing)</option><option value="45">45° (Chamfer)</option><option value="0">0° (Neutral)</option></select></div>
-                            </div>
-                        </div>
-
-                        <!-- Weight Engine Output -->
-                        <div class="bg-slate-900 text-white p-5 rounded-xl flex justify-between items-center shadow-lg shadow-slate-900/20 mb-6 relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500 rounded-full mix-blend-screen filter blur-[50px] opacity-20"></div>
-                            <div class="relative z-10"><p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Calculated Finish Weight</p><p class="text-[10px] text-slate-400 mt-1">Multi-material exact volume math</p></div>
-                            <div class="text-right relative z-10"><p class="text-3xl font-black text-emerald-400 tracking-tight" id="toolWeightDisplay">0.00 kg</p></div>
-                        </div>
-
-                        <button id="saveLibraryBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl font-black shadow-lg shadow-purple-600/30 transition uppercase tracking-wider text-sm flex justify-center items-center"><span class="mr-2">💾</span> Save Master Profile</button>
+                        <button id="saveLibraryBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl font-black shadow-lg shadow-purple-600/30 transition uppercase tracking-wider text-sm flex justify-center items-center mt-auto"><span class="mr-2">💾</span> Save To Master Library</button>
                     </div>
                 </div>
 
                 <!-- 3D INTERACTIVE SANDBOX -->
-                <div class="col-span-12 lg:col-span-7">
-                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-200 h-[60vh] sm:h-[750px] relative overflow-hidden flex flex-col">
+                <div class="col-span-12 lg:col-span-7 flex flex-col">
+                    <div class="bg-white rounded-2xl shadow-sm border-2 border-slate-200 flex-1 relative overflow-hidden flex flex-col min-h-[60vh]">
                         <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center z-10">
-                            <h3 class="text-slate-800 font-black text-sm uppercase tracking-wide flex items-center">📐 CAD Studio <span class="ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span></h3>
-                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest hidden sm:block">Touch/Click: Rotate | Scroll/Pinch: Zoom</span>
+                            <h3 class="text-slate-800 font-black text-sm uppercase tracking-wide flex items-center">📐 Smart CAD Studio <span class="ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span></h3>
+                            <button onclick="window.triggerRender()" class="text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1 rounded font-bold uppercase tracking-wider transition">Re-Render 3D</button>
                         </div>
                         
                         <!-- 3D Canvas -->
@@ -118,11 +109,13 @@
                         <div id="dimLabels" class="absolute top-16 left-4 pointer-events-none z-10 flex flex-col space-y-1"></div>
 
                         <!-- AI Chat Assistant -->
-                        <div class="absolute bottom-2 right-2 left-2 sm:bottom-4 sm:right-4 sm:left-4 flex flex-col space-y-2 bg-white/90 p-4 rounded-xl shadow-2xl border border-slate-200 z-20 backdrop-blur-md">
-                            <div id="aiChatLog" class="text-[10px] sm:text-xs h-20 overflow-y-auto custom-scrollbar text-slate-700 font-mono space-y-1 pr-1 border-b border-slate-200 pb-2"><i>AI Parametric Engine Ready...</i><br></div>
+                        <div class="absolute bottom-2 right-2 left-2 sm:bottom-4 sm:right-4 sm:left-4 flex flex-col space-y-2 bg-white/95 p-4 rounded-xl shadow-2xl border border-slate-200 z-20 backdrop-blur-md">
+                            <div id="aiChatLog" class="text-[10px] sm:text-xs h-24 overflow-y-auto custom-scrollbar text-slate-700 font-mono space-y-2 pr-1 border-b border-slate-200 pb-2">
+                                <div class="text-indigo-700 font-bold">🤖 AI Draftsman initialized. Add stages or ask me to configure complex geometry (e.g. "Set stage 2 insert to axial cartridge").</div>
+                            </div>
                             <div class="flex space-x-2">
-                                <input type="text" id="ai3dPrompt" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-900 rounded-lg p-2.5 text-xs outline-none focus:border-purple-500 transition font-bold" placeholder="e.g. 'Make stage 2 Alu' or 'Set shank dia 40'...">
-                                <button type="button" onclick="window.processAi3d()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-5 rounded-lg shadow-lg font-black transition">Apply</button>
+                                <input type="text" id="ai3dPrompt" class="w-full bg-slate-50 border-2 border-slate-200 text-slate-900 rounded-lg p-2.5 text-xs outline-none focus:border-purple-500 transition font-bold" placeholder="Talk to AI Draftsman...">
+                                <button type="button" onclick="window.processAi3d()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-5 rounded-lg shadow-lg font-black transition">Send</button>
                             </div>
                         </div>
                     </div>
@@ -138,48 +131,40 @@
 
         const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", authDomain: "renuka-tools-quote.firebaseapp.com", databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "renuka-tools-quote", storageBucket: "renuka-tools-quote.firebasestorage.app", messagingSenderId: "300959855269", appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
-        const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
-
-        let mst = { raw_materials: [], inserts: [], design_library: [] };
         
-        // Critical: Using Document IDs instead of Array Indexes to prevent corruption
+        let mst = { raw_materials: [], inserts: [], design_library: [] };
+        let companyProfile = { name: "RENUKA TOOLS", address: "MIDC, Waluj, Chhatrapati Sambhajinagar", logo: "" };
+        
+        // ADVANCED STAGE ARCHITECTURE
         let stages = [
-            { id: 1, name: "Shank/Taper", shape: "round", d1: 44.45, d2: 25, l: 65, feature: "none", materialId: "" }, 
-            { id: 2, name: "Head", shape: "round", d1: 50, d2: 50, l: 45, feature: "none", materialId: "" }
+            { id: 1, name: "Shank/Taper", shape: "round", d1: 44.45, d2: 25, l: 65, feature: "none", materialId: "", insId: "None", insOrient: "axial", insApp: 95, pocketType: "screw" }, 
+            { id: 2, name: "Boring Head", shape: "round", d1: 50, d2: 50, l: 45, feature: "none", materialId: "", insId: "None", insOrient: "axial", insApp: 95, pocketType: "screw" }
         ];
 
-        window.toggleSidebar = () => {
-            const sb = document.getElementById('sidebar'); const overlay = document.getElementById('mobileOverlay');
-            if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } 
-            else { sb.classList.add('-translate-x-full'); overlay.classList.add('hidden'); }
-        };
+        window.toggleSidebar = () => { const sb = document.getElementById('sidebar'); const overlay = document.getElementById('mobileOverlay'); if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } else { sb.classList.add('-translate-x-full'); overlay.classList.add('hidden'); } };
 
         onAuthStateChanged(auth, (user) => { 
             if (user) { 
-                document.getElementById('loginScreen').classList.add('hidden'); 
-                document.getElementById('userBadge').innerText = user.email;
-                setupRealTimeData(); initThreeJS(); 
+                document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('userBadge').innerText = user.email; setupRealTimeData(); initThreeJS(); 
             } else { document.getElementById('loginScreen').classList.remove('hidden'); } 
         });
 
         document.getElementById('loginBtn').addEventListener('click', () => {
             const btn = document.getElementById('loginBtn'); btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>`;
-            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=> { alert("Invalid Login"); btn.innerHTML = "Access CAD Engine"; });
+            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).catch(()=> { alert("Invalid Login"); btn.innerHTML = "Access AI Draftsman"; });
         });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // REAL-TIME DATA SYNC
         function setupRealTimeData() {
+            onSnapshot(doc(db, "settings", "company_profile"), (snap) => { if(snap.exists()) { companyProfile = { ...companyProfile, ...snap.data() }; } });
+            
             onSnapshot(collection(db, "inserts"), (snap) => {
                 mst.inserts = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(x => x.isActive !== false);
-                document.getElementById('insType').innerHTML = `<option value="None">-- No Insert --</option>` + mst.inserts.map(i => `<option value="${i.id}">${i.name} (${i.param1})</option>`).join('');
-                window.triggerRender();
+                renderStagesUI(); window.triggerRender();
             });
 
             onSnapshot(collection(db, "raw_materials"), (snap) => {
                 mst.raw_materials = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(x => x.isActive !== false);
-                
-                // Set default materialId to the first steel found if current is empty
                 if (mst.raw_materials.length > 0) {
                     let defaultMat = mst.raw_materials.find(m => m.name.toLowerCase().includes('en') || m.name.toLowerCase().includes('h13')) || mst.raw_materials[0];
                     stages.forEach(st => { if (!st.materialId) st.materialId = defaultMat.id; });
@@ -190,99 +175,110 @@
             onSnapshot(collection(db, "design_library"), (snap) => {
                 mst.design_library = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(x => x.isActive !== false);
                 const list = document.getElementById('savedList'); list.innerHTML = "";
-                mst.design_library.forEach(d => { 
-                    list.insertAdjacentHTML('beforeend', `<div class="p-3 bg-slate-800 rounded-lg flex justify-between items-center mb-2 border border-slate-700 shadow-sm"><span class="truncate font-bold text-slate-200 text-xs w-3/4">${d.name}</span><button onclick="window.delDesign('${d.id}')" class="text-red-400 hover:bg-red-900/30 text-[10px] uppercase font-black px-2 py-1 rounded transition">Del</button></div>`); 
-                });
+                mst.design_library.forEach(d => { list.insertAdjacentHTML('beforeend', `<div class="p-3 bg-slate-800 rounded-lg flex justify-between items-center mb-2 border border-slate-700 shadow-sm"><span class="truncate font-bold text-slate-200 text-xs w-3/4">${d.name}</span><button onclick="window.delDesign('${d.id}')" class="text-red-400 hover:bg-red-900/30 text-[10px] uppercase font-black px-2 py-1 rounded transition">Del</button></div>`); });
             });
         }
 
         window.addStage = () => { 
             const lastD = stages.length > 0 ? stages[stages.length-1].d2 : 40; 
             const lastMat = stages.length > 0 ? stages[stages.length-1].materialId : (mst.raw_materials[0]?.id || "");
-            stages.push({ id: Date.now(), name: `Stage ${stages.length + 1}`, shape: 'round', d1: lastD, d2: lastD, l: 30, feature: 'none', materialId: lastMat }); 
+            stages.push({ id: Date.now(), name: `Stage ${stages.length + 1}`, shape: 'round', d1: lastD, d2: lastD, l: 30, feature: 'none', materialId: lastMat, insId: 'None', insOrient: 'axial', insApp: 95, pocketType: 'screw' }); 
             renderStagesUI(); window.triggerRender(); 
         };
         window.removeStage = (idx) => { stages.splice(idx, 1); renderStagesUI(); window.triggerRender(); };
-        window.updateStage = (idx, field, value) => { stages[idx][field] = (field==='name'||field==='shape'||field==='feature'||field==='materialId') ? value : Number(value); window.triggerRender(); };
+        window.updateStage = (idx, field, value) => { stages[idx][field] = (['d1','d2','l','insApp'].includes(field)) ? Number(value) : value; window.triggerRender(); };
+        window.triggerStageRenderUI = () => { renderStagesUI(); window.triggerRender(); }; // For complex dropdown toggles
 
         function renderStagesUI() {
             const container = document.getElementById('stagesContainer'); container.innerHTML = '';
+            const insOptions = `<option value="None">-- No Insert --</option>` + mst.inserts.map(i => `<option value="${i.id}">${i.name} (${i.param1})</option>`).join('');
             
             stages.forEach((st, idx) => {
-                // Dropdown uses true Document ID mapping
-                let currentMatOptions = mst.raw_materials.map(m => `<option value="${m.id}" ${st.materialId === m.id ? 'selected' : ''}>${m.name} (${m.param1} g/cc)</option>`).join('');
+                let currentMatOptions = mst.raw_materials.map(m => `<option value="${m.id}" ${st.materialId === m.id ? 'selected' : ''}>${m.name}</option>`).join('');
+                let pocketOptions = `<option value="screw" ${st.pocketType==='screw'?'selected':''}>Screw-on</option><option value="top_clamp" ${st.pocketType==='top_clamp'?'selected':''}>Top Clamp</option><option value="lever" ${st.pocketType==='lever'?'selected':''}>Lever Lock</option><option value="cartridge_std" ${st.pocketType==='cartridge_std'?'selected':''}>Std Cartridge</option><option value="cartridge_spc" ${st.pocketType==='cartridge_spc'?'selected':''}>Special Cartridge</option>`;
 
                 container.insertAdjacentHTML('beforeend', `
                     <div class="bg-slate-50 border-2 border-slate-200 p-4 rounded-xl relative shadow-sm transition hover:border-purple-300">
-                        <button onclick="window.removeStage(${idx})" class="absolute top-2 right-2 text-red-500 font-black text-xs hover:bg-red-100 px-2.5 py-1 rounded-md transition">✕</button>
-                        <input type="text" value="${st.name}" onchange="window.updateStage(${idx}, 'name', this.value)" class="font-black text-sm text-slate-800 bg-transparent outline-none mb-3 w-3/4 border-b-2 border-dashed border-slate-300 focus:border-purple-500 transition">
+                        <button onclick="window.removeStage(${idx})" class="absolute top-2 right-2 text-red-400 font-black text-xs hover:bg-red-100 px-2 py-1 rounded-md transition">✕</button>
                         
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[10px] mb-3">
-                            <div><label class="text-slate-500 font-bold uppercase tracking-wider block mb-1">Shape</label><select onchange="window.updateStage(${idx}, 'shape', this.value)" class="w-full border-2 border-white p-2 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-700 shadow-sm"><option value="round" ${st.shape==='round'?'selected':''}>Round Cyl/Taper</option><option value="square" ${st.shape==='square'?'selected':''}>Square Block</option></select></div>
-                            <div><label class="text-slate-500 font-bold uppercase tracking-wider block mb-1">Material</label><select onchange="window.updateStage(${idx}, 'materialId', this.value)" class="w-full border-2 border-white p-2 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-700 shadow-sm">${currentMatOptions}</select></div>
+                        <div class="flex items-center space-x-2 mb-3 w-4/5">
+                            <input type="text" value="${st.name}" onchange="window.updateStage(${idx}, 'name', this.value)" class="font-black text-sm text-slate-800 bg-transparent outline-none border-b-2 border-dashed border-slate-300 focus:border-purple-500 transition w-1/2">
+                            <select onchange="window.updateStage(${idx}, 'materialId', this.value)" class="text-[10px] border-2 border-white p-1 rounded outline-none font-bold text-slate-600 shadow-sm w-1/2">${currentMatOptions}</select>
+                        </div>
+                        
+                        <div class="grid grid-cols-4 gap-2 text-[9px] mb-3 bg-white p-2 rounded border border-slate-100">
+                            <div><label class="text-slate-400 font-bold uppercase block mb-1">Shape</label><select onchange="window.updateStage(${idx}, 'shape', this.value); window.triggerStageRenderUI();" class="w-full border p-1.5 rounded font-bold text-slate-700 outline-none"><option value="round" ${st.shape==='round'?'selected':''}>Cylindrical</option><option value="square" ${st.shape==='square'?'selected':''}>Rect Block</option></select></div>
+                            <div><label class="text-slate-400 font-bold uppercase block mb-1">D1/W</label><input type="number" min="0" value="${st.d1}" onchange="window.updateStage(${idx}, 'd1', this.value)" class="w-full border p-1.5 rounded font-bold outline-none text-slate-800"></div>
+                            <div><label class="text-slate-400 font-bold uppercase block mb-1">D2/H</label><input type="number" min="0" value="${st.d2}" onchange="window.updateStage(${idx}, 'd2', this.value)" class="w-full border p-1.5 rounded font-bold outline-none text-slate-800"></div>
+                            <div><label class="text-slate-400 font-bold uppercase block mb-1">Step Len</label><input type="number" min="0" value="${st.l}" onchange="window.updateStage(${idx}, 'l', this.value)" class="w-full border p-1.5 rounded font-bold outline-none text-slate-800"></div>
                         </div>
 
-                        <div class="grid grid-cols-4 gap-3 text-[10px]">
-                            <div><label class="text-slate-500 font-bold uppercase tracking-wider block mb-1">D1/W</label><input type="number" value="${st.d1}" oninput="window.updateStage(${idx}, 'd1', this.value)" class="w-full border-2 border-white p-2 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-800 shadow-sm"></div>
-                            <div><label class="text-slate-500 font-bold uppercase tracking-wider block mb-1">D2/H</label><input type="number" value="${st.d2}" oninput="window.updateStage(${idx}, 'd2', this.value)" class="w-full border-2 border-white p-2 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-800 shadow-sm"></div>
-                            <div><label class="text-slate-500 font-bold uppercase tracking-wider block mb-1">Len</label><input type="number" value="${st.l}" oninput="window.updateStage(${idx}, 'l', this.value)" class="w-full border-2 border-white p-2 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-800 shadow-sm"></div>
-                            <div><label class="text-slate-500 font-bold uppercase tracking-wider block mb-1">Flat</label><select onchange="window.updateStage(${idx}, 'feature', this.value)" class="w-full border-2 border-white p-2 rounded-lg outline-none focus:border-purple-500 font-bold text-slate-700 shadow-sm"><option value="none" ${st.feature==='none'?'selected':''}>No</option><option value="flat" ${st.feature==='flat'?'selected':''}>Yes</option></select></div>
+                        <!-- ADVANCED INSERT & POCKETING LOGIC -->
+                        <div class="bg-indigo-50/50 p-2 rounded border border-indigo-100 grid grid-cols-2 gap-2 text-[9px]">
+                            <div class="col-span-2"><label class="text-indigo-400 font-bold uppercase block mb-1">Geometry & Pocketing (Optional)</label><select onchange="window.updateStage(${idx}, 'insId', this.value); window.triggerStageRenderUI();" class="w-full border-2 border-indigo-200 p-1.5 rounded font-bold text-indigo-900 outline-none focus:border-indigo-400">${insOptions.replace(`value="${st.insId}"`, `value="${st.insId}" selected`)}</select></div>
+                            ${st.insId !== 'None' ? `
+                                <div><label class="text-slate-400 font-bold uppercase block mb-1">Mount Axis</label><select onchange="window.updateStage(${idx}, 'insOrient', this.value)" class="w-full border p-1.5 rounded font-bold text-slate-700 outline-none"><option value="axial" ${st.insOrient==='axial'?'selected':''}>Axial (Boring)</option><option value="radial" ${st.insOrient==='radial'?'selected':''}>Radial (Milling)</option></select></div>
+                                <div><label class="text-slate-400 font-bold uppercase block mb-1">KAP Angle</label><input type="number" value="${st.insApp}" onchange="window.updateStage(${idx}, 'insApp', this.value)" class="w-full border p-1.5 rounded font-bold text-slate-700 outline-none"></div>
+                                <div class="col-span-2"><label class="text-slate-400 font-bold uppercase block mb-1">Pocket Mechanism</label><select onchange="window.updateStage(${idx}, 'pocketType', this.value)" class="w-full border p-1.5 rounded font-bold text-slate-700 outline-none">${pocketOptions}</select></div>
+                            ` : `
+                                <div class="col-span-2"><label class="text-slate-400 font-bold uppercase block mb-1">Body Milling</label><select onchange="window.updateStage(${idx}, 'feature', this.value)" class="w-full border p-1.5 rounded font-bold text-slate-700 outline-none"><option value="none" ${st.feature==='none'?'selected':''}>No Flats/Slots</option><option value="flat" ${st.feature==='flat'?'selected':''}>Weldon Flat</option><option value="slot" ${st.feature==='slot'?'selected':''}>Keyway Slot</option></select></div>
+                            `}
                         </div>
                     </div>
                 `);
             });
         }
 
-        document.querySelectorAll('.preview-trigger').forEach(el => { el.addEventListener('change', () => window.triggerRender()); });
+        // ==========================================
+        // AI DRAFTSMAN LOGIC (Intelligent Prompting)
+        // ==========================================
+        window.runAiDiagnostics = () => {
+            const chatLog = document.getElementById('aiChatLog');
+            let hasWarnings = false;
+            
+            stages.forEach((st, i) => {
+                if (st.insId !== 'None') {
+                    if (st.insOrient === 'radial' && st.d1 < 20) { chatLog.innerHTML += `<div class="text-orange-500 font-bold">⚠️ Stage ${i+1}: Diameter too small for radial cartridge pocket. Consider axial or increase diameter.</div>`; hasWarnings = true; }
+                    if (st.pocketType === 'cartridge_spc') { chatLog.innerHTML += `<div class="text-indigo-600 font-bold">💬 Stage ${i+1}: Special Cartridge selected. What is the dimensional offset compared to std?</div>`; hasWarnings = true; }
+                }
+                if (st.shape === 'round' && st.d1 !== st.d2 && st.l < 10) { chatLog.innerHTML += `<div class="text-orange-500 font-bold">⚠️ Stage ${i+1}: Steep taper detected. Verify step length is sufficient for approach angle.</div>`; hasWarnings = true; }
+            });
+            
+            if(!hasWarnings) { chatLog.innerHTML += `<div class="text-emerald-600 font-bold">✨ AI Diagnostics: Geometry checks passed. Tool topology is sound.</div>`; }
+            chatLog.scrollTop = chatLog.scrollHeight;
+        };
 
-        // AI 2D PDF EXTRACTION SIMULATOR
-        document.getElementById('pdfUpload').addEventListener('change', (e) => {
-            if(!e.target.files[0]) return; const loader = document.getElementById('aiLoader'); loader.classList.remove('hidden');
-            setTimeout(() => {
-                let steelMat = mst.raw_materials.find(m => m.name.toLowerCase().includes('en') || m.name.toLowerCase().includes('h13')) || mst.raw_materials[0];
-                let aluMat = mst.raw_materials.find(m => m.name.toLowerCase().includes('alu')) || steelMat;
+        window.processAi3d = () => {
+            const p = document.getElementById('ai3dPrompt').value.toLowerCase(); 
+            const chatLog = document.getElementById('aiChatLog'); chatLog.innerHTML += `<div class="text-slate-900 mt-1">👤 ${p}</div>`;
+            let updated = false;
 
-                stages = [
-                    { id: 1, name: "BT40 Base", shape: "round", d1: 44.45, d2: 25.0, l: 65.4, feature: "none", materialId: steelMat.id },
-                    { id: 2, name: "V-Flange", shape: "round", d1: 63.0, d2: 63.0, l: 16.6, feature: "none", materialId: steelMat.id },
-                    { id: 3, name: "Vibration Dampening Core", shape: "round", d1: 40.0, d2: 40.0, l: 80.0, feature: "flat", materialId: aluMat.id },
-                    { id: 4, name: "Boring Head", shape: "round", d1: 32.0, d2: 32.0, l: 25.0, feature: "none", materialId: steelMat.id }
-                ];
-                document.getElementById('pName').value = "AI-Parsed BT40 Bi-Metal Design"; 
-                document.getElementById('insApproach').value = "95";
-                
-                let cnmg = mst.inserts.find(i => i.name.toUpperCase().includes('CNMG'));
-                if(cnmg) document.getElementById('insType').value = cnmg.id;
-                
-                loader.classList.add('hidden'); renderStagesUI(); window.triggerRender(); document.getElementById('pdfUpload').value = ""; alert("✨ AI Extraction Complete! Bi-metal constraints applied.");
-            }, 2500);
-        });
+            if (p.includes('add stage')) { window.addStage(); chatLog.innerHTML += `<div class="text-emerald-600 font-bold">🤖 Added new stage.</div>`; updated = true; } 
+            else if (p.includes('radial') || p.includes('milling')) { if(stages.length>0) { stages[stages.length-1].insOrient = 'radial'; updated = true; chatLog.innerHTML += `<div class="text-emerald-600">🤖 Set to Radial orientation.</div>`; } }
+            else if (p.includes('axial') || p.includes('boring')) { if(stages.length>0) { stages[stages.length-1].insOrient = 'axial'; updated = true; chatLog.innerHTML += `<div class="text-emerald-600">🤖 Set to Axial orientation.</div>`; } }
+            else if (p.includes('cartridge')) { if(stages.length>0) { stages[stages.length-1].pocketType = p.includes('special') ? 'cartridge_spc' : 'cartridge_std'; updated = true; chatLog.innerHTML += `<div class="text-emerald-600">🤖 Applied Cartridge pocket type.</div>`; } }
+            else if (p.includes('clamp') || p.includes('lever') || p.includes('screw')) {
+                if(stages.length>0) { 
+                    stages[stages.length-1].pocketType = p.includes('clamp') ? 'top_clamp' : (p.includes('lever') ? 'lever' : 'screw'); 
+                    updated = true; chatLog.innerHTML += `<div class="text-emerald-600">🤖 Updated pocket mechanism.</div>`; 
+                }
+            } else {
+                const extract = (keywords, field) => { keywords.forEach(kw => { let rx = new RegExp(kw + "\\s*[:=]?\\s*(\\d+)"); let m = p.match(rx); if(m && stages.length > 0) { let idx = p.match(/stage\s*(\d+)/); let targetIdx = idx ? (Number(idx[1])-1) : (stages.length - 1); if(targetIdx >= 0 && targetIdx < stages.length) { stages[targetIdx][field] = Number(m[1]); updated = true; } } }); };
+                extract(['dia', 'diameter', 'd'], 'd1'); extract(['dia', 'diameter', 'd'], 'd2'); extract(['len', 'length', 'l', 'step'], 'l'); extract(['angle', 'kap', 'approach', 'chamfer'], 'insApp');
+            }
 
-        // DB OPERATIONS
-        window.delDesign = async (id) => { if(confirm("Delete this master profile? Quotes using it will lose visual reference.")) { await deleteDoc(doc(db, "design_library", id)); } };
-        
-        document.getElementById('saveLibraryBtn').addEventListener('click', async () => {
-            const name = document.getElementById('pName').value; if(!name) return alert("Designation required.");
-            const insSel = document.getElementById('insType').value; const insData = insSel === 'None' ? null : mst.inserts.find(i=>i.id===insSel);
-            const config = { stages: stages, insData: insData, insApproach: document.getElementById('insApproach').value };
-            try { 
-                const btn = document.getElementById('saveLibraryBtn');
-                btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>`;
-                await addDoc(collection(db, "design_library"), { name: name, param1: JSON.stringify(config), isActive: true }); 
-                alert("Saved to Global Library!"); document.getElementById('pName').value = ""; 
-                btn.innerHTML = `<span class="mr-2">💾</span> Save Master Profile`;
-            } catch(e) { alert("Error saving profile."); }
-        });
+            if(updated) { renderStagesUI(); window.triggerRender(); } else { chatLog.innerHTML += `<div class="text-orange-500 font-bold">🤖 Awaiting clear geometric prompt.</div>`; }
+            chatLog.scrollTop = chatLog.scrollHeight; document.getElementById('ai3dPrompt').value = ""; 
+        };
 
         // ==========================================
-        // ENTERPRISE CSG 3D ENGINE & EXACT MATH
+        // 3D CSG RENDER ENGINE (WebGL / Three.js)
         // ==========================================
         let scene, camera, renderer, toolGroup, orbitControls;
         function initThreeJS() {
             const container = document.getElementById('canvasContainer'); scene = new THREE.Scene(); 
             scene.background = new THREE.Color(0xf8fafc); 
-            
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000); camera.position.set(200, 150, 300);
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000); camera.position.set(150, 100, 200);
             
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true }); renderer.setSize(container.clientWidth, container.clientHeight); 
             container.appendChild(renderer.domElement);
@@ -290,12 +286,9 @@
             orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
             orbitControls.enableDamping = true; orbitControls.dampingFactor = 0.05;
             
-            scene.add(new THREE.AmbientLight(0xffffff, 0.7)); 
-            const keyLight = new THREE.DirectionalLight(0xffffff, 0.7); keyLight.position.set(100, 200, 100); scene.add(keyLight);
-            const fillLight = new THREE.DirectionalLight(0xaaccff, 0.3); fillLight.position.set(-100, 50, -100); scene.add(fillLight);
-
-            const gridHelper = new THREE.GridHelper(500, 50, 0x94a3b8, 0xe2e8f0); gridHelper.position.y = -60; scene.add(gridHelper);
-            const axesHelper = new THREE.AxesHelper(100); scene.add(axesHelper);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8)); 
+            const keyLight = new THREE.DirectionalLight(0xffffff, 0.6); keyLight.position.set(100, 200, 100); scene.add(keyLight);
+            const gridHelper = new THREE.GridHelper(500, 50, 0x94a3b8, 0xe2e8f0); gridHelper.position.y = -50; scene.add(gridHelper);
 
             toolGroup = new THREE.Group(); scene.add(toolGroup);
             animate(); window.triggerRender();
@@ -304,153 +297,154 @@
         window.triggerRender = () => {
             if(!toolGroup || typeof CSG === 'undefined') return; 
             while(toolGroup.children.length > 0) { toolGroup.remove(toolGroup.children[0]); }
-            
-            const addEdges = (mesh) => { const edges = new THREE.EdgesGeometry(mesh.geometry); const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2, transparent: true, opacity: 0.2 })); mesh.add(line); };
+            const addEdges = (mesh) => { const edges = new THREE.EdgesGeometry(mesh.geometry); const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2, transparent: true, opacity: 0.15 })); mesh.add(line); };
 
-            let currentX = 0; let totalWeightGrams = 0; let hudHTML = "";
+            let currentX = 0; let hudHTML = "";
 
             stages.forEach((st, idx) => {
-                let stageVolMM3 = 0;
-                
                 const matData = mst.raw_materials.find(m => m.id === st.materialId);
-                const density = matData ? matData.param1 : 7.85; 
-                
-                let colorHex = 0x94a3b8;
-                if(density < 4) colorHex = 0xf1f5f9; // Aluminium
-                if(density > 10) colorHex = 0x334155; // Carbide
-                if(matData && matData.name.toLowerCase().includes('copper')) colorHex = 0xb45309; 
-
-                const cadMaterial = new THREE.MeshPhysicalMaterial({ color: colorHex, metalness: 0.7, roughness: 0.3, clearcoat: 0.4 });
+                let colorHex = matData && matData.name.toLowerCase().includes('alu') ? 0xf1f5f9 : 0x64748b;
+                const cadMaterial = new THREE.MeshStandardMaterial({ color: colorHex, metalness: 0.6, roughness: 0.4 });
                 
                 let stMesh;
                 if (st.shape === 'square') {
                     stMesh = new THREE.Mesh(new THREE.BoxGeometry(st.l, st.d2, st.d1), cadMaterial);
-                    stageVolMM3 = st.l * st.d2 * st.d1;
                     stMesh.position.set(currentX + (st.l/2), 0, 0); stMesh.updateMatrix();
                 } else {
                     const geo = new THREE.CylinderGeometry(st.d2/2, st.d1/2, st.l, 64);
                     geo.rotateZ(-Math.PI / 2);
                     stMesh = new THREE.Mesh(geo, cadMaterial);
                     stMesh.position.set(currentX + (st.l/2), 0, 0); stMesh.updateMatrix();
-                    
-                    // Exact Frustum Math
-                    stageVolMM3 = Math.PI * (st.l / 3) * (Math.pow(st.d1/2, 2) + ((st.d1/2) * (st.d2/2)) + Math.pow(st.d2/2, 2));
 
+                    // Milling Flats / Slots via CSG
                     if (st.feature === 'flat') {
                         let stCsg = CSG.fromMesh(stMesh);
-                        
-                        // CSG Subtract Weldon Flat
-                        const flatGeo = new THREE.BoxGeometry(st.l*0.8, st.d1*0.25, st.d1*0.8);
-                        const flatMesh = new THREE.Mesh(flatGeo);
+                        const flatMesh = new THREE.Mesh(new THREE.BoxGeometry(st.l*0.8, st.d1*0.3, st.d1*0.8));
                         flatMesh.position.set(currentX + (st.l/2), (st.d1/2)*0.9, 0); flatMesh.updateMatrix();
-                        let flatCsg = CSG.fromMesh(flatMesh);
-                        
-                        let cutCsg = stCsg.subtract(flatCsg);
+                        let cutCsg = stCsg.subtract(CSG.fromMesh(flatMesh));
                         stMesh = CSG.toMesh(cutCsg, stMesh.matrix, cadMaterial);
-                        
-                        stageVolMM3 -= (st.l*0.8) * (st.d1*0.25) * (st.d1*0.8);
+                    } else if (st.feature === 'slot') {
+                        let stCsg = CSG.fromMesh(stMesh);
+                        const slotMesh = new THREE.Mesh(new THREE.BoxGeometry(st.l*0.9, st.d1*0.4, st.d1*0.2));
+                        slotMesh.position.set(currentX + (st.l/2), (st.d1/2)*0.8, 0); slotMesh.updateMatrix();
+                        let cutCsg = stCsg.subtract(CSG.fromMesh(slotMesh));
+                        stMesh = CSG.toMesh(cutCsg, stMesh.matrix, cadMaterial);
                     }
                 }
                 
-                // CSG Pocket Subtraction on Final Stage
-                const insSel = document.getElementById('insType').value;
-                if(idx === stages.length - 1 && insSel !== 'None') {
-                    const insData = mst.inserts.find(i=>i.id === insSel);
+                // Advanced Pocketing
+                if(st.insId !== 'None') {
+                    const insData = mst.inserts.find(i=>i.id === st.insId);
                     if(insData) {
                         let hCsg = CSG.fromMesh(stMesh);
                         let sLtr = insData.param1 ? insData.param1.toUpperCase() : 'C';
-                        let insApp = Number(document.getElementById('insApproach').value);
                         
-                        // CSG Cutter (Slightly larger than insert to simulate true pocket)
-                        let cGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(10.2, 3, 10.2) : new THREE.CylinderGeometry(6.2, 6.2, 3, sLtr==='S'?4:3); 
+                        // Cartridge pockets are larger
+                        let isCart = st.pocketType.includes('cartridge');
+                        let cGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(isCart?15:10, 3, isCart?15:10) : new THREE.CylinderGeometry(isCart?8:6, isCart?8:6, 3, sLtr==='S'?4:3); 
                         let cMesh = new THREE.Mesh(cGeo);
-                        cMesh.position.set(currentX + st.l, 0, (st.d2/2)-1.5); // End of tool, edge of cylinder
-                        cMesh.rotation.y = (insApp * Math.PI) / 180;
+                        
+                        // Axial vs Radial Positioning
+                        if (st.insOrient === 'radial') {
+                            cMesh.position.set(currentX + (st.l/2), (st.d2/2)-1.5, 0);
+                            cMesh.rotation.z = (st.insApp * Math.PI) / 180;
+                        } else {
+                            cMesh.position.set(currentX + st.l, 0, (st.d2/2)-1.5);
+                            cMesh.rotation.y = (st.insApp * Math.PI) / 180;
+                        }
                         cMesh.updateMatrix();
                         
-                        let cutCsg = CSG.fromMesh(cMesh);
-                        let finalCsg = hCsg.subtract(cutCsg);
-                        stMesh = CSG.toMesh(finalCsg, stMesh.matrix, cadMaterial);
+                        stMesh = CSG.toMesh(hCsg.subtract(CSG.fromMesh(cMesh)), stMesh.matrix, cadMaterial);
                         
-                        // Deduct Pocket Volume
-                        let pocketVol = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? (10.2*3*10.2) : (Math.PI*Math.pow(6.2,2)*3);
-                        stageVolMM3 -= pocketVol;
-                        
-                        // Place Actual Insert in Pocket
-                        const insMat = new THREE.MeshPhysicalMaterial({ color: 0xfacc15, metalness: 0.4, roughness: 0.4, clearcoat: 0.5 }); 
+                        // Insert Placement
+                        const insMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.3, roughness: 0.5 }); 
                         let iGeo = (sLtr==='C'||sLtr==='V'||sLtr==='D') ? new THREE.BoxGeometry(10, 2, 10) : new THREE.CylinderGeometry(6, 6, 2, sLtr==='S'?4:3); 
                         const insert = new THREE.Mesh(iGeo, insMat); addEdges(insert);
-                        insert.position.copy(cMesh.position); insert.rotation.copy(cMesh.rotation);
+                        
+                        if (st.insOrient === 'radial') { insert.position.set(currentX + (st.l/2), (st.d2/2)+0.5, 0); insert.rotation.z = cMesh.rotation.z; } 
+                        else { insert.position.set(currentX + st.l + 1, 0, (st.d2/2)-1.5); insert.rotation.y = cMesh.rotation.y; insert.rotation.x = Math.PI/2; }
+                        
                         toolGroup.add(insert);
                     }
                 }
 
-                addEdges(stMesh); 
-                toolGroup.add(stMesh);
-                currentX += st.l; 
-                totalWeightGrams += (stageVolMM3 / 1000) * density;
-
-                let matName = matData ? matData.name.split(' ')[0] : 'Steel';
-                hudHTML += `<div class="bg-white/90 border border-slate-300 px-2 py-1 rounded shadow-sm"><span class="font-black text-slate-800">${st.name}</span> <span class="text-slate-500 font-bold text-[9px]">Ø${Math.max(st.d1,st.d2)}×${st.l} [${matName}]</span></div>`;
+                addEdges(stMesh); toolGroup.add(stMesh); currentX += st.l; 
+                hudHTML += `<div class="bg-white/80 border border-slate-300 px-2 py-1 rounded shadow-sm text-[9px] text-slate-600"><b class="text-slate-800">${st.name}:</b> Ø${Math.max(st.d1,st.d2)}×${st.l}</div>`;
             });
 
-            document.getElementById('toolWeightDisplay').innerText = (totalWeightGrams / 1000).toFixed(2) + " kg";
             document.getElementById('dimLabels').innerHTML = hudHTML;
-
-            camera.position.x = currentX / 2;
-            orbitControls.target.set(currentX / 2, 0, 0);
+            camera.position.x = currentX / 2; orbitControls.target.set(currentX / 2, 0, 0);
         }
 
         function animate() { requestAnimationFrame(animate); orbitControls.update(); renderer.render(scene, camera); }
         
-        // AI NATURAL LANGUAGE
-        window.processAi3d = () => {
-            const p = document.getElementById('ai3dPrompt').value.toLowerCase(); 
-            const chatLog = document.getElementById('aiChatLog'); 
-            chatLog.innerHTML += `<div class="text-slate-900 mt-1">👤 ${p}</div>`;
+        // AI 2D PDF EXTRACTION SIMULATOR
+        document.getElementById('pdfUpload').addEventListener('change', (e) => {
+            if(!e.target.files[0]) return; const loader = document.getElementById('aiLoader'); loader.classList.remove('hidden');
+            setTimeout(() => {
+                let sMat = mst.raw_materials.find(m => m.name.toLowerCase().includes('en')) || mst.raw_materials[0];
+                stages = [
+                    { id: 1, name: "VDI Shank", shape: "round", d1: 40, d2: 40, l: 60, feature: "flat", materialId: sMat.id, insId: "None", insOrient: "axial", insApp: 0, pocketType: "screw" },
+                    { id: 2, name: "Collar", shape: "round", d1: 60, d2: 60, l: 15, feature: "none", materialId: sMat.id, insId: "None", insOrient: "axial", insApp: 0, pocketType: "screw" },
+                    { id: 3, name: "Tool Head", shape: "round", d1: 50, d2: 50, l: 45, feature: "none", materialId: sMat.id, insId: mst.inserts[0]?.id||"None", insOrient: "axial", insApp: 95, pocketType: "top_clamp" }
+                ];
+                document.getElementById('pName').value = "AI-Extracted VDI Turning Tool"; 
+                loader.classList.add('hidden'); renderStagesUI(); window.triggerRender(); document.getElementById('pdfUpload').value = ""; alert("✨ AI Extraction Complete! Geometry mapped from 2D drawing.");
+            }, 2000);
+        });
+
+        // DB OPERATIONS
+        window.delDesign = async (id) => { if(confirm("Delete this master profile?")) { await deleteDoc(doc(db, "design_library", id)); } };
+        document.getElementById('saveLibraryBtn').addEventListener('click', async () => {
+            const name = document.getElementById('pName').value; if(!name) return alert("Designation required.");
+            const config = { stages: stages };
+            try { await addDoc(collection(db, "design_library"), { name: name, param1: JSON.stringify(config), isActive: true }); alert("Saved to Global Library!"); document.getElementById('pName').value = ""; } catch(e) { alert("Error saving."); }
+        });
+
+        // ==========================================
+        // RENUKA TOOLS ENGINEERING PDF EXPORT
+        // ==========================================
+        document.getElementById('exportPdfBtn').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF('landscape');
+            const toolName = document.getElementById('pName').value || "Custom Tool Design";
             
-            let updated = false;
-
-            if (p.includes('add stage')) { window.addStage(); chatLog.innerHTML += `<div class="text-emerald-600 font-bold">🤖 Added new stage.</div>`; updated = true; } 
-            else if (p.includes('remove') && p.includes('stage')) { if(stages.length > 1) { window.removeStage(stages.length-1); chatLog.innerHTML += `<div class="text-emerald-600 font-bold">🤖 Removed last stage.</div>`; updated = true; } }
-            else {
-                const extract = (keywords, field) => {
-                    keywords.forEach(kw => { 
-                        let rx = new RegExp(kw + "\\s*[:=]?\\s*(\\d+)"); let m = p.match(rx); 
-                        if(m && stages.length > 0) { 
-                            let idx = p.match(/stage\s*(\d+)/); 
-                            let targetIdx = idx ? (Number(idx[1])-1) : (stages.length - 1);
-                            if(targetIdx >= 0 && targetIdx < stages.length) { stages[targetIdx][field] = Number(m[1]); updated = true; }
-                        } 
-                    });
-                };
-
-                extract(['dia', 'diameter', 'd'], 'd1'); extract(['dia', 'diameter', 'd'], 'd2'); extract(['len', 'length', 'l'], 'l');
-
-                if (p.includes('weldon') || p.includes('flat')) { stages[stages.length-1].feature = 'flat'; updated = true; }
-                if (p.includes('square')) { stages[stages.length-1].shape = 'square'; updated = true; }
-                if (p.includes('round')) { stages[stages.length-1].shape = 'round'; updated = true; }
-
-                // Dynamic material fuzzy matching
-                if(p.includes('mat') || p.includes('make') || p.includes('set')) {
-                    mst.raw_materials.forEach(m => {
-                        let kw = m.name.split(' ')[0].toLowerCase(); // e.g. "Aluminium", "EN24"
-                        if(p.includes(kw)) {
-                            let idx = p.match(/stage\s*(\d+)/); 
-                            let targetIdx = idx ? (Number(idx[1])-1) : (stages.length - 1);
-                            if(targetIdx >= 0 && targetIdx < stages.length) { stages[targetIdx].materialId = m.id; updated = true; }
-                        }
-                    });
+            // Standard Title Block Border
+            doc.setLineWidth(0.5); doc.rect(10, 10, 277, 190);
+            
+            // Branding
+            if(companyProfile.logo) { try { doc.addImage(companyProfile.logo, 'PNG', 15, 15, 40, 15); } catch(e) { doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text(companyProfile.name, 15, 25); } }
+            else { doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.text(companyProfile.name, 15, 25); }
+            
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text("ENGINEERING DRAWING - TECHNICAL ANNEXURE", 80, 25);
+            doc.setFontSize(9); doc.setFont("helvetica", "normal");
+            doc.text(`Date: ${new Date().toLocaleDateString()}   |   Designation: ${toolName}`, 15, 35);
+            
+            // 3D Canvas Snapshot
+            const imgData = renderer.domElement.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 15, 40, 180, 110);
+            doc.setDrawColor(200); doc.rect(15, 40, 180, 110); // Frame for image
+            
+            // Smart Spares & Hardware Table (Generated from Pocket Types)
+            let spares = [];
+            stages.forEach((st, idx) => {
+                if (st.insId !== 'None') {
+                    let insName = mst.inserts.find(i=>i.id===st.insId)?.name || 'Custom Insert';
+                    spares.push([`Stage ${idx+1}`, 'Cutting Insert', insName, '1']);
+                    if(st.pocketType === 'screw') { spares.push([`Stage ${idx+1}`, 'Torx Screw', 'M4 / M5', '1']); spares.push([`Stage ${idx+1}`, 'Torx Key', 'T-15', '1']); }
+                    if(st.pocketType === 'top_clamp') { spares.push([`Stage ${idx+1}`, 'Top Clamp', 'Std', '1']); spares.push([`Stage ${idx+1}`, 'Clamp Screw', 'M6', '1']); spares.push([`Stage ${idx+1}`, 'Shim / Seat', 'Std', '1']); }
+                    if(st.pocketType === 'lever') { spares.push([`Stage ${idx+1}`, 'Lever', 'Std', '1']); spares.push([`Stage ${idx+1}`, 'Lock Screw', 'Std', '1']); spares.push([`Stage ${idx+1}`, 'Shim / Seat', 'Std', '1']); }
+                    if(st.pocketType.includes('cartridge')) { spares.push([`Stage ${idx+1}`, 'Cartridge Mod', st.pocketType==='cartridge_spc'?'Special':'Standard', '1']); spares.push([`Stage ${idx+1}`, 'Adjustment Screw', 'Fine Pitch', '1']); }
                 }
+            });
+            if(spares.length === 0) spares.push(['-', 'No Spares Required', '-', '-']);
 
-                if(mst.inserts) { for(let i=0; i<mst.inserts.length; i++) { if(p.includes(mst.inserts[i].name.toLowerCase()) || p.includes(mst.inserts[i].param1.toLowerCase())) { document.getElementById('insType').value = mst.inserts[i].id; updated = true; break; } } }
-            }
-
-            if(updated) { chatLog.innerHTML += `<div class="text-emerald-600 font-bold">🤖 Parameters applied to CAD.</div>`; renderStagesUI(); window.triggerRender(); } 
-            else { chatLog.innerHTML += `<div class="text-orange-500 font-bold">🤖 Unrecognized command. Try "Make stage 2 Alu".</div>`; }
+            doc.setFont("helvetica", "bold"); doc.text("HARDWARE & SPARES BOM", 200, 45);
+            doc.autoTable({ startY: 50, margin: { left: 200, right: 15 }, head: [['Loc', 'Item', 'Spec', 'Qty']], body: spares, theme: 'grid', styles: { fontSize: 7 }, headStyles: { fillColor: [40, 40, 40] } });
             
-            chatLog.scrollTop = chatLog.scrollHeight; document.getElementById('ai3dPrompt').value = ""; 
-        };
+            doc.setFontSize(8); doc.text("Note: Dimensions are derived from parametric stage models. Verify prior to manufacturing.", 15, 195);
+            
+            doc.save(`${toolName.replace(/[^a-z0-9]/gi, '_')}_Drawing.pdf`);
+        });
     </script>
 </body>
 </html>

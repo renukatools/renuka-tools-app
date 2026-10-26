@@ -37,10 +37,10 @@
             <button class="lg:hidden text-gray-400 hover:text-white font-bold text-xl" onclick="toggleSidebar()">✕</button>
         </div>
         <div class="flex-1 overflow-y-auto custom-scrollbar py-4">
-            <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Raw Material Costs</p></div>
-            <div id="nav-mfg" class="space-y-1 mb-4"></div>
-            <div class="px-4 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Trading & Spares</p></div>
-            <div id="nav-com" class="space-y-1 mb-4"></div>
+            <div class="px-4 mb-2"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Quote-Level (Global)</p></div>
+            <div id="nav-quote" class="space-y-1 mb-4"></div>
+            <div class="px-4 mb-2 border-t border-gray-800 pt-4"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Component-Level (Loop)</p></div>
+            <div id="nav-comp" class="space-y-1 mb-4"></div>
         </div>
         <div class="p-4 bg-gray-950 border-t border-gray-800 space-y-2">
             <div class="text-xs text-gray-500 mb-2 truncate border-b border-gray-800 pb-2" id="userBadge"></div>
@@ -81,9 +81,9 @@
             <input type="hidden" id="activeCollection"><input type="hidden" id="activeDocId">
             <div class="space-y-4">
                 <div id="grp1"><label id="lbl1" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp1" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-bold text-gray-800 transition"></div>
-                <div class="hidden" id="grp2"><label id="lbl2" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp2" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold transition"></div>
-                <div class="hidden" id="grp3"><label id="lbl3" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp3" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold transition"></div>
-                <div class="hidden" id="grp4"><label id="lbl4" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="text" id="inp4" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold transition"></div>
+                <div class="hidden" id="grp2"><label id="lbl2" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="number" min="0" oninput="validity.valid||(value='');" id="inp2" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold transition"><input type="text" id="inp2_text" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold"></div>
+                <div class="hidden" id="grp3"><label id="lbl3" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="number" min="0" oninput="validity.valid||(value='');" id="inp3" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold transition"><input type="text" id="inp3_text" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold"></div>
+                <div class="hidden" id="grp4"><label id="lbl4" class="block text-[10px] font-bold mb-1 text-gray-500 uppercase tracking-wide"></label><input type="number" min="0" oninput="validity.valid||(value='');" id="inp4" class="w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold transition"><input type="text" id="inp4_text" class="hidden w-full border-2 border-gray-200 p-2.5 rounded-lg focus:border-emerald-500 outline-none text-sm font-semibold"></div>
             </div>
             <div class="flex justify-end space-x-3 border-t mt-6 pt-4">
                 <button id="cancelModalBtn" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-bold transition">Cancel</button>
@@ -102,8 +102,8 @@
                 <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Master Title</label><input type="text" id="schTitle" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm focus:border-emerald-500 outline-none font-bold transition" placeholder="e.g. PVD Coating Costs"></div>
                 
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Module Category</label><select id="schCat" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm font-bold text-slate-700 focus:border-emerald-500 outline-none transition"><option value="mfg">Manufacturing Cost (BOM)</option><option value="com">Commercial / Trading Cost</option></select></div>
-                    <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Calculation Behavior</label><select id="schBehavior" class="w-full border-2 border-gray-200 p-2.5 rounded-lg bg-emerald-50 text-emerald-900 text-sm font-bold focus:border-emerald-500 outline-none transition"><option value="flat">Flat Cost Adder (₹)</option><option value="variable">Variable Cost Adder (₹ × Qty)</option><option value="percentage">MRP Percentage Adder (%)</option><option value="lookup">Standalone Lookup</option></select></div>
+                    <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Module Category</label><select id="schCat" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm font-bold text-slate-700 focus:border-emerald-500 outline-none transition bg-emerald-50"><option value="component_level">Component-Level (BOM Loop)</option><option value="quote_level">Quote-Level (Global)</option></select></div>
+                    <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Calculation Behavior</label><select id="schBehavior" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm font-bold focus:border-emerald-500 outline-none transition"><option value="flat">Flat Cost Adder (₹)</option><option value="variable">Variable Cost Adder (₹ × Qty)</option><option value="percentage">MRP Percentage Adder (%)</option><option value="lookup">Standalone Lookup</option></select></div>
                 </div>
 
                 <div><label class="block text-[10px] font-bold mb-1 uppercase tracking-wide text-gray-500">Data Columns Needed</label><select id="schType" class="w-full border-2 border-gray-200 p-2.5 rounded-lg text-sm font-semibold focus:border-emerald-500 outline-none transition"><option value="1">1 Column</option><option value="2">2 Columns</option><option value="3">3 Columns</option><option value="4">4 Columns</option></select></div>
@@ -128,31 +128,22 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, setDoc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // VIP FIREBASE KEYS
         const firebaseConfig = { apiKey: "AIzaSyAYOA07Rta4_vXODvdoC1zIIeM4tRv5Jgs", authDomain: "renuka-tools-quote.firebaseapp.com", databaseURL: "https://renuka-tools-quote-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "renuka-tools-quote", storageBucket: "renuka-tools-quote.firebasestorage.app", messagingSenderId: "300959855269", appId: "1:300959855269:web:d8d19e979ac3616b10934c" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
-        const ADMIN_EMAILS = ["anandmulay@renukatools.in", "renukatools.rt@gmail.com"]; 
         
-        // STRICT BANNED LIST (Purchase team CANNOT see these modules)
-        const BANNED_SCHEMAS = ['roles', 'users', 'customers', 'customer_tiers', 'tool_categories', 'payment_terms', 'inco_terms'];
+        // Strict Banned List (Purchase team CANNOT see CRM/Core structural modules)
+        const BANNED_SCHEMAS = ['roles', 'users', 'customers', 'customer_tiers', 'payment_terms', 'inco_terms'];
 
         let appSchemas = []; let mst = {}; let currentTabId = "raw_materials"; let pendingImportCollection = "";
         let unsubSchemas = null; let unsubTable = null;
 
-        window.toggleSidebar = () => {
-            const sb = document.getElementById('sidebar'); const overlay = document.getElementById('mobileOverlay');
-            if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } 
-            else { sb.classList.add('-translate-x-full'); overlay.classList.add('hidden'); }
-        };
+        window.toggleSidebar = () => { const sb = document.getElementById('sidebar'); const overlay = document.getElementById('mobileOverlay'); if(sb.classList.contains('-translate-x-full')) { sb.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); } else { sb.classList.add('-translate-x-full'); overlay.classList.add('hidden'); } };
 
         onAuthStateChanged(auth, (user) => { 
             if (user) { 
-                document.getElementById('loginScreen').classList.add('hidden'); 
-                document.getElementById('userBadge').innerText = user.email;
-                setupRealTimeSync(); 
+                document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('userBadge').innerText = user.email; setupRealTimeSync(); 
             } else { 
-                document.getElementById('loginScreen').classList.remove('hidden'); 
-                if(unsubSchemas) unsubSchemas(); if(unsubTable) unsubTable();
+                document.getElementById('loginScreen').classList.remove('hidden'); if(unsubSchemas) unsubSchemas(); if(unsubTable) unsubTable();
             } 
         });
 
@@ -162,29 +153,24 @@
         });
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // REAL-TIME SYNC ENGINE
         function setupRealTimeSync() {
             if(unsubSchemas) unsubSchemas();
             unsubSchemas = onSnapshot(collection(db, "system_schemas"), (snap) => {
                 appSchemas = [];
                 snap.forEach(doc => { 
                     const data = doc.data();
-                    // Dynamic Fencing: Only allow Cost/MFG schemas that are active
-                    if(!BANNED_SCHEMAS.includes(data.id) && data.isActive !== false) {
-                        appSchemas.push(data); 
-                    }
+                    if(!BANNED_SCHEMAS.includes(data.id) && data.isActive !== false) { appSchemas.push(data); }
                 });
                 renderSidebar();
-                
                 if(!currentTabId && appSchemas.length > 0) currentTabId = appSchemas[0].id;
                 if(currentTabId) mountTableListener(currentTabId);
             });
         }
 
         function renderSidebar() {
-            document.getElementById('nav-mfg').innerHTML = ""; document.getElementById('nav-com').innerHTML = "";
+            document.getElementById('nav-quote').innerHTML = ""; document.getElementById('nav-comp').innerHTML = "";
             appSchemas.forEach(sch => {
-                const targetDiv = sch.category === 'mfg' ? 'nav-mfg' : 'nav-com';
+                const targetDiv = sch.category === 'quote_level' ? 'nav-quote' : 'nav-comp';
                 const btn = document.createElement('button'); 
                 btn.className = `w-full text-left px-4 py-2 sm:px-6 sm:py-2 text-xs sm:text-sm font-bold transition-all hover:bg-slate-800 rounded-lg mb-1 ${sch.id === currentTabId ? 'active-nav' : 'text-slate-400'}`; 
                 btn.innerText = sch.title;
@@ -193,7 +179,7 @@
                     if(window.innerWidth < 1024) toggleSidebar();
                     renderSidebar(); mountTableListener(sch.id); 
                 };
-                if(document.getElementById(targetDiv)) document.getElementById(targetDiv).appendChild(btn); else document.getElementById('nav-mfg').appendChild(btn);
+                if(document.getElementById(targetDiv)) document.getElementById(targetDiv).appendChild(btn); else document.getElementById('nav-comp').appendChild(btn);
             });
         }
 
@@ -236,29 +222,35 @@
             const sch = appSchemas.find(s => s.id === schemaId); let eData = {}; if (docId) eData = mst[schemaId].find(x => x.id === docId) || {};
             document.getElementById('modalTitle').innerText = docId ? `Edit ${sch.title}` : `New ${sch.title}`; document.getElementById('activeCollection').value = sch.id; document.getElementById('activeDocId').value = docId;
             [2,3,4].forEach(n => document.getElementById(`grp${n}`).classList.add('hidden')); 
-            document.getElementById('inp1').value = eData.name || ""; document.getElementById('inp2').value = eData.param1 || ""; document.getElementById('inp3').value = eData.param2 || ""; document.getElementById('inp4').value = eData.param3 || ""; document.getElementById('isActive').checked = eData.isActive !== false;
-            document.getElementById('lbl1').innerText = sch.cols[0]; if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; } if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; } if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; }
+            const showInp = (id, isText) => { document.getElementById(id).classList.toggle('hidden', isText); document.getElementById(id+'_text').classList.toggle('hidden', !isText); };
+            
+            const isTextType = (sch.id === 'inserts' || sch.behavior === 'lookup');
+
+            document.getElementById('inp1').value = eData.name || ""; document.getElementById('isActive').checked = eData.isActive !== false;
+            document.getElementById('lbl1').innerText = sch.cols[0]; 
+            
+            if(sch.params >= 2) { document.getElementById('grp2').classList.remove('hidden'); document.getElementById('lbl2').innerText = sch.cols[1]; showInp('inp2', isTextType); if(isTextType) document.getElementById('inp2_text').value = eData.param1||""; else document.getElementById('inp2').value = eData.param1||""; } 
+            if(sch.params >= 3) { document.getElementById('grp3').classList.remove('hidden'); document.getElementById('lbl3').innerText = sch.cols[2]; showInp('inp3', isTextType); if(isTextType) document.getElementById('inp3_text').value = eData.param2||""; else document.getElementById('inp3').value = eData.param2||""; } 
+            if(sch.params >= 4) { document.getElementById('grp4').classList.remove('hidden'); document.getElementById('lbl4').innerText = sch.cols[3]; showInp('inp4', isTextType); if(isTextType) document.getElementById('inp4_text').value = eData.param3||""; else document.getElementById('inp4').value = eData.param3||""; }
+            
             document.getElementById('dataModal').classList.remove('hidden');
         };
 
         document.getElementById('cancelModalBtn').addEventListener('click', () => document.getElementById('dataModal').classList.add('hidden'));
         document.getElementById('saveDataBtn').addEventListener('click', async () => {
             const col = document.getElementById('activeCollection').value; const id = document.getElementById('activeDocId').value; const sch = appSchemas.find(s => s.id === col);
+            const isText = (col === 'inserts' || sch.behavior === 'lookup');
             const dataObj = { name: document.getElementById('inp1').value, isActive: document.getElementById('isActive').checked }; 
             
-            if (sch.params >= 2) dataObj.param1 = col === 'inserts' ? document.getElementById('inp2').value : Number(document.getElementById('inp2').value);
-            if (sch.params >= 3) dataObj.param2 = Number(document.getElementById('inp3').value);
-            if (sch.params >= 4) dataObj.param3 = Number(document.getElementById('inp4').value);
+            if (sch.params >= 2) dataObj.param1 = isText ? document.getElementById('inp2_text').value : Number(document.getElementById('inp2').value);
+            if (sch.params >= 3) dataObj.param2 = isText ? document.getElementById('inp3_text').value : Number(document.getElementById('inp3').value);
+            if (sch.params >= 4) dataObj.param3 = isText ? document.getElementById('inp4_text').value : Number(document.getElementById('inp4').value);
             
-            try { 
-                if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); 
-                document.getElementById('dataModal').classList.add('hidden'); 
-            } catch (err) { alert("Error saving data."); }
+            try { if (id) await updateDoc(doc(db, col, id), dataObj); else await addDoc(collection(db, col), dataObj); document.getElementById('dataModal').classList.add('hidden'); } catch (err) { alert("Error saving data."); }
         });
 
         window.deleteItem = async (col, id) => { if(confirm("Permanently delete? Warning: Will affect Historic Quotes.")) { await deleteDoc(doc(db, col, id)); } };
 
-        // PURCHASE TEAM: DECENTRALIZED MASTER CREATION (Fixed Category Trap)
         document.getElementById('schemaBuilderBtn').addEventListener('click', () => { document.getElementById('schemaModal').classList.remove('hidden'); if(window.innerWidth < 1024) toggleSidebar(); }); 
         document.getElementById('cancelSchemaBtn').addEventListener('click', () => document.getElementById('schemaModal').classList.add('hidden')); 
         document.getElementById('schType').addEventListener('change', (e) => { const val = Number(e.target.value); document.getElementById('schCol2Grp').classList.toggle('hidden', val < 2); document.getElementById('schCol3Grp').classList.toggle('hidden', val < 3); document.getElementById('schCol4Grp').classList.toggle('hidden', val < 4); });
@@ -266,19 +258,10 @@
         document.getElementById('saveSchemaBtn').addEventListener('click', async () => { 
             const title = document.getElementById('schTitle').value; if(!title) return alert("Title required"); 
             const id = title.toLowerCase().replace(/[^a-z0-9]/g, '_'); 
-            
-            // Purchase Team explicitly chooses Mfg or Commercial category
-            const category = document.getElementById('schCat').value;
-            const behavior = document.getElementById('schBehavior').value; 
-            const params = Number(document.getElementById('schType').value); 
-            let cols = [document.getElementById('schCol1').value]; 
-            if(params >= 2) cols.push(document.getElementById('schCol2').value); 
-            if(params >= 3) cols.push(document.getElementById('schCol3').value); 
-            if(params >= 4) cols.push(document.getElementById('schCol4').value); 
-            
+            const category = document.getElementById('schCat').value; const behavior = document.getElementById('schBehavior').value; const params = Number(document.getElementById('schType').value); 
+            let cols = [document.getElementById('schCol1').value]; if(params >= 2) cols.push(document.getElementById('schCol2').value); if(params >= 3) cols.push(document.getElementById('schCol3').value); if(params >= 4) cols.push(document.getElementById('schCol4').value); 
             await setDoc(doc(db, "system_schemas", id), { id, title, params, cols, behavior, category: category, isActive: true }); 
-            document.getElementById('schemaModal').classList.add('hidden'); 
-            alert(`New Costing Master "${title}" deployed successfully! It is now live in the Sales Engine.`);
+            document.getElementById('schemaModal').classList.add('hidden'); alert(`New Master "${title}" deployed successfully!`);
         });
 
         // EXCEL IMPORTS
@@ -288,11 +271,12 @@
             const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); 
             reader.onload = async (event) => { 
                 const workbook = XLSX.read(new Uint8Array(event.target.result), {type: 'array'}); const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]); const sch = appSchemas.find(s => s.id === pendingImportCollection); let count = 0; const b = writeBatch(db);
+                const isText = (pendingImportCollection === 'inserts' || sch.behavior === 'lookup');
                 for(let row of jsonData) { 
                     const dataObj = { name: String(row[sch.cols[0]] || "Unnamed"), isActive: true }; 
-                    if(sch.params >= 2) dataObj.param1 = pendingImportCollection === 'inserts' ? String(row[sch.cols[1]]||"") : Number(row[sch.cols[1]] || 0); 
-                    if(sch.params >= 3) dataObj.param2 = Number(row[sch.cols[2]] || 0); 
-                    if(sch.params >= 4) dataObj.param3 = Number(row[sch.cols[3]] || 0); 
+                    if(sch.params >= 2) dataObj.param1 = isText ? String(row[sch.cols[1]]||"") : Number(row[sch.cols[1]] || 0); 
+                    if(sch.params >= 3) dataObj.param2 = isText ? String(row[sch.cols[2]]||"") : Number(row[sch.cols[2]] || 0); 
+                    if(sch.params >= 4) dataObj.param3 = isText ? String(row[sch.cols[3]]||"") : Number(row[sch.cols[3]] || 0); 
                     b.set(doc(collection(db, pendingImportCollection)), dataObj); count++; 
                 } 
                 await b.commit();
